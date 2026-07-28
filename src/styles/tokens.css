@@ -1,0 +1,75 @@
+:root {
+  color-scheme: dark;
+
+  /* Color */
+  --color-background: #262d38;
+  --color-surface: #131722;
+  --color-surface-raised: #11151f;
+  --color-surface-inset: #0b0e14;
+  --color-surface-interactive: rgb(255 255 255 / 5%);
+  --color-surface-interactive-hover: rgb(255 255 255 / 10%);
+  --color-surface-interactive-active: rgb(255 255 255 / 15%);
+  --color-text: rgb(204 208 220);
+  --color-text-muted: rgb(117 134 150);
+  --color-text-accent: rgb(173 155 227);
+  --color-positive: rgb(118 209 170);
+  --color-negative: rgb(173 155 227);
+  --color-border: var(--color-background);
+  --color-border-subtle: rgb(255 255 255 / 10%);
+  --color-border-strong: rgb(255 255 255 / 20%);
+  --color-focus: var(--color-positive);
+  --color-chart-axis: var(--color-text);
+  --color-chart-candlestick: var(--color-text-accent);
+  --color-chart-candlestick-up: var(--color-positive);
+  --color-chart-bid: var(--color-positive);
+  --color-chart-ask: var(--color-negative);
+  --color-chart-grid-line: var(--color-surface-interactive);
+  --color-footprint-buy: var(--color-positive);
+  --color-footprint-sell: var(--color-negative);
+  --color-footprint-poc: var(--color-text);
+  --color-footprint-imbalance: var(--color-text-accent);
+  --chart-volume-opacity: 0.5;
+  --chart-depth-area-opacity: 0.1;
+  --chart-depth-fill-opacity: 0.5;
+
+  /* Typography */
+  --font-family-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+  --font-size-xs: 0.6875rem;
+  --font-size-sm: 0.75rem;
+  --font-size-md: 0.875rem;
+  --font-size-lg: 1rem;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Application layout */
+  --layout-grid-gap: var(--space-1);
+  --layout-sidebar-width: 18.75rem;
+  --layout-topbar-height: 4.5rem;
+  --layout-footer-height: 4rem;
+  --layout-market-panel-width: 31.25rem;
+  --layout-settings-panel-width: 18.75rem;
+
+  /* Shape, elevation, motion and layers */
+  --border-width: 1px;
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --shadow-panel: 0 0.5rem 1.5rem rgb(0 0 0 / 20%);
+  --shadow-overlay: 0 1rem 2rem rgb(0 0 0 / 35%);
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --easing-standard: ease-in-out;
+  --z-base: 0;
+  --z-raised: 1;
+  --z-overlay: 10;
+}

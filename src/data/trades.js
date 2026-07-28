@@ -213,5 +213,5 @@ export const trades = [
     time: '17:30:45',
     amount: 0.00198765,
     price: 24990
-  },
-];
+  }
+]

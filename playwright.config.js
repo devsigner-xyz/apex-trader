@@ -38,10 +38,7 @@ const config = {
     baseURL: 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-
-    /* Only on CI systems run the tests headless */
-    headless: !!process.env.CI
+    trace: 'on-first-retry'
   },
 
   /* Configure projects for major browsers */
@@ -99,13 +96,11 @@ const config = {
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    /**
-     * Use the dev server by default for faster feedback loop.
-     * Use the preview server on CI for more realistic testing.
-     */
-    command: process.env.CI ? 'vite preview --port 5173' : 'vite dev',
+    /* Pin the React Vite dev server to the configured base URL. */
+    command: 'npm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
     port: 5173,
-    reuseExistingServer: !process.env.CI
+    reuseExistingServer: !process.env.CI,
+    timeout: 30 * 1000
   }
 }
 

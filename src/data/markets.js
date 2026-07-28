@@ -50,5 +50,5 @@ export const markets = [
       change: -0.5
     },
     favorite: true
-  },
-];
+  }
+]
