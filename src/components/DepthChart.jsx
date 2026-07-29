@@ -111,7 +111,7 @@ export default function DepthChart({ asks, bids }) {
     )
     askChartRef.current = Highcharts.chart(
       askContainerRef.current,
-      depthChartOptions('Asks', colors.ask, false)
+      depthChartOptions('Asks', colors.ask, true)
     )
 
     return () => {
@@ -120,6 +120,18 @@ export default function DepthChart({ asks, bids }) {
       bidChartRef.current = null
       askChartRef.current = null
     }
+  }, [])
+
+  useEffect(() => {
+    if (!bidContainerRef.current || !askContainerRef.current) return undefined
+
+    const observer = new ResizeObserver(() => {
+      bidChartRef.current?.reflow()
+      askChartRef.current?.reflow()
+    })
+    observer.observe(bidContainerRef.current)
+    observer.observe(askContainerRef.current)
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {

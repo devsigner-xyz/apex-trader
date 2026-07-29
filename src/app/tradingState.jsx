@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import { createContext, useContext, useMemo, useReducer } from 'react'
 import { markets } from '../data/markets.js'
-import { orderbook } from '../data/orderbook.js'
-import { trades } from '../data/trades.js'
+import { generateDemoMarketData } from '../services/demoOrderFlow.js'
 
 const AppStateContext = createContext(null)
 const AppDispatchContext = createContext(null)
@@ -10,6 +9,7 @@ const AppDispatchContext = createContext(null)
 const currencies = ['USD', 'EUR']
 const timeframe = 24
 const initialFavorites = markets.filter((market) => market.favorite).map((market) => market.ticker)
+const demoMarketData = generateDemoMarketData()
 
 export const tradingActionTypes = {
   closePanel: 'closePanel',
@@ -19,6 +19,7 @@ export const tradingActionTypes = {
   selectTab: 'selectTab',
   setBaseCurrency: 'setBaseCurrency',
   setChartMode: 'setChartMode',
+  setChartTimeframe: 'setChartTimeframe',
   toggleFavorite: 'toggleFavorite'
 }
 
@@ -28,6 +29,7 @@ function createInitialState() {
     asset: 'BTC',
     baseCurrency: 'USD',
     chartMode: 'price',
+    chartTimeframe: 5,
     favorites: initialFavorites,
     selectedPrice: null,
     selectedTab: 'buy'
@@ -50,6 +52,8 @@ export function tradingReducer(state, action) {
       return { ...state, baseCurrency: action.currency }
     case tradingActionTypes.setChartMode:
       return { ...state, chartMode: action.chartMode }
+    case tradingActionTypes.setChartTimeframe:
+      return { ...state, chartTimeframe: action.minutes }
     case tradingActionTypes.toggleFavorite:
       return {
         ...state,
@@ -109,6 +113,8 @@ export function useTradingActions() {
       setBaseCurrency: (currency) =>
         dispatch({ type: tradingActionTypes.setBaseCurrency, currency }),
       setChartMode: (chartMode) => dispatch({ type: tradingActionTypes.setChartMode, chartMode }),
+      setChartTimeframe: (minutes) =>
+        dispatch({ type: tradingActionTypes.setChartTimeframe, minutes }),
       toggleFavorite: (asset) => dispatch({ type: tradingActionTypes.toggleFavorite, asset })
     }),
     [dispatch]
@@ -128,9 +134,9 @@ export function useTradingViewModel() {
       currencies,
       market: selectActiveMarket(state),
       markets,
-      orderbook,
+      orderbook: demoMarketData.bookSnapshots.at(-1),
       timeframe,
-      trades
+      trades: demoMarketData.tape
     }),
     [state]
   )

@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.cache/tardis/
+data/raw/tardis/
 .DS_Store
 dist
 dist-ssr

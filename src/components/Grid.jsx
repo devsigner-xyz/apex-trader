@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import Chart from './Chart.jsx'
 import ChartModeToggle from './ChartModeToggle.jsx'
+import ChartTimeframeSelector from './ChartTimeframeSelector.jsx'
 import DepthChart from './DepthChart.jsx'
 import FootprintChart from './FootprintChart.jsx'
 import Operative from './Operative.jsx'
 import Orderbook from './Orderbook.jsx'
+import PlaybackControls from './PlaybackControls.jsx'
 import Topbar from './Topbar.jsx'
 import Trades from './Trades.jsx'
+import { getBarTimestampForExecution } from '../services/orderFlowAnalytics.js'
 
 const marketShape = PropTypes.shape({
   price: PropTypes.shape({
@@ -27,23 +31,53 @@ const tradeShape = PropTypes.shape({
 export default function Grid({
   appState,
   onChartModeChange,
+  onChartTimeframeChange,
   onOpenMarkets,
   onOpenSettings,
-  onOrderSubmit,
+  onPlaybackSpeedChange,
   onSelectPrice,
   onSelectTab
 }) {
   const {
     asset,
     baseCurrency,
+    barDurationMs,
+    candlesticks,
     chartMode,
+    chartTimeframe,
+    cvd,
+    cvdBars,
+    footprintBars,
     market,
     orderbook,
+    playbackSpeed,
+    playbackTimestamp,
+    profile,
     selectedPrice,
     selectedTab,
+    sessionDate,
+    sessionSymbol,
     timeframe,
-    trades
+    tickSize,
+    trades,
+    volumes
   } = appState
+  const [selectedExecution, setSelectedExecution] = useState(null)
+  const selectExecution = (execution) => {
+    if (!execution) return
+    setSelectedExecution({
+      barTimestamp: getBarTimestampForExecution(execution.timestamp, barDurationMs),
+      footprintPrice: Math.round(execution.price / tickSize) * tickSize,
+      price: execution.price,
+      side: execution.side
+    })
+    onSelectPrice(execution.price)
+  }
+  const selectFootprintCell = ({ barTimestamp, price }) => {
+    setSelectedExecution({ barTimestamp, footprintPrice: price, price })
+    onSelectPrice(price)
+  }
+  const selectCvdBar = (barTimestamp) => setSelectedExecution({ barTimestamp })
 
   return (
     <div className={`trading-grid ${chartMode === 'footprint' ? 'trading-grid--footprint' : ''}`}>
@@ -62,7 +96,6 @@ export default function Grid({
           asset={asset}
           counterpart={baseCurrency}
           onSelectTab={onSelectTab}
-          onSubmit={onOrderSubmit}
           selectedPrice={selectedPrice}
           selectedTab={selectedTab}
         />
@@ -82,19 +115,54 @@ export default function Grid({
           chartMode === 'footprint' ? 'grid-chart--footprint' : ''
         }`}
       >
-        <ChartModeToggle chartMode={chartMode} onChange={onChartModeChange} />
+        <div className="chart-toolbar">
+          <ChartModeToggle chartMode={chartMode} onChange={onChartModeChange} />
+          <ChartTimeframeSelector onChange={onChartTimeframeChange} value={chartTimeframe} />
+          <PlaybackControls
+            onSpeedChange={onPlaybackSpeedChange}
+            speed={playbackSpeed}
+            timestamp={playbackTimestamp}
+          />
+        </div>
         {chartMode === 'footprint' ? (
-          <FootprintChart baseCurrency={baseCurrency} />
+          <FootprintChart
+            asset={asset}
+            bars={footprintBars}
+            baseCurrency={baseCurrency}
+            cvd={cvd}
+            cvdBars={cvdBars}
+            onSelectBar={selectCvdBar}
+            onSelectExecution={selectFootprintCell}
+            profile={profile}
+            selectedExecution={selectedExecution}
+            sessionDate={sessionDate}
+            sessionSymbol={sessionSymbol}
+            tickSize={tickSize}
+          />
         ) : (
           <>
-            <Chart asset={asset} baseCurrency={baseCurrency} />
+            <Chart
+              candlesticks={candlesticks}
+              selectedPrice={selectedExecution?.price ?? selectedPrice}
+              timeframe={chartTimeframe}
+              sessionDate={sessionDate}
+              symbol={sessionSymbol}
+              volumes={volumes}
+            />
             <DepthChart asks={orderbook.asks} bids={orderbook.bids} />
           </>
         )}
       </section>
       <div className="grid-tabs grid-item" />
       <div className="grid-trades grid-item">
-        <Trades baseCurrency={baseCurrency} trades={trades} />
+        <Trades
+          barDurationMs={barDurationMs}
+          baseCurrency={baseCurrency}
+          onSelectExecution={selectExecution}
+          selectedExecution={selectedExecution}
+          tickSize={tickSize}
+          trades={trades}
+        />
       </div>
       <footer className="grid-footer ui-surface">
         <span>
@@ -112,18 +180,37 @@ Grid.propTypes = {
   appState: PropTypes.shape({
     asset: PropTypes.string.isRequired,
     baseCurrency: PropTypes.string.isRequired,
+    barDurationMs: PropTypes.number.isRequired,
+    candlesticks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
     chartMode: PropTypes.oneOf(['price', 'footprint']).isRequired,
+    chartTimeframe: PropTypes.oneOf([5, 15, 30, 60]).isRequired,
+    cvd: PropTypes.number.isRequired,
+    cvdBars: PropTypes.arrayOf(
+      PropTypes.shape({
+        delta: PropTypes.number.isRequired,
+        timestamp: PropTypes.number.isRequired
+      })
+    ).isRequired,
+    footprintBars: PropTypes.arrayOf(PropTypes.object).isRequired,
     market: marketShape.isRequired,
     orderbook: orderbookShape.isRequired,
+    playbackSpeed: PropTypes.number.isRequired,
+    playbackTimestamp: PropTypes.number.isRequired,
+    profile: PropTypes.object.isRequired,
     selectedPrice: PropTypes.number,
     selectedTab: PropTypes.oneOf(['buy', 'sell']).isRequired,
+    sessionDate: PropTypes.string.isRequired,
+    sessionSymbol: PropTypes.string.isRequired,
     timeframe: PropTypes.number.isRequired,
-    trades: PropTypes.arrayOf(tradeShape).isRequired
+    tickSize: PropTypes.number.isRequired,
+    trades: PropTypes.arrayOf(tradeShape).isRequired,
+    volumes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
   }).isRequired,
   onChartModeChange: PropTypes.func.isRequired,
+  onChartTimeframeChange: PropTypes.func.isRequired,
   onOpenMarkets: PropTypes.func.isRequired,
   onOpenSettings: PropTypes.func.isRequired,
-  onOrderSubmit: PropTypes.func.isRequired,
+  onPlaybackSpeedChange: PropTypes.func.isRequired,
   onSelectPrice: PropTypes.func.isRequired,
   onSelectTab: PropTypes.func.isRequired
 }
