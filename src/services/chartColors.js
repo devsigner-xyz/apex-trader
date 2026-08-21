@@ -10,6 +10,18 @@ function readCssToken(name, fallback) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
 }
 
+function readCssColor(name, fallback) {
+  const value = readCssToken(name, fallback)
+  if (typeof document === 'undefined' || !value.startsWith('var(')) return value
+
+  const probe = document.createElement('span')
+  probe.style.color = value
+  document.documentElement.append(probe)
+  const resolved = getComputedStyle(probe).color
+  probe.remove()
+  return resolved || fallback
+}
+
 function readCssNumber(name, fallback) {
   const value = Number.parseFloat(readCssToken(name, String(fallback)))
 
@@ -31,28 +43,28 @@ function withOpacity(color, opacity) {
 }
 
 export function getChartColors() {
-  const candlestick = readCssToken('--color-chart-candlestick', FALLBACK_COLORS.ask)
-  const bid = readCssToken('--color-chart-bid', FALLBACK_COLORS.bid)
-  const ask = readCssToken('--color-chart-ask', FALLBACK_COLORS.ask)
+  const candlestick = readCssColor('--color-chart-candlestick', FALLBACK_COLORS.ask)
+  const bid = readCssColor('--color-chart-bid', FALLBACK_COLORS.bid)
+  const ask = readCssColor('--color-chart-ask', FALLBACK_COLORS.ask)
 
   return {
     ask: {
       area: withOpacity(ask, readCssNumber('--chart-depth-area-opacity', 0.1)),
       line: ask
     },
-    axis: readCssToken('--color-chart-axis', FALLBACK_COLORS.axis),
+    axis: readCssColor('--color-chart-axis', FALLBACK_COLORS.axis),
     bid: {
       area: withOpacity(bid, readCssNumber('--chart-depth-area-opacity', 0.1)),
       line: bid
     },
-    border: readCssToken('--color-border', 'rgb(255 255 255 / 18%)'),
+    border: readCssColor('--color-border', 'rgb(255 255 255 / 18%)'),
     candlestick,
-    grid: readCssToken('--color-chart-grid-line', 'rgb(255 255 255 / 8%)'),
-    surface: readCssToken('--color-surface-raised', '#292929'),
-    upCandlestick: readCssToken('--color-chart-candlestick-up', bid),
+    grid: readCssColor('--color-chart-grid-line', 'rgb(255 255 255 / 8%)'),
+    surface: readCssColor('--color-surface-raised', '#292929'),
+    upCandlestick: readCssColor('--color-chart-candlestick-up', bid),
     volumeDown: withOpacity(candlestick, readCssNumber('--chart-volume-opacity', 0.5)),
     volumeUp: withOpacity(
-      readCssToken('--color-chart-candlestick-up', bid),
+      readCssColor('--color-chart-candlestick-up', bid),
       readCssNumber('--chart-volume-opacity', 0.5)
     )
   }

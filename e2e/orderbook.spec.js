@@ -51,11 +51,20 @@ test.describe('Charts', () => {
   test('renders the price and bid/ask depth charts from static data', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByTestId('price-chart').locator('svg')).toBeVisible()
-    const firstCandle = page.locator('.price-chart .highcharts-series-0 .highcharts-point').first()
-    await firstCandle.hover()
+    const priceCanvas = page.getByTestId('price-chart').locator('canvas').first()
+    await expect(priceCanvas).toBeVisible()
+    const priceChartBounds = await page.getByTestId('price-chart').boundingBox()
+    await page.mouse.move(priceChartBounds.x + 160, priceChartBounds.y + 160)
     await expect(page.getByTestId('price-chart-readout')).toContainText(/O .*H .*L .*C .*V /)
-    await expect(page.locator('.price-chart .highcharts-tooltip')).toHaveCount(0)
+    await expect(page.locator('.price-chart .highcharts-container')).toHaveCount(0)
+
+    await page.getByLabel('Chart type').selectOption('line')
+    await expect(page.getByLabel('Chart type')).toHaveValue('line')
+    await page.getByLabel('Chart type').selectOption('heikinAshi')
+    await expect(page.getByLabel('Chart type')).toHaveValue('heikinAshi')
+    await page.getByLabel('Show SMA 20').check()
+    await expect(page.getByLabel('Show SMA 20')).toBeChecked()
+
     await expect(page.getByTestId('bid-depth-chart').locator('svg')).toBeVisible()
     await expect(page.getByTestId('ask-depth-chart').locator('svg')).toBeVisible()
     await expect(page.getByRole('alert')).toHaveCount(0)
@@ -73,12 +82,9 @@ test.describe('Charts', () => {
     await page.getByRole('button', { name: '1D' }).click()
     await expect(page.getByRole('button', { name: '1D' })).toHaveAttribute('aria-pressed', 'true')
     await expect(page.getByRole('button', { name: /1m unavailable/i })).toBeDisabled()
-    await expect(page.locator('.price-chart .highcharts-title')).toHaveText('')
-
-    const volumeHeight = page.getByLabel('Volume pane height')
-    await volumeHeight.focus()
-    await volumeHeight.press('End')
-    await expect(page.locator('.chart-volume-height-control output')).toHaveText('50%')
+    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
+    await expect(page.locator('.price-chart .highcharts-container')).toHaveCount(0)
+    await expect(page.getByLabel('Volume pane height')).toHaveCount(0)
 
     const dimensions = await page.evaluate(() => ({
       documentHeight: document.body.scrollHeight,
@@ -101,7 +107,7 @@ test.describe('React trading flows', () => {
     page.on('pageerror', (error) => consoleErrors.push(error.message))
 
     await page.goto('/')
-    await expect(page.getByTestId('price-chart').locator('svg')).toBeVisible()
+    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
 
     await page.getByRole('button', { name: 'BTC-USD' }).click()
     const markets = page.getByRole('dialog', { name: 'Markets' })
@@ -173,7 +179,7 @@ test.describe('Historical Tardis playback', () => {
 
     await page.goto('/')
     await expect(page.getByTestId('playback-controls')).toBeVisible()
-    await expect(page.getByTestId('price-chart').locator('svg')).toBeVisible()
+    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
     const clock = page.getByTestId('playback-clock')
     const initialClock = await clock.textContent()
     await page.getByLabel('Playback speed').selectOption('3600')
@@ -188,7 +194,7 @@ test.describe('Historical Tardis playback', () => {
     await expect(page.getByTestId('cvd-panel')).toBeVisible()
     await expect(clock).not.toHaveText(initialClock ?? '')
     await page.getByRole('button', { name: 'Precio', exact: true }).click()
-    await expect(page.getByTestId('price-chart').locator('svg')).toBeVisible()
+    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
     expect(consoleErrors).toEqual([])
   })
 

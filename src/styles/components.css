@@ -925,25 +925,40 @@
   opacity: 0.45;
 }
 
-.chart-volume-height-control {
+.price-chart-controls {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  gap: var(--space-1);
+  gap: var(--space-2);
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   white-space: nowrap;
 }
 
-.chart-volume-height-control input {
-  width: 4.5rem;
-  accent-color: var(--color-brand);
+.price-chart-controls > label:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
-.chart-volume-height-control output {
-  width: 2rem;
-  color: var(--color-text-accent);
-  font-variant-numeric: tabular-nums;
+.price-chart-controls select {
+  min-height: 1.75rem;
+  padding: 0 var(--space-1);
+  color: var(--color-text);
+  background: var(--color-surface-inset);
+  border: var(--border-width) solid var(--color-border-subtle);
+  font-size: var(--font-size-xs);
+}
+
+.price-chart-controls__indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+}
+
+.price-chart-controls__indicator input {
+  accent-color: var(--color-brand);
 }
 
 .grid-chart {
@@ -967,7 +982,8 @@
   display: flex;
   grid-column: 1 / -1;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: var(--space-2);
   min-width: 0;
   padding: var(--space-2);

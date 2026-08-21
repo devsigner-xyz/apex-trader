@@ -8,9 +8,9 @@ import FootprintChart from './FootprintChart.jsx'
 import Operative from './Operative.jsx'
 import Orderbook from './Orderbook.jsx'
 import PlaybackControls from './PlaybackControls.jsx'
+import PriceChartControls from './PriceChartControls.jsx'
 import Topbar from './Topbar.jsx'
 import Trades from './Trades.jsx'
-import VolumeHeightControl from './VolumeHeightControl.jsx'
 import { getBarTimestampForExecution } from '../services/orderFlowAnalytics.js'
 
 const marketShape = PropTypes.shape({
@@ -64,7 +64,8 @@ export default function Grid({
     volumes
   } = appState
   const [selectedExecution, setSelectedExecution] = useState(null)
-  const [volumeHeight, setVolumeHeight] = useState(28)
+  const [priceChartType, setPriceChartType] = useState('candlestick')
+  const [showSma, setShowSma] = useState(false)
   const selectExecution = (execution) => {
     if (!execution) return
     setSelectedExecution({
@@ -119,7 +120,12 @@ export default function Grid({
         <div className="chart-toolbar">
           <ChartModeToggle chartMode={chartMode} onChange={onChartModeChange} />
           <ChartTimeframeSelector onChange={onChartTimeframeChange} value={chartTimeframe} />
-          <VolumeHeightControl onChange={setVolumeHeight} value={volumeHeight} />
+          <PriceChartControls
+            chartType={priceChartType}
+            onChartTypeChange={setPriceChartType}
+            onSmaChange={setShowSma}
+            showSma={showSma}
+          />
           <PlaybackControls
             onSpeedChange={onPlaybackSpeedChange}
             speed={playbackSpeed}
@@ -145,9 +151,10 @@ export default function Grid({
           <>
             <Chart
               candlesticks={candlesticks}
+              chartType={priceChartType}
               selectedPrice={selectedExecution?.price ?? selectedPrice}
+              showSma={showSma}
               timeframe={chartTimeframe}
-              volumeHeight={volumeHeight}
               volumes={volumes}
             />
             <DepthChart asks={orderbook.asks} bids={orderbook.bids} />

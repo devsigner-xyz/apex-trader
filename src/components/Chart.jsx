@@ -1,256 +1,238 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import Highcharts from 'highcharts/highstock'
+import {
+  CandlestickSeries,
+  ColorType,
+  CrosshairMode,
+  HistogramSeries,
+  LineSeries,
+  createChart
+} from 'lightweight-charts'
 import { getChartColors } from '../services/chartColors.js'
 import { aggregateChartData } from '../services/chartAggregation.js'
+import {
+  createCandlestickData,
+  createHeikinAshiData,
+  createLineData,
+  createSmaData,
+  createVolumeData
+} from '../services/chartTransforms.js'
 
-function paneLayout(volumeHeight) {
-  const gap = 4
-  const priceHeight = 100 - volumeHeight - gap
-
-  return {
-    priceHeight: `${priceHeight}%`,
-    volumeHeight: `${volumeHeight}%`,
-    volumeTop: `${priceHeight + gap}%`
-  }
-}
+const SMA_PERIOD = 20
 
 function formatValue(value) {
   return value.toLocaleString('en-US', { maximumFractionDigits: 2 })
 }
 
-function chartOptions(colors, volumeHeight, onPointHover) {
-  const panes = paneLayout(volumeHeight)
+const INITIAL_VOLUME_PANE_RATIO = 0.28
 
-  return {
-    chart: {
-      backgroundColor: 'transparent',
-      marginBottom: 24,
-      marginRight: 72,
-      spacing: [0, 0, 0, 0],
-      type: 'stock'
-    },
-    navigator: {
-      enabled: false
-    },
-    rangeSelector: {
-      enabled: false
-    },
-    scrollbar: {
-      enabled: false
-    },
-    title: {
-      text: null
-    },
-    plotOptions: {
-      candlestick: {
-        color: colors.candlestick,
-        lineColor: colors.candlestick,
-        maxPointWidth: 12,
-        point: {
-          events: {
-            mouseOver() {
-              onPointHover(this)
-            }
-          }
-        },
-        upColor: colors.upCandlestick,
-        upLineColor: colors.upCandlestick
-      },
-      column: {
-        borderColor: 'transparent',
-        borderWidth: 0,
-        groupPadding: 0.08,
-        pointPadding: 0.04
-      }
-    },
-    xAxis: {
-      gridLineWidth: 0,
-      labels: {
-        style: {
-          color: colors.axis
-        }
-      },
-      lineColor: colors.border,
-      tickColor: colors.border,
-      type: 'datetime'
-    },
-    yAxis: [
-      {
-        gridLineColor: colors.grid,
-        gridLineDashStyle: 'ShortDot',
-        height: panes.priceHeight,
-        labels: {
-          style: {
-            color: colors.axis
-          },
-          x: 8
-        },
-        lineColor: colors.border,
-        opposite: true,
-        tickColor: colors.border,
-        title: {
-          text: null
-        },
-        top: '0%'
-      },
-      {
-        gridLineColor: colors.grid,
-        height: panes.volumeHeight,
-        labels: {
-          style: {
-            color: colors.axis
-          },
-          x: 8
-        },
-        lineColor: colors.border,
-        opposite: true,
-        tickColor: colors.border,
-        title: {
-          text: null
-        },
-        top: panes.volumeTop
-      }
-    ],
-    series: [
-      {
-        color: colors.candlestick,
-        data: [],
-        dataGrouping: { enabled: false },
-        name: 'BTC-USD',
-        type: 'candlestick',
-        upColor: colors.upCandlestick,
-        yAxis: 0
-      },
-      {
-        borderWidth: 0,
-        data: [],
-        dataGrouping: { enabled: false },
-        name: 'Volume',
-        type: 'column',
-        yAxis: 1
-      }
-    ],
-    accessibility: {
-      enabled: false
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
-    tooltip: {
-      enabled: false
-    }
-  }
+function getPriceSeriesData(candlesticks, chartType) {
+  if (chartType === 'line') return createLineData(candlesticks)
+  if (chartType === 'heikinAshi') return createHeikinAshiData(candlesticks)
+  return createCandlestickData(candlesticks)
 }
 
-export default function Chart({ candlesticks, selectedPrice, timeframe, volumeHeight, volumes }) {
+function createPriceSeries(chart, chartType, colors) {
+  if (chartType === 'line') {
+    return chart.addSeries(LineSeries, {
+      color: colors.upCandlestick,
+      crosshairMarkerBorderColor: colors.upCandlestick,
+      crosshairMarkerBackgroundColor: colors.surface,
+      lastValueVisible: false,
+      lineWidth: 2,
+      priceLineVisible: false
+    })
+  }
+
+  return chart.addSeries(CandlestickSeries, {
+    borderDownColor: colors.candlestick,
+    borderUpColor: colors.upCandlestick,
+    downColor: colors.candlestick,
+    lastValueVisible: false,
+    priceLineVisible: false,
+    upColor: colors.upCandlestick,
+    wickDownColor: colors.candlestick,
+    wickUpColor: colors.upCandlestick
+  })
+}
+
+function createChartInstance(container, colors) {
+  return createChart(container, {
+    autoSize: true,
+    crosshair: {
+      horzLine: { labelBackgroundColor: colors.surface },
+      mode: CrosshairMode.Normal,
+      vertLine: { labelBackgroundColor: colors.surface }
+    },
+    grid: {
+      horzLines: { color: colors.grid },
+      vertLines: { color: colors.grid }
+    },
+    layout: {
+      background: { color: 'transparent', type: ColorType.Solid },
+      panes: { separatorColor: colors.border, separatorHoverColor: colors.border },
+      textColor: colors.axis
+    },
+    rightPriceScale: {
+      borderColor: colors.border,
+      minimumWidth: 68
+    },
+    timeScale: {
+      borderColor: colors.border,
+      timeVisible: true
+    }
+  })
+}
+
+export default function Chart({
+  candlesticks,
+  chartType,
+  selectedPrice,
+  showSma,
+  timeframe,
+  volumes
+}) {
   const containerRef = useRef(null)
   const chartRef = useRef(null)
-  const pointHoverRef = useRef(null)
+  const priceSeriesRef = useRef(null)
+  const priceLineRef = useRef(null)
+  const rawCandlesByTimeRef = useRef(new Map())
+  const volumeSeriesRef = useRef(null)
+  const smaSeriesRef = useRef(null)
+  const previousTimeframeRef = useRef(null)
   const [readout, setReadout] = useState(null)
   const groupedData = useMemo(
     () => aggregateChartData(candlesticks, volumes, timeframe),
     [candlesticks, timeframe, volumes]
   )
 
-  pointHoverRef.current = (point) => {
-    setReadout({
-      close: point.close,
-      high: point.high,
-      low: point.low,
-      open: point.open,
-      volume: point.options.custom.volume
-    })
-  }
-
-  useEffect(() => {
-    if (!containerRef.current) return undefined
-
-    chartRef.current = Highcharts.stockChart(
-      containerRef.current,
-      chartOptions(getChartColors(), volumeHeight, (point) => pointHoverRef.current?.(point))
-    )
-
-    return () => {
-      chartRef.current?.destroy()
-      chartRef.current = null
-    }
-  }, [])
-
   useEffect(() => {
     const chart = chartRef.current
-    if (!chart) return
-
-    const panes = paneLayout(volumeHeight)
-    chart.yAxis[0].update({ height: panes.priceHeight, top: '0%' }, false)
-    chart.yAxis[1].update({ height: panes.volumeHeight, top: panes.volumeTop }, false)
-    chart.redraw()
-  }, [volumeHeight])
-
-  useEffect(() => {
-    if (!containerRef.current) return undefined
-
-    const observer = new ResizeObserver(() => chartRef.current?.reflow())
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const chart = chartRef.current
-    if (!chart) return
+    const priceSeries = priceSeriesRef.current
+    const volumeSeries = volumeSeriesRef.current
+    if (!chart || !priceSeries || !volumeSeries) return
 
     const colors = getChartColors()
-    const volumesByTimestamp = new Map(
-      groupedData.volumePoints.map(({ timestamp, volume }) => [timestamp, volume])
+    const rawCandlesByTime = new Map(
+      groupedData.candlesticks.map(([timestamp, open, high, low, close]) => [
+        Math.floor(timestamp / 1000),
+        { close, high, low, open, volume: 0 }
+      ])
     )
-    const chartCandlesticks = groupedData.candlesticks.map(([x, open, high, low, close]) => ({
-      close,
-      custom: { volume: volumesByTimestamp.get(x) ?? 0 },
-      high,
-      low,
-      open,
-      x
-    }))
-    const latestCandle = chartCandlesticks.at(-1)
+    groupedData.volumePoints.forEach(({ timestamp, volume }) => {
+      const candle = rawCandlesByTime.get(Math.floor(timestamp / 1000))
+      if (candle) candle.volume = volume
+    })
+    rawCandlesByTimeRef.current = rawCandlesByTime
 
-    chart.series[0].setData(chartCandlesticks, false)
-    chart.series[1].setData(
-      groupedData.volumePoints.map(({ direction, timestamp, volume }) => ({
-        color: direction === 'up' ? colors.volumeUp : colors.volumeDown,
-        x: timestamp,
-        y: volume
-      })),
-      true
-    )
-    if (latestCandle) {
-      setReadout({
-        close: latestCandle.close,
-        high: latestCandle.high,
-        low: latestCandle.low,
-        open: latestCandle.open,
-        volume: latestCandle.custom.volume
+    priceSeries.setData(getPriceSeriesData(groupedData.candlesticks, chartType))
+    volumeSeries.setData(
+      createVolumeData(groupedData.volumePoints, {
+        down: colors.volumeDown,
+        up: colors.volumeUp
       })
+    )
+    if (showSma) smaSeriesRef.current?.setData(createSmaData(groupedData.candlesticks, SMA_PERIOD))
+
+    const latest = rawCandlesByTime.get(Math.floor(groupedData.candlesticks.at(-1)?.[0] / 1000))
+    if (latest) setReadout(latest)
+
+    if (previousTimeframeRef.current !== timeframe) {
+      chart.timeScale().fitContent()
+      previousTimeframeRef.current = timeframe
     }
-  }, [groupedData])
+  }, [chartType, groupedData, showSma, timeframe])
 
   useEffect(() => {
-    const axis = chartRef.current?.yAxis[0]
-    if (!axis) return
+    const container = containerRef.current
+    if (!container) return undefined
 
-    axis.removePlotLine('selected-execution-price')
+    const colors = getChartColors()
+    const chart = createChartInstance(container, colors)
+    const priceSeries = createPriceSeries(chart, chartType, colors)
+    const volumePane = chart.addPane()
+    const volumeSeries = chart.addSeries(
+      HistogramSeries,
+      {
+        lastValueVisible: false,
+        priceFormat: { type: 'volume' },
+        priceLineVisible: false
+      },
+      volumePane.paneIndex()
+    )
+    const smaSeries = showSma
+      ? chart.addSeries(LineSeries, {
+          color: '#f5c542',
+          lastValueVisible: false,
+          lineWidth: 1,
+          priceLineVisible: false,
+          title: `SMA ${SMA_PERIOD}`
+        })
+      : null
+
+    chartRef.current = chart
+    priceSeriesRef.current = priceSeries
+    volumeSeriesRef.current = volumeSeries
+    smaSeriesRef.current = smaSeries
+    previousTimeframeRef.current = timeframe
+
+    const rawCandlesByTime = new Map(
+      groupedData.candlesticks.map(([timestamp, open, high, low, close]) => [
+        Math.floor(timestamp / 1000),
+        { close, high, low, open, volume: 0 }
+      ])
+    )
+    groupedData.volumePoints.forEach(({ timestamp, volume }) => {
+      const candle = rawCandlesByTime.get(Math.floor(timestamp / 1000))
+      if (candle) candle.volume = volume
+    })
+    rawCandlesByTimeRef.current = rawCandlesByTime
+    priceSeries.setData(getPriceSeriesData(groupedData.candlesticks, chartType))
+    volumeSeries.setData(
+      createVolumeData(groupedData.volumePoints, { down: colors.volumeDown, up: colors.volumeUp })
+    )
+    if (smaSeries) smaSeries.setData(createSmaData(groupedData.candlesticks, SMA_PERIOD))
+    const latest = rawCandlesByTime.get(Math.floor(groupedData.candlesticks.at(-1)?.[0] / 1000))
+    if (latest) setReadout(latest)
+    chart.timeScale().fitContent()
+    volumePane.setHeight(Math.round(container.clientHeight * INITIAL_VOLUME_PANE_RATIO))
+
+    const onCrosshairMove = (parameter) => {
+      if (parameter.time === undefined) return
+      const candle = rawCandlesByTimeRef.current.get(Number(parameter.time))
+      if (candle) setReadout(candle)
+    }
+    chart.subscribeCrosshairMove(onCrosshairMove)
+
+    return () => {
+      chart.unsubscribeCrosshairMove(onCrosshairMove)
+      chart.remove()
+      chartRef.current = null
+      priceSeriesRef.current = null
+      volumeSeriesRef.current = null
+      smaSeriesRef.current = null
+      priceLineRef.current = null
+    }
+  }, [chartType, showSma])
+
+
+  useEffect(() => {
+    const priceSeries = priceSeriesRef.current
+    if (!priceSeries) return
+
+    if (priceLineRef.current) priceSeries.removePriceLine(priceLineRef.current)
+    priceLineRef.current = null
     if (Number.isFinite(selectedPrice)) {
-      axis.addPlotLine({
+      priceLineRef.current = priceSeries.createPriceLine({
+        axisLabelVisible: true,
         color: '#f5c542',
-        id: 'selected-execution-price',
-        label: { text: `Ejecutado ${selectedPrice.toLocaleString('en-US')}` },
-        value: selectedPrice,
-        width: 1
+        lineVisible: true,
+        lineWidth: 1,
+        price: selectedPrice,
+        title: 'Ejecutado'
       })
     }
-  }, [selectedPrice])
+  }, [chartType, selectedPrice])
 
   const direction = readout && readout.close >= readout.open ? 'up' : 'down'
 
@@ -281,8 +263,9 @@ export default function Chart({ candlesticks, selectedPrice, timeframe, volumeHe
 
 Chart.propTypes = {
   candlesticks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
+  chartType: PropTypes.oneOf(['candlestick', 'line', 'heikinAshi']).isRequired,
   selectedPrice: PropTypes.number,
+  showSma: PropTypes.bool.isRequired,
   timeframe: PropTypes.oneOf([5, 15, 30, 60, 240, 1440]).isRequired,
-  volumeHeight: PropTypes.number.isRequired,
   volumes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
 }
