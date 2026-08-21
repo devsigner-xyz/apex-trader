@@ -17,8 +17,14 @@ function readCssNumber(name, fallback) {
 }
 
 function withOpacity(color, opacity) {
-  const channels = color.match(/\d+(?:\.\d+)?/g)
+  const hex = color.match(/^#([\da-f]{3}|[\da-f]{6})$/i)
+  if (hex) {
+    const value = hex[1].length === 3 ? [...hex[1]].map((channel) => channel.repeat(2)).join('') : hex[1]
+    const channels = [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16))
+    return `rgba(${channels.join(', ')}, ${opacity})`
+  }
 
+  const channels = color.match(/\d+(?:\.\d+)?/g)
   if (!channels || channels.length < 3) return color
 
   return `rgba(${channels.slice(0, 3).join(', ')}, ${opacity})`
@@ -39,7 +45,10 @@ export function getChartColors() {
       area: withOpacity(bid, readCssNumber('--chart-depth-area-opacity', 0.1)),
       line: bid
     },
+    border: readCssToken('--color-border', 'rgb(255 255 255 / 18%)'),
     candlestick,
+    grid: readCssToken('--color-chart-grid-line', 'rgb(255 255 255 / 8%)'),
+    surface: readCssToken('--color-surface-raised', '#292929'),
     upCandlestick: readCssToken('--color-chart-candlestick-up', bid),
     volume: withOpacity(candlestick, readCssNumber('--chart-volume-opacity', 0.5))
   }

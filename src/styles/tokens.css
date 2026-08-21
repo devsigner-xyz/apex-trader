@@ -1,25 +1,31 @@
 :root {
   color-scheme: dark;
 
-  /* Color */
-  --color-background: #262d38;
-  --color-surface: #131722;
-  --color-surface-raised: #11151f;
-  --color-surface-inset: #0b0e14;
-  --color-surface-interactive: rgb(255 255 255 / 5%);
-  --color-surface-interactive-hover: rgb(255 255 255 / 10%);
-  --color-surface-interactive-active: rgb(255 255 255 / 15%);
-  --color-text: rgb(204 208 220);
-  --color-text-muted: rgb(117 134 150);
-  --color-text-accent: rgb(173 155 227);
-  --color-positive: rgb(118 209 170);
-  --color-negative: rgb(173 155 227);
-  --color-border: var(--color-background);
-  --color-border-subtle: rgb(255 255 255 / 10%);
-  --color-border-strong: rgb(255 255 255 / 20%);
-  --color-focus: var(--color-positive);
+  /* Devsigner brand foundation: warm charcoal, cream and terracotta. */
+  --color-background: #1b1b1b;
+  --color-surface: #242424;
+  --color-surface-raised: #292929;
+  --color-surface-inset: #1b1b1b;
+  --color-surface-interactive: rgb(249 233 203 / 7%);
+  --color-surface-interactive-hover: rgb(249 233 203 / 12%);
+  --color-surface-interactive-active: #391b1e;
+  --color-text: #f9e9cb;
+  --color-text-muted: #d5d5d5;
+  --color-text-accent: #f1cfa1;
+  --color-brand: #af232b;
+  --color-brand-dark: #891c23;
+  --color-brand-highlight: #ec826a;
+  --color-brand-soft: #391b1e;
+
+  /* Semantic market states remain distinct from the devsigner brand accent. */
+  --color-positive: #9fbd87;
+  --color-negative: #cf7069;
+  --color-border: #393939;
+  --color-border-subtle: rgb(249 233 203 / 12%);
+  --color-border-strong: rgb(249 233 203 / 22%);
+  --color-focus: #f1cfa1;
   --color-chart-axis: var(--color-text);
-  --color-chart-candlestick: var(--color-text-accent);
+  --color-chart-candlestick: #f1cfa1;
   --color-chart-candlestick-up: var(--color-positive);
   --color-chart-bid: var(--color-positive);
   --color-chart-ask: var(--color-negative);
@@ -27,7 +33,7 @@
   --color-footprint-buy: var(--color-positive);
   --color-footprint-sell: var(--color-negative);
   --color-footprint-poc: var(--color-text);
-  --color-footprint-imbalance: var(--color-text-accent);
+  --color-footprint-imbalance: #d99a62;
   --chart-volume-opacity: 0.5;
   --chart-depth-area-opacity: 0.1;
   --chart-depth-fill-opacity: 0.5;
@@ -54,7 +60,10 @@
 
   /* Application layout */
   --layout-grid-gap: var(--space-1);
-  --layout-sidebar-width: 18.75rem;
+  --layout-operative-width: 17.5rem;
+  --layout-orderbook-width: 15rem;
+  --layout-trades-width: 16rem;
+  --layout-depth-chart-width: 5.5rem;
   --layout-topbar-height: 4.5rem;
   --layout-footer-height: 4rem;
   --layout-market-panel-width: 31.25rem;
@@ -63,9 +72,9 @@
   /* Shape, elevation, motion and layers */
   --border-width: 1px;
   --radius-none: 0;
-  --radius-sm: 0.125rem;
-  --shadow-panel: 0 0.5rem 1.5rem rgb(0 0 0 / 20%);
-  --shadow-overlay: 0 1rem 2rem rgb(0 0 0 / 35%);
+  --radius-sm: 0.55rem;
+  --shadow-panel: 0 0.5rem 1.5rem rgb(0 0 0 / 24%);
+  --shadow-overlay: 0 1rem 2rem rgb(0 0 0 / 42%);
   --duration-fast: 100ms;
   --duration-normal: 200ms;
   --easing-standard: ease-in-out;

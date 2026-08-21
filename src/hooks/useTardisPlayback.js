@@ -7,6 +7,7 @@ import {
 
 export const playbackSpeeds = [60, 300, 1200, 3600]
 const DEFAULT_PLAYBACK_SPEED = 60
+const INITIAL_HISTORY_MS = 4 * 60 * 60 * 1000
 
 export function useTardisPlayback() {
   const [session, setSession] = useState(null)
@@ -22,7 +23,9 @@ export function useTardisPlayback() {
       .then((nextSession) => {
         if (cancelled) return
         setSession(nextSession)
-        setTimestamp(nextSession.playbackStart)
+        setTimestamp(
+          Math.min(nextSession.playbackStart + INITIAL_HISTORY_MS, nextSession.sessionEndExclusive - 1)
+        )
       })
       .catch((loadError) => {
         if (!cancelled) setError(loadError.message)

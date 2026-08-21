@@ -66,6 +66,10 @@ OrderbookSide.propTypes = {
 export default function Orderbook({ asset, baseCurrency, market, onSelectPrice, orderbook }) {
   return (
     <section aria-label="Order book" className="orderbook-panel">
+      <header className="panel-heading">
+        <span>Order book</span>
+        <span>{asset}/{baseCurrency}</span>
+      </header>
       <div className="orderbook-header">
         <span />
         <span>Sum ({asset})</span>

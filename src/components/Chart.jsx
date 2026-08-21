@@ -7,22 +7,27 @@ import { aggregateChartData } from '../services/chartAggregation.js'
 function chartOptions(colors, title) {
   return {
     chart: {
+      backgroundColor: 'transparent',
       marginBottom: 16,
       spacing: [0, 0, 0, 0],
       type: 'stock'
     },
-    rangeSelector: {
-      inputPosition: {
-        align: 'right'
-      },
-      selected: 2
-    },
     navigator: {
-      enabled: true
+      enabled: false
+    },
+    rangeSelector: {
+      enabled: false
+    },
+    scrollbar: {
+      enabled: false
     },
     title: {
+      align: 'left',
+      margin: 8,
       style: {
-        color: colors.axis
+        color: colors.axis,
+        fontSize: '11px',
+        fontWeight: '600'
       },
       text: title
     },
@@ -30,38 +35,49 @@ function chartOptions(colors, title) {
       candlestick: {
         color: colors.candlestick,
         lineColor: colors.candlestick,
+        maxPointWidth: 12,
         upColor: colors.upCandlestick,
         upLineColor: colors.upCandlestick
       }
     },
     xAxis: {
+      gridLineWidth: 0,
       labels: {
         style: {
           color: colors.axis
         }
       },
+      lineColor: colors.border,
+      tickColor: colors.border,
       type: 'datetime'
     },
     yAxis: [
       {
+        gridLineColor: colors.grid,
+        gridLineDashStyle: 'ShortDot',
         labels: {
           style: {
             color: colors.axis
           },
           x: -40
         },
+        lineColor: colors.border,
         opposite: true,
+        tickColor: colors.border,
         title: {
           text: 'Price'
         }
       },
       {
+        gridLineColor: colors.grid,
         labels: {
           style: {
             color: colors.axis
           }
         },
+        lineColor: colors.border,
         opposite: true,
+        tickColor: colors.border,
         title: {
           text: 'Volume'
         }
@@ -95,7 +111,12 @@ function chartOptions(colors, title) {
       enabled: false
     },
     tooltip: {
-      enabled: true
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      enabled: true,
+      style: {
+        color: colors.axis
+      }
     }
   }
 }
@@ -110,7 +131,7 @@ export default function Chart({
 }) {
   const containerRef = useRef(null)
   const chartRef = useRef(null)
-  const title = `${symbol} Price · ${timeframe}m (Binance Spot, ${sessionDate} UTC)`
+  const title = `${symbol} · ${timeframe}m · ${sessionDate}`
   const groupedData = useMemo(
     () => aggregateChartData(candlesticks, volumes, timeframe),
     [candlesticks, timeframe, volumes]

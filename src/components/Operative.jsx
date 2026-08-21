@@ -229,6 +229,10 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
 
   return (
     <section aria-label="Order form" className="operative-panel">
+      <header className="panel-heading">
+        <span>Order ticket</span>
+        <span>{asset}/{counterpart}</span>
+      </header>
       <div aria-label="Order side" className="ui-tabs" role="tablist">
         {['buy', 'sell'].map((tab) => (
           <button

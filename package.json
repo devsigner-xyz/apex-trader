@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "serve dist -l ${PORT:-3000}",
     "data:tardis": "node scripts/tardis-ingest.mjs",
     "data:tardis:download": "node scripts/tardis-ingest.mjs --download",
     "test:unit": "node --experimental-default-type=module --test tests/*.test.js",
@@ -24,7 +25,8 @@
     "highcharts": "^11.1.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "serve": "14.2.6"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.1",
