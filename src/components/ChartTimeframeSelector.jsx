@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 
 export const chartTimeframes = [
-  { label: '1m', minutes: 1, supported: false },
   { label: '5m', minutes: 5, supported: true },
   { label: '15m', minutes: 15, supported: true },
   { label: '30m', minutes: 30, supported: true },

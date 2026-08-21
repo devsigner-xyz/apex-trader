@@ -81,7 +81,7 @@ test.describe('Charts', () => {
     await expect(page.getByRole('button', { name: '4h' })).toHaveAttribute('aria-pressed', 'true')
     await page.getByRole('button', { name: '1D' }).click()
     await expect(page.getByRole('button', { name: '1D' })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: /1m unavailable/i })).toBeDisabled()
+    await expect(page.getByRole('button', { name: /1m/i })).toHaveCount(0)
     await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
     await expect(page.locator('.price-chart .highcharts-container')).toHaveCount(0)
     await expect(page.getByLabel('Volume pane height')).toHaveCount(0)
@@ -154,6 +154,19 @@ test.describe('React trading flows', () => {
     await page.getByRole('button', { name: 'Review configuration' }).click()
     await expect(page.getByText('Configuration is complete.', { exact: true })).toBeVisible()
     await expect(page.locator('body')).not.toContainText(/demo|simulat|no ejecutable/i)
+
+    await expect(page.getByLabel('Practice balance')).toBeVisible()
+    const quantityAllocation = page.getByLabel('Quantity allocation')
+    await quantityAllocation.focus()
+    await quantityAllocation.press('End')
+    await expect(page.getByLabel('Quantity (BTC)')).not.toHaveValue('')
+
+    const orderManagement = page.getByTestId('order-management')
+    await expect(orderManagement.getByLabel('Open orders')).toBeVisible()
+    await expect(orderManagement.getByLabel('Order history')).toBeVisible()
+    const orderManagementBounds = await orderManagement.boundingBox()
+    const priceChartBounds = await page.getByTestId('price-chart').boundingBox()
+    expect(orderManagementBounds.y).toBeGreaterThan(priceChartBounds.y)
 
     await page.getByLabel('Order type').selectOption('iceberg')
     await expect(page.getByLabel('Visible quantity (BTC)')).toBeVisible()

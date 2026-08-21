@@ -7,6 +7,7 @@ import DepthChart from './DepthChart.jsx'
 import FootprintChart from './FootprintChart.jsx'
 import Operative from './Operative.jsx'
 import Orderbook from './Orderbook.jsx'
+import OrderManagement from './OrderManagement.jsx'
 import PlaybackControls from './PlaybackControls.jsx'
 import PriceChartControls from './PriceChartControls.jsx'
 import Topbar from './Topbar.jsx'
@@ -98,6 +99,7 @@ export default function Grid({
         <Operative
           asset={asset}
           counterpart={baseCurrency}
+          marketPrice={market.price.value}
           onSelectTab={onSelectTab}
           selectedPrice={selectedPrice}
           selectedTab={selectedTab}
@@ -161,7 +163,9 @@ export default function Grid({
           </>
         )}
       </section>
-      <div className="grid-tabs grid-item" />
+      <div className="grid-tabs grid-item">
+        <OrderManagement />
+      </div>
       <div className="grid-trades grid-item">
         <Trades
           barDurationMs={barDurationMs}

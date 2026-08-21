@@ -25,6 +25,15 @@ const initialValues = {
   triggerPrice: ''
 }
 
+const PRACTICE_BALANCE = {
+  asset: 0.8421,
+  quote: 12_500
+}
+
+function formatBalance(value, maximumFractionDigits = 2) {
+  return value.toLocaleString('en-US', { maximumFractionDigits })
+}
+
 function NumericField({ error, help, id, inputRef, label, onChange, required, value }) {
   const helpId = `${id}-help`
   const errorId = `${id}-error`
@@ -148,7 +157,14 @@ function validate(values, fields) {
   return errors
 }
 
-export default function Operative({ asset, counterpart, onSelectTab, selectedPrice, selectedTab }) {
+export default function Operative({
+  asset,
+  counterpart,
+  marketPrice,
+  onSelectTab,
+  selectedPrice,
+  selectedTab
+}) {
   const [orderType, setOrderType] = useState('limit')
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState({})
@@ -158,6 +174,11 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
   const supportsTimeInForce = ['limit', 'stopLimit', 'takeProfitLimit', 'oco', 'iceberg'].includes(
     orderType
   )
+  const sizingPrice = Number(values.price) > 0 ? Number(values.price) : marketPrice
+  const maximumQuantity = selectedTab === 'buy' ? PRACTICE_BALANCE.quote / sizingPrice : PRACTICE_BALANCE.asset
+  const allocationMaximum = Number(maximumQuantity.toFixed(4))
+  const quantityValue = Math.min(Number(values.quantity) || 0, allocationMaximum)
+  const quantityPercent = allocationMaximum ? Math.round((quantityValue / allocationMaximum) * 100) : 0
 
   useEffect(() => {
     if (selectedPrice === null || selectedPrice === undefined) return
@@ -215,6 +236,19 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
         ))}
       </div>
       <form className="operative-form" noValidate onSubmit={handleSubmit}>
+        <section aria-label="Practice balance" className="operative-balance">
+          <span>Practice balance</span>
+          <dl>
+            <div>
+              <dt>{asset}</dt>
+              <dd>{formatBalance(PRACTICE_BALANCE.asset, 4)}</dd>
+            </div>
+            <div>
+              <dt>{counterpart}</dt>
+              <dd>{formatBalance(PRACTICE_BALANCE.quote)}</dd>
+            </div>
+          </dl>
+        </section>
         <div className="form-element">
           <label htmlFor="orderType">Order type</label>
           <select id="orderType" name="orderType" onChange={changeOrderType} value={orderType}>
@@ -240,6 +274,27 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
             value={values[field.key]}
           />
         ))}
+        {fields.some(({ key }) => key === 'quantity') && (
+          <div className="quantity-allocation">
+            <div>
+              <label htmlFor="quantityAllocation">Quantity allocation</label>
+              <output>{quantityPercent}%</output>
+            </div>
+            <input
+              aria-label="Quantity allocation"
+              id="quantityAllocation"
+              max={allocationMaximum}
+              min="0"
+              onChange={(event) => {
+                updateValue('quantity')({ target: { value: Number(event.target.value).toFixed(4) } })
+              }}
+              step={allocationMaximum / 100}
+              type="range"
+              value={quantityValue}
+            />
+            <small>Max. {formatBalance(allocationMaximum, 4)} {asset}</small>
+          </div>
+        )}
         {supportsTimeInForce && (
           <fieldset className="advanced-options">
             <legend>Additional options</legend>
@@ -282,6 +337,7 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
 Operative.propTypes = {
   asset: PropTypes.string.isRequired,
   counterpart: PropTypes.string.isRequired,
+  marketPrice: PropTypes.number.isRequired,
   onSelectTab: PropTypes.func.isRequired,
   selectedPrice: PropTypes.number,
   selectedTab: PropTypes.oneOf(['buy', 'sell']).isRequired

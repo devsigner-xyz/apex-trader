@@ -218,7 +218,7 @@
   grid-template-columns: var(--layout-operative-width) var(--layout-orderbook-width) minmax(0, 1fr) var(
       --layout-trades-width
     );
-  grid-template-rows: var(--layout-topbar-height) minmax(0, 1fr) 0;
+  grid-template-rows: var(--layout-topbar-height) minmax(0, 1fr) minmax(9.5rem, 26vh);
   gap: var(--layout-grid-gap);
   width: 100%;
   min-width: 60rem;
@@ -259,8 +259,80 @@
 }
 
 .grid-tabs {
+  display: grid;
   grid-row: 3;
   grid-column: 3;
+  min-width: 0;
+}
+
+.order-management {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  min-height: 0;
+}
+
+.order-management__panel + .order-management__panel {
+  border-left: var(--border-width) solid var(--color-border);
+}
+
+.order-management__panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+
+.order-management__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.25rem;
+  padding: 0 var(--space-3);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.order-management__header > span:last-child {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.order-management__table-wrap {
+  min-width: 0;
+  overflow: auto;
+}
+
+.order-management table {
+  width: 100%;
+  min-width: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+}
+
+.order-management th,
+.order-management td {
+  height: 1.8rem;
+  padding: 0 var(--space-1);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: var(--border-width) solid var(--color-border-subtle);
+}
+
+.order-management th:first-child,
+.order-management td:first-child {
+  text-align: left;
+}
+
+.order-management th {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
 }
 
 .grid-trades {
@@ -500,6 +572,73 @@
 
 .panel-heading > span:last-child {
   color: var(--color-text-accent);
+  font-size: var(--font-size-xs);
+}
+
+.operative-balance {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  background: var(--color-surface-inset);
+  border-left: 2px solid var(--color-focus);
+}
+
+.operative-balance > span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.operative-balance dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.operative-balance dl > div {
+  min-width: 0;
+}
+
+.operative-balance dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.operative-balance dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-accent);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+}
+
+.quantity-allocation {
+  display: grid;
+  gap: var(--space-1);
+  margin: calc(var(--space-2) * -1) 0 var(--space-4);
+}
+
+.quantity-allocation > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.quantity-allocation label,
+.quantity-allocation small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.quantity-allocation input {
+  width: 100%;
+  accent-color: var(--color-brand);
+}
+
+.quantity-allocation output {
+  color: var(--color-text-accent);
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-xs);
 }
 
@@ -1236,6 +1375,14 @@
 
 .cvd-contributions button[aria-pressed='true'] {
   border-bottom-color: var(--color-focus);
+}
+
+.trading-grid--footprint {
+  grid-template-rows: var(--layout-topbar-height) minmax(0, 1fr) 0;
+}
+
+.trading-grid--footprint .grid-tabs {
+  display: none;
 }
 
 .trading-grid--footprint .grid-orderbook {
