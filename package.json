@@ -3,6 +3,10 @@
   "description": "Blazing fast professional trading interface",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "npm@11.15.0",
+  "engines": {
+    "node": "22.x"
+  },
   "docs": "vitepress",
   "scripts": {
     "dev": "vite",
