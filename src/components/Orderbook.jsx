@@ -21,7 +21,7 @@ function OrderbookSide({ currency, label, onSelectPrice, rows, side }) {
   const totalAmount = cumulativeAmounts[cumulativeAmounts.length - 1] ?? 1
 
   return (
-    <div aria-label={label} className={`orderbook-side orderbook-side--${side}`}>
+    <div aria-label={label} className={`orderbook-side orderbook-side--${side}`} tabIndex="0">
       {rows.map((row, index) => {
         const sum = cumulativeAmounts[index]
         const width = `${(sum / totalAmount) * 100}%`
@@ -63,18 +63,14 @@ OrderbookSide.propTypes = {
   side: PropTypes.oneOf(['ask', 'bid']).isRequired
 }
 
-export default function Orderbook({ asset, baseCurrency, market, onSelectPrice, orderbook }) {
+export default function Orderbook({ baseCurrency, market, onSelectPrice, orderbook }) {
   return (
     <section aria-label="Order book" className="orderbook-panel">
-      <header className="panel-heading">
-        <span>Order book</span>
-        <span>{asset}/{baseCurrency}</span>
-      </header>
       <div className="orderbook-header">
         <span />
-        <span>Sum ({asset})</span>
-        <span>Amount ({asset})</span>
-        <span>Price ({baseCurrency})</span>
+        <span>Sum</span>
+        <span>Amount</span>
+        <span>Price</span>
       </div>
       <OrderbookSide
         currency={baseCurrency}
@@ -102,7 +98,6 @@ export default function Orderbook({ asset, baseCurrency, market, onSelectPrice, 
 }
 
 Orderbook.propTypes = {
-  asset: PropTypes.string.isRequired,
   baseCurrency: PropTypes.string.isRequired,
   market: PropTypes.shape({
     price: PropTypes.shape({

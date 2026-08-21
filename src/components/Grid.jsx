@@ -10,6 +10,7 @@ import Orderbook from './Orderbook.jsx'
 import PlaybackControls from './PlaybackControls.jsx'
 import Topbar from './Topbar.jsx'
 import Trades from './Trades.jsx'
+import VolumeHeightControl from './VolumeHeightControl.jsx'
 import { getBarTimestampForExecution } from '../services/orderFlowAnalytics.js'
 
 const marketShape = PropTypes.shape({
@@ -63,6 +64,7 @@ export default function Grid({
     volumes
   } = appState
   const [selectedExecution, setSelectedExecution] = useState(null)
+  const [volumeHeight, setVolumeHeight] = useState(28)
   const selectExecution = (execution) => {
     if (!execution) return
     setSelectedExecution({
@@ -102,7 +104,6 @@ export default function Grid({
       </div>
       <div className="grid-orderbook grid-item">
         <Orderbook
-          asset={asset}
           baseCurrency={baseCurrency}
           market={market}
           onSelectPrice={onSelectPrice}
@@ -118,6 +119,7 @@ export default function Grid({
         <div className="chart-toolbar">
           <ChartModeToggle chartMode={chartMode} onChange={onChartModeChange} />
           <ChartTimeframeSelector onChange={onChartTimeframeChange} value={chartTimeframe} />
+          <VolumeHeightControl onChange={setVolumeHeight} value={volumeHeight} />
           <PlaybackControls
             onSpeedChange={onPlaybackSpeedChange}
             speed={playbackSpeed}
@@ -145,8 +147,7 @@ export default function Grid({
               candlesticks={candlesticks}
               selectedPrice={selectedExecution?.price ?? selectedPrice}
               timeframe={chartTimeframe}
-              sessionDate={sessionDate}
-              symbol={sessionSymbol}
+              volumeHeight={volumeHeight}
               volumes={volumes}
             />
             <DepthChart asks={orderbook.asks} bids={orderbook.bids} />
@@ -164,14 +165,6 @@ export default function Grid({
           trades={trades}
         />
       </div>
-      <footer className="grid-footer ui-surface">
-        <span>
-          ApexTrader by{' '}
-          <a href="https://github.com/FrontendCrypto/apex-trader" rel="noreferrer" target="_blank">
-            Pablo Carballeda
-          </a>
-        </span>
-      </footer>
     </div>
   )
 }
@@ -183,7 +176,7 @@ Grid.propTypes = {
     barDurationMs: PropTypes.number.isRequired,
     candlesticks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
     chartMode: PropTypes.oneOf(['price', 'footprint']).isRequired,
-    chartTimeframe: PropTypes.oneOf([5, 15, 30, 60]).isRequired,
+    chartTimeframe: PropTypes.oneOf([5, 15, 30, 60, 240, 1440]).isRequired,
     cvd: PropTypes.number.isRequired,
     cvdBars: PropTypes.arrayOf(
       PropTypes.shape({

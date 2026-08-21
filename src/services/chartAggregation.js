@@ -28,6 +28,10 @@ export function aggregateChartData(candlesticks, volumes, timeframeMinutes) {
       low,
       close
     ]),
-    volumes: grouped.map(({ timestamp, volume }) => [timestamp, volume])
+    volumePoints: grouped.map(({ close, open, timestamp, volume }) => ({
+      direction: close >= open ? 'up' : 'down',
+      timestamp,
+      volume
+    }))
   }
 }

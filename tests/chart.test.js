@@ -21,9 +21,9 @@ test('aggregates five-minute candles and volumes into the selected chart timefra
       [0, 100, 108, 99, 104],
       [15 * 60_000, 104, 109, 102, 108]
     ],
-    volumes: [
-      [0, 15],
-      [15 * 60_000, 11]
+    volumePoints: [
+      { direction: 'up', timestamp: 0, volume: 15 },
+      { direction: 'up', timestamp: 15 * 60_000, volume: 11 }
     ]
   })
 })

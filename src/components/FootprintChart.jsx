@@ -138,10 +138,6 @@ export default function FootprintChart({
       className="footprint-chart chart-slot"
       data-testid="footprint-chart"
     >
-      <p className="footprint-disclaimer">
-        HISTÓRICO — trades reales de Binance Spot BTCUSDT agregados desde Tardis. No son una señal
-        ni una cotización en directo.
-      </p>
       <form aria-label="Controles de footprint" className="footprint-controls">
         <label>
           Modo

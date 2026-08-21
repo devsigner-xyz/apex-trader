@@ -46,7 +46,6 @@ export default function Trades({
     <section aria-label="Time and Sales" className="trades-panel" data-testid="time-and-sales">
       <header className="trades-panel__header">
         <strong>Time &amp; Sales</strong>
-        <small>Ejecutado · Tardis</small>
       </header>
       <form aria-label="Filtros de Time and Sales" className="time-sales-controls">
         <label>

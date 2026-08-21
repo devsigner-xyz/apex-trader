@@ -50,7 +50,11 @@ export function getChartColors() {
     grid: readCssToken('--color-chart-grid-line', 'rgb(255 255 255 / 8%)'),
     surface: readCssToken('--color-surface-raised', '#292929'),
     upCandlestick: readCssToken('--color-chart-candlestick-up', bid),
-    volume: withOpacity(candlestick, readCssNumber('--chart-volume-opacity', 0.5))
+    volumeDown: withOpacity(candlestick, readCssNumber('--chart-volume-opacity', 0.5)),
+    volumeUp: withOpacity(
+      readCssToken('--color-chart-candlestick-up', bid),
+      readCssNumber('--chart-volume-opacity', 0.5)
+    )
   }
 }
 

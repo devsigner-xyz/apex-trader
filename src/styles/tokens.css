@@ -19,14 +19,16 @@
 
   /* Semantic market states remain distinct from the devsigner brand accent. */
   --color-positive: #9fbd87;
+  --color-positive-soft: rgb(159 189 135 / 10%);
   --color-negative: #cf7069;
+  --color-negative-soft: rgb(207 112 105 / 10%);
   --color-border: #393939;
   --color-border-subtle: rgb(249 233 203 / 12%);
   --color-border-strong: rgb(249 233 203 / 22%);
   --color-focus: #f1cfa1;
   --color-chart-axis: var(--color-text);
-  --color-chart-candlestick: #f1cfa1;
-  --color-chart-candlestick-up: var(--color-positive);
+  --color-chart-candlestick: var(--color-brand);
+  --color-chart-candlestick-up: var(--color-text);
   --color-chart-bid: var(--color-positive);
   --color-chart-ask: var(--color-negative);
   --color-chart-grid-line: var(--color-surface-interactive);
@@ -65,7 +67,7 @@
   --layout-trades-width: 16rem;
   --layout-depth-chart-width: 5.5rem;
   --layout-topbar-height: 4.5rem;
-  --layout-footer-height: 4rem;
+  --layout-footer-height: 0;
   --layout-market-panel-width: 31.25rem;
   --layout-settings-panel-width: 18.75rem;
 

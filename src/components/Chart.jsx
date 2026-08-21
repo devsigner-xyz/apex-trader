@@ -1,14 +1,32 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Highcharts from 'highcharts/highstock'
 import { getChartColors } from '../services/chartColors.js'
 import { aggregateChartData } from '../services/chartAggregation.js'
 
-function chartOptions(colors, title) {
+function paneLayout(volumeHeight) {
+  const gap = 4
+  const priceHeight = 100 - volumeHeight - gap
+
+  return {
+    priceHeight: `${priceHeight}%`,
+    volumeHeight: `${volumeHeight}%`,
+    volumeTop: `${priceHeight + gap}%`
+  }
+}
+
+function formatValue(value) {
+  return value.toLocaleString('en-US', { maximumFractionDigits: 2 })
+}
+
+function chartOptions(colors, volumeHeight, onPointHover) {
+  const panes = paneLayout(volumeHeight)
+
   return {
     chart: {
       backgroundColor: 'transparent',
-      marginBottom: 16,
+      marginBottom: 24,
+      marginRight: 72,
       spacing: [0, 0, 0, 0],
       type: 'stock'
     },
@@ -22,22 +40,28 @@ function chartOptions(colors, title) {
       enabled: false
     },
     title: {
-      align: 'left',
-      margin: 8,
-      style: {
-        color: colors.axis,
-        fontSize: '11px',
-        fontWeight: '600'
-      },
-      text: title
+      text: null
     },
     plotOptions: {
       candlestick: {
         color: colors.candlestick,
         lineColor: colors.candlestick,
         maxPointWidth: 12,
+        point: {
+          events: {
+            mouseOver() {
+              onPointHover(this)
+            }
+          }
+        },
         upColor: colors.upCandlestick,
         upLineColor: colors.upCandlestick
+      },
+      column: {
+        borderColor: 'transparent',
+        borderWidth: 0,
+        groupPadding: 0.08,
+        pointPadding: 0.04
       }
     },
     xAxis: {
@@ -55,32 +79,37 @@ function chartOptions(colors, title) {
       {
         gridLineColor: colors.grid,
         gridLineDashStyle: 'ShortDot',
+        height: panes.priceHeight,
         labels: {
           style: {
             color: colors.axis
           },
-          x: -40
+          x: 8
         },
         lineColor: colors.border,
         opposite: true,
         tickColor: colors.border,
         title: {
-          text: 'Price'
-        }
+          text: null
+        },
+        top: '0%'
       },
       {
         gridLineColor: colors.grid,
+        height: panes.volumeHeight,
         labels: {
           style: {
             color: colors.axis
-          }
+          },
+          x: 8
         },
         lineColor: colors.border,
         opposite: true,
         tickColor: colors.border,
         title: {
-          text: 'Volume'
-        }
+          text: null
+        },
+        top: panes.volumeTop
       }
     ],
     series: [
@@ -90,10 +119,11 @@ function chartOptions(colors, title) {
         dataGrouping: { enabled: false },
         name: 'BTC-USD',
         type: 'candlestick',
-        upColor: colors.upCandlestick
+        upColor: colors.upCandlestick,
+        yAxis: 0
       },
       {
-        color: colors.volume,
+        borderWidth: 0,
         data: [],
         dataGrouping: { enabled: false },
         name: 'Volume',
@@ -111,45 +141,54 @@ function chartOptions(colors, title) {
       enabled: false
     },
     tooltip: {
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      enabled: true,
-      style: {
-        color: colors.axis
-      }
+      enabled: false
     }
   }
 }
 
-export default function Chart({
-  candlesticks,
-  selectedPrice,
-  sessionDate,
-  symbol,
-  timeframe,
-  volumes
-}) {
+export default function Chart({ candlesticks, selectedPrice, timeframe, volumeHeight, volumes }) {
   const containerRef = useRef(null)
   const chartRef = useRef(null)
-  const title = `${symbol} · ${timeframe}m · ${sessionDate}`
+  const pointHoverRef = useRef(null)
+  const [readout, setReadout] = useState(null)
   const groupedData = useMemo(
     () => aggregateChartData(candlesticks, volumes, timeframe),
     [candlesticks, timeframe, volumes]
   )
+
+  pointHoverRef.current = (point) => {
+    setReadout({
+      close: point.close,
+      high: point.high,
+      low: point.low,
+      open: point.open,
+      volume: point.options.custom.volume
+    })
+  }
 
   useEffect(() => {
     if (!containerRef.current) return undefined
 
     chartRef.current = Highcharts.stockChart(
       containerRef.current,
-      chartOptions(getChartColors(), title)
+      chartOptions(getChartColors(), volumeHeight, (point) => pointHoverRef.current?.(point))
     )
 
     return () => {
       chartRef.current?.destroy()
       chartRef.current = null
     }
-  }, [title])
+  }, [])
+
+  useEffect(() => {
+    const chart = chartRef.current
+    if (!chart) return
+
+    const panes = paneLayout(volumeHeight)
+    chart.yAxis[0].update({ height: panes.priceHeight, top: '0%' }, false)
+    chart.yAxis[1].update({ height: panes.volumeHeight, top: panes.volumeTop }, false)
+    chart.redraw()
+  }, [volumeHeight])
 
   useEffect(() => {
     if (!containerRef.current) return undefined
@@ -163,8 +202,38 @@ export default function Chart({
     const chart = chartRef.current
     if (!chart) return
 
-    chart.series[0].setData(groupedData.candlesticks, false)
-    chart.series[1].setData(groupedData.volumes, true)
+    const colors = getChartColors()
+    const volumesByTimestamp = new Map(
+      groupedData.volumePoints.map(({ timestamp, volume }) => [timestamp, volume])
+    )
+    const chartCandlesticks = groupedData.candlesticks.map(([x, open, high, low, close]) => ({
+      close,
+      custom: { volume: volumesByTimestamp.get(x) ?? 0 },
+      high,
+      low,
+      open,
+      x
+    }))
+    const latestCandle = chartCandlesticks.at(-1)
+
+    chart.series[0].setData(chartCandlesticks, false)
+    chart.series[1].setData(
+      groupedData.volumePoints.map(({ direction, timestamp, volume }) => ({
+        color: direction === 'up' ? colors.volumeUp : colors.volumeDown,
+        x: timestamp,
+        y: volume
+      })),
+      true
+    )
+    if (latestCandle) {
+      setReadout({
+        close: latestCandle.close,
+        high: latestCandle.high,
+        low: latestCandle.low,
+        open: latestCandle.open,
+        volume: latestCandle.custom.volume
+      })
+    }
   }, [groupedData])
 
   useEffect(() => {
@@ -183,8 +252,23 @@ export default function Chart({
     }
   }, [selectedPrice])
 
+  const direction = readout && readout.close >= readout.open ? 'up' : 'down'
+
   return (
     <div className="chart-slot price-chart">
+      {readout && (
+        <div
+          aria-live="polite"
+          className={`price-chart__readout price-chart__readout--${direction}`}
+          data-testid="price-chart-readout"
+        >
+          <span>O {formatValue(readout.open)}</span>
+          <span>H {formatValue(readout.high)}</span>
+          <span>L {formatValue(readout.low)}</span>
+          <span>C {formatValue(readout.close)}</span>
+          <span>V {formatValue(readout.volume)}</span>
+        </div>
+      )}
       <div
         aria-label="Price chart"
         className="price-chart__canvas"
@@ -198,8 +282,7 @@ export default function Chart({
 Chart.propTypes = {
   candlesticks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
   selectedPrice: PropTypes.number,
-  sessionDate: PropTypes.string.isRequired,
-  symbol: PropTypes.string.isRequired,
-  timeframe: PropTypes.oneOf([5, 15, 30, 60]).isRequired,
+  timeframe: PropTypes.oneOf([5, 15, 30, 60, 240, 1440]).isRequired,
+  volumeHeight: PropTypes.number.isRequired,
   volumes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
 }

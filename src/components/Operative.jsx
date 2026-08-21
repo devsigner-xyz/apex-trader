@@ -2,44 +2,16 @@ import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 
 const orderTypes = [
-  { value: 'limit', label: 'Limit', help: 'Appears at the configured limit price.' },
-  { value: 'market', label: 'Market', help: 'Uses the available price without a limit price.' },
-  { value: 'stop', label: 'Stop', help: 'Activates when the reference price reaches the trigger.' },
-  {
-    value: 'stopLimit',
-    label: 'Stop Limit',
-    help: 'After triggering, it presents a limit order that may not complete.'
-  },
-  {
-    value: 'takeProfit',
-    label: 'Take Profit',
-    help: 'Activates when the reference price reaches the target.'
-  },
-  {
-    value: 'takeProfitLimit',
-    label: 'Take Profit Limit',
-    help: 'After triggering, it presents a limit order at the configured price.'
-  },
-  {
-    value: 'trailingStop',
-    label: 'Trailing Stop',
-    help: 'The trigger follows the reference price by the configured distance.'
-  },
-  {
-    value: 'oco',
-    label: 'OCO',
-    help: 'Shows linked limit and stop parameters in one configuration.'
-  },
-  {
-    value: 'bracket',
-    label: 'Bracket',
-    help: 'Groups entry, target, and stop parameters in one configuration.'
-  },
-  {
-    value: 'iceberg',
-    label: 'Iceberg',
-    help: 'Shows a visible quantity smaller than the configured total quantity.'
-  }
+  { value: 'limit', label: 'Limit' },
+  { value: 'market', label: 'Market' },
+  { value: 'stop', label: 'Stop' },
+  { value: 'stopLimit', label: 'Stop Limit' },
+  { value: 'takeProfit', label: 'Take Profit' },
+  { value: 'takeProfitLimit', label: 'Take Profit Limit' },
+  { value: 'trailingStop', label: 'Trailing Stop' },
+  { value: 'oco', label: 'OCO' },
+  { value: 'bracket', label: 'Bracket' },
+  { value: 'iceberg', label: 'Iceberg' }
 ]
 
 const initialValues = {
@@ -183,7 +155,6 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
   const [status, setStatus] = useState('')
   const inputRefs = useRef({})
   const fields = getFields(orderType, asset, counterpart)
-  const selectedOrderType = orderTypes.find((type) => type.value === orderType)
   const supportsTimeInForce = ['limit', 'stopLimit', 'takeProfitLimit', 'oco', 'iceberg'].includes(
     orderType
   )
@@ -229,10 +200,6 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
 
   return (
     <section aria-label="Order form" className="operative-panel">
-      <header className="panel-heading">
-        <span>Order ticket</span>
-        <span>{asset}/{counterpart}</span>
-      </header>
       <div aria-label="Order side" className="ui-tabs" role="tablist">
         {['buy', 'sell'].map((tab) => (
           <button
@@ -257,9 +224,6 @@ export default function Operative({ asset, counterpart, onSelectTab, selectedPri
               </option>
             ))}
           </select>
-          <small className="field-help" id="order-type-help">
-            {selectedOrderType.help}
-          </small>
         </div>
         {fields.map((field) => (
           <NumericField
