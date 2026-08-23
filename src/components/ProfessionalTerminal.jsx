@@ -965,10 +965,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <select aria-label="Tick size">
           <option>0.01 USD</option>
         </select>
-        <span>
-          CVD&nbsp;&nbsp;|&nbsp;&nbsp;VWAP&nbsp;&nbsp;|&nbsp;&nbsp;Session
-          VP&nbsp;&nbsp;|&nbsp;&nbsp;Imbalance 300%
-        </span>
         <button onClick={() => setSettings(true)} type="button">
           Layout 01&nbsp;&nbsp;·&nbsp;&nbsp;Settings
         </button>
