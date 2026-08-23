@@ -270,7 +270,6 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           </span>
         </div>
         <div className="chart-controls" aria-label="Chart navigation controls">
-          <span>Drag to pan · wheel to zoom</span>
           <button aria-label="Zoom chart in" onClick={() => zoom(-1)} type="button">
             −
           </button>
