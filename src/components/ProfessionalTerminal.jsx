@@ -372,12 +372,12 @@ function MarketChart({ mode, sourceTickSize, view }) {
                 level.price + footprintTickSize / 2 <= high
             )
             const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
-            const barWidth = Math.min(step * 0.86, 88)
+            const barWidth = Math.min(step * 0.92, 96)
             const halfWidth = barWidth / 2
             const rowHeight = clamp(
               (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
-              12,
-              22
+              16,
+              24
             )
             return (
               <g className="footprint-bar" key={bar.timestamp}>
@@ -453,7 +453,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
                   )
                 })}
                 <text
-                  className={bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}
+                  className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
                   textAnchor="middle"
                   x={center}
                   y={y(bar.high) - 9}
@@ -492,7 +492,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
                   y2={y(bar.low)}
                 />
                 <text
-                  className={bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}
+                  className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
                   textAnchor="middle"
                   x={center}
                   y={y(bar.low) + 16}

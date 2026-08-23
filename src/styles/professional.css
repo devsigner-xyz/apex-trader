@@ -393,7 +393,7 @@
 
 .footprint-cell-value {
   fill: #e4edf1;
-  font: 700 8px 'Roboto Mono', monospace;
+  font: 700 10px 'Roboto Mono', monospace;
   pointer-events: none;
 }
 
@@ -411,9 +411,8 @@
   stroke-width: 1.4;
 }
 
-.positive-fill,
-.negative-fill {
-  font: 700 9px 'Roboto Mono', monospace;
+.bar-delta {
+  font: 700 11px 'Roboto Mono', monospace;
 }
 
 .positive-fill {

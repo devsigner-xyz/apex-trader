@@ -42,6 +42,11 @@ for (const [route, mode] of views) {
           )
         )
       expect(volumeCenters).toEqual(profileCenters)
+      const deltaFontSize = await page
+        .locator('.bar-delta')
+        .first()
+        .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
+      expect(deltaFontSize).toBeGreaterThanOrEqual(11)
     }
     if (mode === 'footprint') {
       const cells = page.locator('.footprint-cell')
@@ -49,6 +54,10 @@ for (const [route, mode] of views) {
       expect(await cells.count()).toBeGreaterThan(20)
       expect(await values.count()).toBeGreaterThan(40)
       await expect(values.first()).toBeVisible()
+      const valueFontSize = await values
+        .first()
+        .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
+      expect(valueFontSize).toBeGreaterThanOrEqual(10)
       const renderedValues = await values.allTextContents()
       expect(renderedValues.some((value) => value !== '—' && Number.parseFloat(value) > 0)).toBe(
         true
