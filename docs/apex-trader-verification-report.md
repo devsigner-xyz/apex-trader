@@ -1,6 +1,6 @@
 # Apex Trader v2 implementation and verification report
 
-Date: 2026-08-23. Scope: the Apex Trader repository only. No Figma writes were performed.
+Date: 2026-08-23. Scope: the Apex Trader repository and the explicitly authorized DOM-controls correction in the Apex Trader Figma file.
 
 ## Implemented routes and interactions
 
@@ -8,7 +8,8 @@ Date: 2026-08-23. Scope: the Apex Trader repository only. No Figma writes were p
 - `/footprint`: real bid/ask footprint, delta, imbalances by intensity, volume, CVD and session profile.
 - `/step-profile`: interval bid/ask distributions, local POC, high/low spine, volume, CVD and session profile.
 - Shared shell: market header, toolbar, watchlist, DOM, execution ticket, Time & Sales, activity blotter, playback dock and settings modal.
-- Working controls: mode route transition, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, order fields, activity tabs, settings and Escape close. Variable-speed controls were removed from UI and playback state.
+- Working controls: mode route transition, real 5/15/30/60-minute aggregation, chart zoom/pan/reset, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, order fields, activity tabs, panel resizing, settings and Escape close. Variable-speed controls were removed from UI and playback state.
+- The nonfunctional `LADDER / AUTO / D42 / CUM` row was removed from the web UI and from the existing `Trading/OrderBook` Figma master (`103:59`) without recreating the component.
 
 The detailed Figma mapping is in `docs/figma-implementation-inventory.md`.
 
@@ -25,7 +26,7 @@ Coverage verified from first/last rows: trades `2019-12-01T00:00:03.572Z` throug
 
 L2 reconstruction groups all rows sharing the exact microsecond `local_timestamp`. Pre-snapshot deltas are ignored, every snapshot resets both sides, zero quantities delete levels, and bids/asks are sorted at the consumption boundary. The checked dataset starts with a snapshot, so ignored pre-snapshot rows and later snapshot resets are both zero.
 
-All 420,562 trades are retained. Aggressor buys map to ask volume and sells to bid volume. The active five-minute interval is rebuilt only from executions at or before the shared clock, so no OHLC, footprint or Time & Sales look-ahead remains.
+All 420,562 trades are retained. Aggressor buys map to ask volume and sells to bid volume. The active five-minute interval is rebuilt only from executions at or before the shared clock, so no OHLC, footprint or Time & Sales look-ahead remains. Higher selectable intervals merge those real five-minute bars, including bid/ask levels, OHLC, volume, delta, CVD, VWAP, POC and 70% value area; they do not synthesize market data.
 
 ## Browser artifacts and frequency
 
@@ -43,13 +44,14 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 | Raw gzip integrity                                | pass (`gzip -t`)                                                |
 | Raw hashes/counts/date bounds                     | pass                                                            |
 | Derived fragment gzip integrity                   | pass, 192/192                                                   |
-| Deterministic L2/value-area/clock tests           | pass                                                            |
+| Deterministic L2/value-area/clock/timeframe tests | pass                                                            |
 | Complete unit suite                               | pass, 8 files                                                   |
 | ESLint                                            | pass                                                            |
-| Vite production build                             | pass; JS 176.77 kB (58.12 kB gzip), CSS 40.24 kB (7.83 kB gzip) |
+| Vite production build                             | pass; JS 178.39 kB (58.69 kB gzip), CSS 40.34 kB (7.86 kB gzip) |
 | `git diff --check`                                | pass (line-ending notices only)                                 |
-| Chromium route/console/interaction/keyboard suite | pass, 5/5                                                       |
+| Chromium route/console/interaction/keyboard suite | pass, 9/9                                                       |
 | Figma comparison                                  | inspected at 1920×1080 for all three target frames              |
+| Figma DOM correction                              | pass; master and latest Step instance re-rendered after removal |
 
 ## Residual deviations and risks
 

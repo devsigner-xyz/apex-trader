@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
+import { aggregateProfessionalBars } from '../services/proPlayback.js'
 
 const fixtureMarkets = [
   ['BTCUSDT', '7,391.62', '7,391.61', '7,391.63', '+0.30%', '5.1K'],
@@ -47,8 +48,8 @@ const chartMinimums = { candles: 10, footprint: 4, 'step-profile': 4 }
 const chartWidth = 1128
 const chartHeight = 730
 const plotLeft = 48
-const plotRight = 1014
-const priceAxisX = 1024
+const plotRight = 1038
+const priceAxisX = 1046
 const mainTop = 42
 const mainBottom = 505
 const volumeTop = 558
@@ -137,23 +138,28 @@ function niceDisplayStep(target, sourceTickSize) {
   return Math.max(sourceTickSize, Number((multiplier * magnitude).toFixed(8)))
 }
 
-function MarketChart({ mode, sourceTickSize, view }) {
+function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const [visibleCount, setVisibleCount] = useState(chartDefaults[mode])
   const [rightOffset, setRightOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
   const dragState = useRef(null)
+  const bars = useMemo(
+    () => aggregateProfessionalBars(view.bars, timeframe),
+    [timeframe, view.bars]
+  )
+  const current = bars.at(-1)
 
   useEffect(() => {
     setVisibleCount(chartDefaults[mode])
     setRightOffset(0)
-  }, [mode])
+  }, [mode, timeframe])
 
   const minimumCount = chartMinimums[mode]
-  const maximumOffset = Math.max(0, view.bars.length - Math.min(visibleCount, view.bars.length))
+  const maximumOffset = Math.max(0, bars.length - Math.min(visibleCount, bars.length))
   const safeOffset = clamp(rightOffset, 0, maximumOffset)
-  const endIndex = view.bars.length - safeOffset
+  const endIndex = bars.length - safeOffset
   const startIndex = Math.max(0, endIndex - visibleCount)
-  const visible = view.bars.slice(startIndex, endIndex)
+  const visible = bars.slice(startIndex, endIndex)
 
   useEffect(() => {
     if (rightOffset !== safeOffset) setRightOffset(safeOffset)
@@ -177,7 +183,12 @@ function MarketChart({ mode, sourceTickSize, view }) {
   const timeIndexes = uniqueIndexes(visible.length, Math.min(6, visible.length))
   const candleWidth = clamp(step * 0.58, 4, 16)
   const volumeWidth = clamp(step * 0.48, 5, 18)
-  const footprintTickSize = niceDisplayStep(range / 28, sourceTickSize)
+  const footprintZoomScale = clamp(chartDefaults.footprint / visible.length, 1, 1.6)
+  const footprintFontSize = clamp(10 + (footprintZoomScale - 1) * 7, 10, 14)
+  const footprintDeltaFontSize = clamp(11 + (footprintZoomScale - 1) * 5, 11, 14)
+  const stepZoomScale = clamp(chartDefaults['step-profile'] / visible.length, 1, 1.5)
+  const stepDeltaFontSize = clamp(13 + (stepZoomScale - 1) * 4, 13, 15)
+  const footprintTickSize = niceDisplayStep((range / 28) * footprintZoomScale, sourceTickSize)
   const footprintSettings = {
     format: 'compact',
     imbalanceRatio: 3,
@@ -243,19 +254,19 @@ function MarketChart({ mode, sourceTickSize, view }) {
   const windowLabel = `${clock(visible[0]?.timestamp ?? view.timestamp)} – ${clock(
     visible.at(-1)?.timestamp ?? view.timestamp
   )}`
+  const timeframeLabel = timeframe === 60 ? '1H' : `${timeframe}M`
 
   return (
     <section className="market-chart">
       <header>
         <div className="chart-summary">
           <span>
-            O {fmt(view.current.open)} H {fmt(view.current.high)} L {fmt(view.current.low)} C{' '}
-            {fmt(view.current.close)}
+            O {fmt(current.open)} H {fmt(current.high)} L {fmt(current.low)} C {fmt(current.close)}
           </span>
           <span>
             {mode === 'footprint'
-              ? `Δ ${fmt(view.current.delta)} · V ${fmt(view.current.volume)}`
-              : `VWAP ${fmt(view.current.vwap)} · POC ${fmt(view.current.poc)}`}
+              ? `Δ ${fmt(current.delta)} · V ${fmt(current.volume)}`
+              : `VWAP ${fmt(current.vwap)} · POC ${fmt(current.poc)}`}
           </span>
         </div>
         <div className="chart-controls" aria-label="Chart navigation controls">
@@ -324,10 +335,12 @@ function MarketChart({ mode, sourceTickSize, view }) {
 
         <text className="quiet" x={plotLeft} y="24">
           {mode === 'candles'
-            ? 'CANDLES · VWAP · EMA20'
+            ? `CANDLES · ${timeframeLabel} · VWAP · EMA20`
             : mode === 'footprint'
-            ? `BID × ASK · ${fmt(footprintTickSize)} USD DISPLAY · ${fmt(sourceTickSize)} SOURCE`
-            : 'STEP PROFILE · 30M · BID × ASK · VA 70%'}
+            ? `BID × ASK · ${timeframeLabel} · ${fmt(footprintTickSize)} USD DISPLAY · ${fmt(
+                sourceTickSize
+              )} SOURCE`
+            : `STEP PROFILE · ${timeframeLabel} · BID × ASK · VA 70%`}
         </text>
         <text className="quiet" x={plotRight - 170} y="24">
           SESSION VOLUME PROFILE
@@ -371,12 +384,12 @@ function MarketChart({ mode, sourceTickSize, view }) {
                 level.price + footprintTickSize / 2 <= high
             )
             const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
-            const barWidth = Math.min(step * 0.92, 96)
+            const barWidth = Math.min(step * 0.92, 96 * footprintZoomScale)
             const halfWidth = barWidth / 2
             const rowHeight = clamp(
               (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
               16,
-              24
+              24 * footprintZoomScale
             )
             return (
               <g className="footprint-bar" key={bar.timestamp}>
@@ -423,6 +436,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
                         className={`footprint-cell-value bid${
                           level.bidImbalance ? ' is-imbalance' : ''
                         }`}
+                        style={{ fontSize: footprintFontSize }}
                         textAnchor="end"
                         x={center - 3}
                         y={y(price) + 3}
@@ -433,6 +447,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
                         className={`footprint-cell-value ask${
                           level.askImbalance ? ' is-imbalance' : ''
                         }`}
+                        style={{ fontSize: footprintFontSize }}
                         textAnchor="start"
                         x={center + 3}
                         y={y(price) + 3}
@@ -453,6 +468,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
                 })}
                 <text
                   className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
+                  style={{ fontSize: footprintDeltaFontSize }}
                   textAnchor="middle"
                   x={center}
                   y={y(bar.high) - 9}
@@ -491,7 +507,10 @@ function MarketChart({ mode, sourceTickSize, view }) {
                   y2={y(bar.low)}
                 />
                 <text
-                  className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
+                  className={`bar-delta step-delta ${
+                    bar.delta >= 0 ? 'positive-fill' : 'negative-fill'
+                  }`}
+                  style={{ fontSize: stepDeltaFontSize }}
                   textAnchor="middle"
                   x={center}
                   y={y(bar.low) + 16}
@@ -529,40 +548,40 @@ function MarketChart({ mode, sourceTickSize, view }) {
           className="poc-line"
           x1={plotLeft}
           x2={plotRight}
-          y1={y(view.current.poc)}
-          y2={y(view.current.poc)}
+          y1={y(current.poc)}
+          y2={y(current.poc)}
         />
         <line
           className="value-line"
           x1={plotLeft}
           x2={plotRight}
-          y1={y(view.current.vah)}
-          y2={y(view.current.vah)}
+          y1={y(current.vah)}
+          y2={y(current.vah)}
         />
         <line
           className="value-line"
           x1={plotLeft}
           x2={plotRight}
-          y1={y(view.current.val)}
-          y2={y(view.current.val)}
+          y1={y(current.val)}
+          y2={y(current.val)}
         />
 
         <line
           className="current-price-line"
           x1={plotRight - 18}
           x2={priceAxisX}
-          y1={y(view.current.close)}
-          y2={y(view.current.close)}
+          y1={y(current.close)}
+          y2={y(current.close)}
         />
         <rect
           className="current-price-tag"
           height="20"
           width={chartWidth - priceAxisX - 4}
           x={priceAxisX + 2}
-          y={y(view.current.close) - 10}
+          y={y(current.close) - 10}
         />
-        <text className="current-price-text" x={priceAxisX + 8} y={y(view.current.close) + 4}>
-          {fmt(view.current.close)}
+        <text className="current-price-text" x={priceAxisX + 6} y={y(current.close) + 4}>
+          {fmt(current.close)}
         </text>
 
         {timeIndexes.map((index) => (
@@ -632,7 +651,7 @@ function MarketChart({ mode, sourceTickSize, view }) {
   )
 }
 
-function Dom({ orderbook, onPrice, pulse }) {
+function Dom({ orderbook, onPrice }) {
   const asks = [...orderbook.asks].reverse().slice(-17)
   const bids = orderbook.bids.slice(0, 17)
   const rows = [
@@ -646,32 +665,34 @@ function Dom({ orderbook, onPrice, pulse }) {
         <strong>DOM</strong>
         <span>BTC · 0.01 · x1</span>
       </header>
-      <div className="dom-tools">LADDER&nbsp;&nbsp;AUTO&nbsp;&nbsp;D42&nbsp;&nbsp;CUM</div>
       <div className="dom-head">
         <span>PRICE</span>
         <span>Δ</span>
         <span>SIZE</span>
         <span>LAST</span>
       </div>
-      {rows.map((row, index) => (
-        <button
-          className={`dom-row ${row.side}`}
-          key={`${row.side}-${row.price}-${pulse}`}
-          onClick={() => onPrice(row.price)}
-          type="button"
-        >
-          <span>{fmt(row.price)}</span>
-          <span>
-            {index % 3 === 0
-              ? `${row.side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}`
-              : ''}
-          </span>
-          <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
-            {fmt(row.amount, 3)}
-          </span>
-          <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
-        </button>
-      ))}
+      <div className="dom-ladder">
+        {rows.map((row, index) => (
+          <button
+            className={`dom-row ${row.side}`}
+            data-price={row.price}
+            key={`${row.side}-${row.price}`}
+            onClick={() => onPrice(row.price)}
+            type="button"
+          >
+            <span>{fmt(row.price)}</span>
+            <span>
+              {index % 3 === 0
+                ? `${row.side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}`
+                : ''}
+            </span>
+            <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
+              {fmt(row.amount, 3)}
+            </span>
+            <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
+          </button>
+        ))}
+      </div>
       <footer>
         <span>
           BID {fmt(orderbook.bids[0]?.price)} ASK {fmt(orderbook.asks[0]?.price)}
@@ -874,7 +895,8 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const { isBuffering, playing, seek, session, setPlaying, timestamp, view } = playback
   const [price, setPrice] = useState(Number(view.current.close).toFixed(2))
   const [settings, setSettings] = useState(false)
-  const [columns, setColumns] = useState({ dom: 218, execution: 280, watch: 340 })
+  const [timeframe, setTimeframe] = useState(5)
+  const [columns, setColumns] = useState({ dom: 218, execution: 280, watch: 360 })
 
   useEffect(() => {
     if (!settings) return undefined
@@ -894,7 +916,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
     onMode(next)
     history.pushState({}, '', next === 'candles' ? '/price-chart' : `/${next}`)
   }
-  const pulse = Math.floor(Date.now() / 500)
   const workspaceStyle = {
     '--dom-width': `${columns.dom}px`,
     '--execution-width': `${columns.execution}px`,
@@ -923,8 +944,15 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <select aria-label="Market">
           <option>BTCUSDT</option>
         </select>
-        <select aria-label="Timeframe">
-          <option>5 min</option>
+        <select
+          aria-label="Timeframe"
+          onChange={(event) => setTimeframe(Number(event.target.value))}
+          value={timeframe}
+        >
+          <option value="5">5 min</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="60">1 hour</option>
         </select>
         <select
           aria-label="Chart mode"
@@ -951,11 +979,16 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <PanelResizer
           label="Resize watchlist"
           onResize={(delta) =>
-            setColumns((current) => ({ ...current, watch: clamp(current.watch + delta, 280, 420) }))
+            setColumns((current) => ({ ...current, watch: clamp(current.watch + delta, 340, 460) }))
           }
         />
         <div className="chart-stack">
-          <MarketChart mode={mode} sourceTickSize={session.tickSize} view={view} />
+          <MarketChart
+            mode={mode}
+            sourceTickSize={session.tickSize}
+            timeframe={timeframe}
+            view={view}
+          />
           <Activity />
         </div>
         <PanelResizer
@@ -964,11 +997,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             setColumns((current) => ({ ...current, dom: clamp(current.dom - delta, 190, 310) }))
           }
         />
-        <Dom
-          onPrice={(next) => setPrice(Number(next).toFixed(2))}
-          orderbook={view.orderbook}
-          pulse={pulse}
-        />
+        <Dom onPrice={(next) => setPrice(Number(next).toFixed(2))} orderbook={view.orderbook} />
         <PanelResizer
           label="Resize execution panel"
           onResize={(delta) =>

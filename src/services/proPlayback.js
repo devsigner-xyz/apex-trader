@@ -111,6 +111,84 @@ export function profileThrough(bars, endIndex) {
   return [...levels.values()].sort((a, b) => a.price - b.price)
 }
 
+function valueArea(levels, pocIndex) {
+  const totalVolume = levels.reduce((sum, level) => sum + level.ask + level.bid, 0)
+  const targetVolume = totalVolume * 0.7
+  let includedVolume = levels[pocIndex].ask + levels[pocIndex].bid
+  let lowIndex = pocIndex
+  let highIndex = pocIndex
+
+  while (includedVolume < targetVolume && (lowIndex > 0 || highIndex < levels.length - 1)) {
+    const lowerVolume = lowIndex > 0 ? levels[lowIndex - 1].ask + levels[lowIndex - 1].bid : -1
+    const higherVolume =
+      highIndex < levels.length - 1 ? levels[highIndex + 1].ask + levels[highIndex + 1].bid : -1
+    if (higherVolume >= lowerVolume) {
+      highIndex += 1
+      includedVolume += higherVolume
+    } else {
+      lowIndex -= 1
+      includedVolume += lowerVolume
+    }
+  }
+
+  return { vah: levels[highIndex].price, val: levels[lowIndex].price }
+}
+
+function mergeBars(group, timestamp) {
+  const levelsByPrice = new Map()
+  for (const bar of group) {
+    for (const level of bar.levels) {
+      const current = levelsByPrice.get(level.price) ?? { ask: 0, bid: 0, price: level.price }
+      current.ask += level.ask
+      current.bid += level.bid
+      levelsByPrice.set(level.price, current)
+    }
+  }
+  const levels = [...levelsByPrice.values()].sort((a, b) => a.price - b.price)
+  const pocIndex = levels.reduce(
+    (best, level, index) =>
+      level.ask + level.bid > levels[best].ask + levels[best].bid ? index : best,
+    0
+  )
+  const { vah, val } = valueArea(levels, pocIndex)
+  const latest = group.at(-1)
+
+  return {
+    ...latest,
+    close: latest.close,
+    cvd: latest.cvd,
+    delta: group.reduce((sum, bar) => sum + bar.delta, 0),
+    high: Math.max(...group.map((bar) => bar.high)),
+    levels,
+    low: Math.min(...group.map((bar) => bar.low)),
+    open: group[0].open,
+    poc: levels[pocIndex].price,
+    timestamp,
+    vah,
+    val,
+    volume: group.reduce((sum, bar) => sum + bar.volume, 0),
+    vwap: latest.vwap
+  }
+}
+
+export function aggregateProfessionalBars(bars, timeframeMinutes, sourceMinutes = 5) {
+  if (!Number.isInteger(timeframeMinutes) || timeframeMinutes < sourceMinutes)
+    throw new Error('Timeframe must be an integer at least as large as the source interval.')
+  if (timeframeMinutes % sourceMinutes !== 0)
+    throw new Error('Timeframe must be a multiple of the source interval.')
+  if (timeframeMinutes === sourceMinutes) return bars
+
+  const intervalMs = timeframeMinutes * 60 * 1000
+  const groups = new Map()
+  for (const bar of bars) {
+    const timestamp = Math.floor(bar.timestamp / intervalMs) * intervalMs
+    const group = groups.get(timestamp) ?? []
+    group.push(bar)
+    groups.set(timestamp, group)
+  }
+  return [...groups.entries()].map(([timestamp, group]) => mergeBars(group, timestamp))
+}
+
 function partialBar(base, previous, rawTrades, timestamp, tickSize, priorVolume) {
   const executions = rawTrades.filter((trade) => {
     const time = Math.floor(trade[0] / 1000)

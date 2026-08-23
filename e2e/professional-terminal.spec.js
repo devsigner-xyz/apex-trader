@@ -21,6 +21,7 @@ for (const [route, mode] of views) {
     await expect(page.getByText(/TARDIS (REPLAYING|PAUSED|BUFFERING)/)).toBeVisible()
     await expect(page.getByText('DOM', { exact: true })).toBeVisible()
     await expect(page.getByText('TIME & SALES')).toBeVisible()
+    await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
     const activity = page.getByLabel('Orders and positions')
     const playbackDock = page.locator('.playback-dock')
     await expect(activity).toBeVisible()
@@ -43,10 +44,10 @@ for (const [route, mode] of views) {
         )
       expect(volumeCenters).toEqual(profileCenters)
       const deltaFontSize = await page
-        .locator('.bar-delta')
+        .locator('.step-delta')
         .first()
         .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
-      expect(deltaFontSize).toBeGreaterThanOrEqual(11)
+      expect(deltaFontSize).toBeGreaterThanOrEqual(13)
     }
     if (mode === 'footprint') {
       const cells = page.locator('.footprint-cell')
@@ -58,6 +59,25 @@ for (const [route, mode] of views) {
         .first()
         .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
       expect(valueFontSize).toBeGreaterThanOrEqual(10)
+      const initialCellWidth = await page
+        .locator('.footprint-bid-bg')
+        .first()
+        .evaluate((node) => Number(node.getAttribute('width')))
+      for (let index = 0; index < 6; index += 1) {
+        await page.getByRole('button', { name: 'Zoom chart in' }).click()
+      }
+      await expect(page.getByLabel('Visible bars')).toHaveText('4 bars')
+      const zoomedValueFontSize = await page
+        .locator('.footprint-cell-value')
+        .first()
+        .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
+      const zoomedCellWidth = await page
+        .locator('.footprint-bid-bg')
+        .first()
+        .evaluate((node) => Number(node.getAttribute('width')))
+      expect(zoomedValueFontSize).toBeGreaterThan(valueFontSize)
+      expect(zoomedValueFontSize).toBeGreaterThanOrEqual(13)
+      expect(zoomedCellWidth).toBeGreaterThan(initialCellWidth)
       const renderedValues = await values.allTextContents()
       expect(renderedValues.some((value) => value !== '—' && Number.parseFloat(value) > 0)).toBe(
         true
@@ -84,6 +104,14 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await expect(page.getByText(/REPLAYING .*×/)).toHaveCount(0)
   await page.getByRole('button', { name: 'PAUSE' }).click()
 
+  const timeframe = page.getByLabel('Timeframe')
+  await expect(timeframe.locator('option')).toHaveCount(4)
+  await timeframe.selectOption('15')
+  await expect(page.locator('.quiet').first()).toContainText('15M')
+  await timeframe.selectOption('60')
+  await expect(page.locator('.quiet').first()).toContainText('1H')
+  await timeframe.selectOption('5')
+
   const chart = page.getByLabel('candles historical chart')
   const visibleBars = page.getByLabel('Visible bars')
   const initialCount = await visibleBars.textContent()
@@ -104,6 +132,17 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   const resizedWatchlist = await watchlist.boundingBox()
   expect(resizedWatchlist.width).toBeGreaterThan(initialWatchlist.width)
 
+  const firstDomRow = page.locator('.dom-row').first()
+  const firstDomPrice = await firstDomRow.getAttribute('data-price')
+  await firstDomRow.evaluate((node) => {
+    window.__firstDomRow = node
+  })
+  await page.waitForTimeout(700)
+  const sameDomRow = await page
+    .locator(`.dom-row[data-price="${firstDomPrice}"]`)
+    .evaluate((node) => node === window.__firstDomRow)
+  expect(sameDomRow).toBe(true)
+
   await page.getByRole('button', { name: /Layout 01/ }).click()
   await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeVisible()
   await page.keyboard.press('Escape')
@@ -119,11 +158,23 @@ test('orders and positions remain visible at a smaller desktop viewport', async 
 
   const activity = page.getByLabel('Orders and positions')
   const playbackDock = page.locator('.playback-dock')
+  const ticket = page.locator('.ticket')
+  const tape = page.locator('.tape')
+  const dom = page.locator('.dom')
+  const ladder = page.locator('.dom-ladder')
   await expect(activity).toBeVisible()
 
   const activityBox = await activity.boundingBox()
   const playbackBox = await playbackDock.boundingBox()
+  const ticketBox = await ticket.boundingBox()
+  const tapeBox = await tape.boundingBox()
+  const domBox = await dom.boundingBox()
+  const ladderBox = await ladder.boundingBox()
   expect(activityBox.height).toBeGreaterThanOrEqual(200)
   expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
   expect(playbackBox.y + playbackBox.height).toBeLessThanOrEqual(900)
+  expect(ticketBox.y + ticketBox.height).toBeLessThanOrEqual(tapeBox.y + 1)
+  expect(tapeBox.height).toBeGreaterThan(190)
+  expect(domBox.height).toBeGreaterThanOrEqual(750)
+  expect(ladderBox.height).toBeGreaterThan(580)
 })

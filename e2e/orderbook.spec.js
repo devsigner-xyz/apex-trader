@@ -1,272 +1,78 @@
-const { test, expect } = require('@playwright/test')
+const { expect, test } = require('@playwright/test')
 
-test.describe('Orderbook Component', () => {
+test.use({ viewport: { height: 1080, width: 1920 } })
+
+test.describe('Professional historical order flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/')
-    await expect(page.getByTestId('playback-controls')).toBeVisible()
+    await page.goto('/price-chart')
+    await expect(page.getByText(/TARDIS (REPLAYING|PAUSED|BUFFERING)/)).toBeVisible()
   })
 
-  test('should display bid and ask rows', async ({ page }) => {
-    const bidRows = page.locator('[data-test="bid-row"]')
-    const askRows = page.locator('[data-test="ask-row"]')
+  test('renders the reconstructed DOM with a balanced visible ladder', async ({ page }) => {
+    const rows = page.locator('.dom-row')
+    await expect(rows).toHaveCount(34)
+    await expect(page.locator('.dom-row.ask')).toHaveCount(17)
+    await expect(page.locator('.dom-row.bid')).toHaveCount(17)
+    await expect(page.locator('.dom footer')).toContainText(/Exact groups applied \d+/)
+    await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
 
-    expect(await bidRows.count()).toBeGreaterThan(0)
-    expect(await askRows.count()).toBeGreaterThan(0)
-    await expect(page.getByLabel('Bids')).toHaveCSS('overflow-y', 'auto')
-    await expect(page.getByLabel('Asks')).toHaveCSS('overflow-y', 'auto')
-
-    const panelTypographyAndAlignment = await page.evaluate(() => {
-      const orderbook = document.querySelector('.orderbook-row')
-      const operativeLabel = document.querySelector('.operative-form .form-element > label')
+    const dimensions = await page.locator('.dom').evaluate((dom) => {
+      const ladder = dom.querySelector('.dom-ladder')
+      const footer = dom.querySelector('footer')
       return {
-        amountAlignment: getComputedStyle(document.querySelector('.orderbook-row__amount'))
-          .textAlign,
-        operativeLabelFontSize: getComputedStyle(operativeLabel).fontSize,
-        orderbookRowFontSize: getComputedStyle(orderbook).fontSize,
-        priceAlignment: getComputedStyle(document.querySelector('.orderbook-row__price')).textAlign,
-        sumAlignment: getComputedStyle(document.querySelector('.orderbook-row__sum')).textAlign
+        domBottom: dom.getBoundingClientRect().bottom,
+        footerBottom: footer.getBoundingClientRect().bottom,
+        ladderHeight: ladder.getBoundingClientRect().height
       }
     })
-    expect(panelTypographyAndAlignment).toEqual({
-      amountAlignment: 'left',
-      operativeLabelFontSize: panelTypographyAndAlignment.orderbookRowFontSize,
-      orderbookRowFontSize: '12px',
-      priceAlignment: 'right',
-      sumAlignment: 'left'
-    })
+    expect(dimensions.ladderHeight).toBeGreaterThan(700)
+    expect(Math.abs(dimensions.domBottom - dimensions.footerBottom)).toBeLessThanOrEqual(1)
   })
 
-  test('should calculate and display bid and ask sums correctly', async ({ page }) => {
-    const bidRows = page.locator('[data-test="bid-row"]')
-    const askRows = page.locator('[data-test="ask-row"]')
-
-    const lastBidSum = bidRows.last().locator('[data-test="bid-sum"]')
-    const lastAskSum = askRows.last().locator('[data-test="ask-sum"]')
-
-    await expect(lastBidSum).toHaveText(/^[1-9]\d*\.\d$/)
-    await expect(lastAskSum).toHaveText(/^[1-9]\d*\.\d$/)
-  })
-})
-
-test.describe('Charts', () => {
-  test('renders the price and bid/ask depth charts from static data', async ({ page }) => {
-    await page.goto('/')
-
-    const priceCanvas = page.getByTestId('price-chart').locator('canvas').first()
-    await expect(priceCanvas).toBeVisible()
-    const priceChartBounds = await page.getByTestId('price-chart').boundingBox()
-    await page.mouse.move(priceChartBounds.x + 160, priceChartBounds.y + 160)
-    await expect(page.getByTestId('price-chart-readout')).toContainText(/O .*H .*L .*C .*V /)
-    await expect(page.locator('.price-chart .highcharts-container')).toHaveCount(0)
-
-    await page.getByLabel('Chart type').selectOption('line')
-    await expect(page.getByLabel('Chart type')).toHaveValue('line')
-    await page.getByLabel('Chart type').selectOption('heikinAshi')
-    await expect(page.getByLabel('Chart type')).toHaveValue('heikinAshi')
-    await page.getByLabel('Show SMA 20').check()
-    await expect(page.getByLabel('Show SMA 20')).toBeChecked()
-
-    await expect(page.getByTestId('bid-depth-chart').locator('svg')).toBeVisible()
-    await expect(page.getByTestId('ask-depth-chart').locator('svg')).toBeVisible()
-    await expect(page.getByRole('alert')).toHaveCount(0)
+  test('sends a selected real DOM price to the execution ticket', async ({ page }) => {
+    await page.getByRole('button', { name: 'PAUSE' }).click()
+    const row = page.locator('.dom-row.bid').first()
+    const price = await row.getAttribute('data-price')
+    await row.click()
+    await expect(page.getByLabel('Limit price')).toHaveValue(Number(price).toFixed(2))
   })
 
-  test('switches the candle timeframe without extending the page beyond the viewport', async ({
+  test('keeps DOM, Time and Sales and chart on the shared historical clock', async ({ page }) => {
+    const timeline = page.getByLabel('Historical time')
+    const before = Number(await timeline.inputValue())
+    const firstTradeBefore = await page.locator('.tape button').first().textContent()
+    const groupsBefore = await page
+      .locator('.dom footer span:last-child')
+      .evaluate((node) => Number(node.textContent.match(/\d+/)?.[0]))
+
+    await page.waitForTimeout(1000)
+
+    expect(Number(await timeline.inputValue())).toBeGreaterThan(before)
+    await expect(page.locator('.tape button').first()).not.toHaveText(firstTradeBefore)
+    const groupsAfter = await page
+      .locator('.dom footer span:last-child')
+      .evaluate((node) => Number(node.textContent.match(/\d+/)?.[0]))
+    expect(groupsAfter).toBeGreaterThan(groupsBefore)
+  })
+
+  test('aggregates the retained five-minute market bars into selectable intervals', async ({
     page
   }) => {
-    await page.goto('/')
+    await page.getByRole('button', { name: 'PAUSE' }).click()
+    const timeframe = page.getByLabel('Timeframe')
+    const visibleBars = page.getByLabel('Visible bars')
 
-    await page.getByRole('button', { name: '15m' }).click()
-    await expect(page.getByRole('button', { name: '15m' })).toHaveAttribute('aria-pressed', 'true')
-    await page.getByRole('button', { name: '4h' }).click()
-    await expect(page.getByRole('button', { name: '4h' })).toHaveAttribute('aria-pressed', 'true')
-    await page.getByRole('button', { name: '1D' }).click()
-    await expect(page.getByRole('button', { name: '1D' })).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByRole('button', { name: /1m/i })).toHaveCount(0)
-    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
-    await expect(page.locator('.price-chart .highcharts-container')).toHaveCount(0)
-    await expect(page.getByLabel('Volume pane height')).toHaveCount(0)
-
-    const dimensions = await page.evaluate(() => ({
-      documentHeight: document.body.scrollHeight,
-      viewportHeight: window.innerHeight
-    }))
-    expect(dimensions.documentHeight).toBeLessThanOrEqual(dimensions.viewportHeight)
-  })
-})
-
-test.describe('React trading flows', () => {
-  test('opens panels, changes the pair, and sends an orderbook price to the form without console errors', async ({
-    page
-  }) => {
-    const consoleErrors = []
-    page.on('console', (message) => {
-      if (message.type() === 'error') {
-        consoleErrors.push(message.text())
-      }
-    })
-    page.on('pageerror', (error) => consoleErrors.push(error.message))
-
-    await page.goto('/')
-    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
-
-    await page.getByRole('button', { name: 'BTC-USD' }).click()
-    const markets = page.getByRole('dialog', { name: 'Markets' })
-    await expect(markets).toBeVisible()
-    await markets.getByRole('button', { name: 'Select ETH-USD' }).click()
-    await expect(markets).toBeHidden()
-    await expect(page.getByRole('button', { name: 'ETH-USD' })).toBeVisible()
-
-    await page.getByRole('button', { name: 'Open settings' }).click()
-    const settings = page.getByRole('dialog', { name: 'Settings' })
-    await expect(settings).toBeVisible()
-    await settings.getByLabel('Base currency').selectOption('EUR')
-    await settings.getByRole('button', { name: 'Close settings' }).click()
-    await expect(settings).toBeHidden()
-    await expect(page.getByRole('button', { name: 'ETH-EUR' })).toBeVisible()
-
-    const firstBid = page.locator('[data-test="bid-row"]').first()
-    await firstBid.focus()
-    await firstBid.press('Enter')
-    await expect(page.getByLabel('Price (EUR)')).not.toHaveValue('')
-    expect(consoleErrors).toEqual([])
-  })
-
-  test('shows advanced order controls without demo or execution messaging', async ({ page }) => {
-    await page.goto('/')
-
-    await expect(page.getByText(/DEMO UI ONLY/i)).toHaveCount(0)
-    await expect(page.getByText('Order ticket', { exact: true })).toHaveCount(0)
-    await expect(page.getByText('Order book', { exact: true })).toHaveCount(0)
-    await expect(page.getByText(/ApexTrader by Pablo Carballeda/i)).toHaveCount(0)
-    await expect(page.getByText('Ejecutado · Tardis', { exact: true })).toHaveCount(0)
-    await expect(
-      page.getByText('Uses the available price without a limit price.', { exact: true })
-    ).toHaveCount(0)
-    await page.getByLabel('Order type').selectOption('stopLimit')
-    await expect(page.getByLabel('Trigger price (USD)')).toBeVisible()
-    await expect(page.getByLabel('Price (USD)', { exact: true })).toBeVisible()
-
-    await page.getByRole('button', { name: 'Review configuration' }).click()
-    await expect(page.getByRole('alert')).toContainText('Review the highlighted fields')
-    await expect(page.getByLabel('Trigger price (USD)')).toHaveAttribute('aria-invalid', 'true')
-
-    await page.getByLabel('Trigger price (USD)').fill('101000')
-    await page.getByLabel('Price (USD)', { exact: true }).fill('101100')
-    await page.getByLabel('Quantity (BTC)').fill('0.01')
-    await page.getByRole('button', { name: 'Review configuration' }).click()
-    await expect(page.getByText('Configuration is complete.', { exact: true })).toBeVisible()
-    await expect(page.locator('body')).not.toContainText(/demo|simulat|no ejecutable/i)
-
-    await expect(page.getByLabel('Practice balance')).toBeVisible()
-    const quantityAllocation = page.getByLabel('Quantity allocation')
-    await quantityAllocation.focus()
-    await quantityAllocation.press('End')
-    await expect(page.getByLabel('Quantity (BTC)')).not.toHaveValue('')
-
-    const orderManagement = page.getByTestId('order-management')
-    await expect(orderManagement.getByLabel('Open orders')).toBeVisible()
-    await expect(orderManagement.getByLabel('Order history')).toBeVisible()
-    const orderManagementBounds = await orderManagement.boundingBox()
-    const priceChartBounds = await page.getByTestId('price-chart').boundingBox()
-    expect(orderManagementBounds.y).toBeGreaterThan(priceChartBounds.y)
-
-    await page.getByLabel('Order type').selectOption('iceberg')
-    await expect(page.getByLabel('Visible quantity (BTC)')).toBeVisible()
-    await expect(page.getByLabel('Post only (display only)')).toBeVisible()
-
-    const dimensions = await page.evaluate(() => ({
-      documentHeight: document.body.scrollHeight,
-      viewportHeight: window.innerHeight
-    }))
-    expect(dimensions.documentHeight).toBeLessThanOrEqual(dimensions.viewportHeight)
-  })
-})
-
-test.describe('Historical Tardis playback', () => {
-  test('renders the local BTCUSDT session and keeps playback views synchronized', async ({
-    page
-  }) => {
-    const consoleErrors = []
-    page.on('console', (message) => {
-      if (message.type() === 'error') consoleErrors.push(message.text())
-    })
-    page.on('pageerror', (error) => consoleErrors.push(error.message))
-
-    await page.goto('/')
-    await expect(page.getByTestId('playback-controls')).toBeVisible()
-    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
-    const clock = page.getByTestId('playback-clock')
-    const initialClock = await clock.textContent()
-
-    await page.getByRole('button', { name: 'Footprint' }).click()
-
-    await expect(page.getByTestId('footprint-chart')).toBeVisible()
-    await expect(
-      page.getByText(/HISTÓRICO — trades reales de Binance Spot BTCUSDT agregados desde Tardis/)
-    ).toHaveCount(0)
-    await expect(page.getByTestId('footprint-inspector')).toBeVisible()
-    await expect(page.getByTestId('cvd-panel')).toBeVisible()
-    await expect(clock).not.toHaveText(initialClock ?? '')
-    await page.getByRole('button', { name: 'Precio', exact: true }).click()
-    await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
-    expect(consoleErrors).toEqual([])
-  })
-
-  test('persists footprint controls and exposes exact diagonal detail to keyboard users', async ({
-    page
-  }) => {
-    await page.goto('/')
-    await page.evaluate(() => window.localStorage.clear())
-    await page.reload()
-    await expect(page.getByTestId('playback-controls')).toBeVisible()
-    await page.getByRole('button', { name: 'Footprint' }).click()
-
-    await page.getByLabel('Modo de footprint').selectOption('delta')
-    await page.getByLabel('Tick size').fill('10')
-    await page.getByLabel('Ratio de imbalance').fill('2.5')
-    await page.getByLabel('Volumen mínimo').fill('1')
-    await page.getByLabel('Escala de intensidad').selectOption('logarithmic')
-    await page.getByLabel('Formato de volumen').selectOption('precise')
-    await page.getByLabel('Tamaño de imbalance apilado').selectOption('2')
-
-    await expect(page.locator('.footprint-cell-text').first()).toHaveText(/^Δ /)
-    const firstCell = page.locator('[data-cell-id]').first()
-    await firstCell.focus()
-    await expect(page.getByTestId('footprint-tooltip')).toContainText('Ask diagonal')
-    await firstCell.press('ArrowUp')
-    await expect(page.getByTestId('footprint-tooltip')).toContainText('umbral 2.5× / mínimo 1')
-
-    await page.reload()
-    await page.getByRole('button', { name: 'Footprint' }).click()
-    await expect(page.getByLabel('Modo de footprint')).toHaveValue('delta')
-    await expect(page.getByLabel('Tick size')).toHaveValue('10')
-    await expect(page.getByLabel('Ratio de imbalance')).toHaveValue('2.5')
-    await expect(page.getByLabel('Volumen mínimo')).toHaveValue('1')
-    await expect(page.getByLabel('Escala de intensidad')).toHaveValue('logarithmic')
-    await expect(page.getByLabel('Formato de volumen')).toHaveValue('precise')
-    await expect(page.getByLabel('Tamaño de imbalance apilado')).toHaveValue('2')
-  })
-
-  test('filters executed Time & Sales and synchronizes its selection with footprint and CVD', async ({
-    page
-  }) => {
-    await page.goto('/')
-    const tape = page.getByTestId('time-and-sales')
-    await expect(tape).toBeVisible()
-    await page.getByLabel('Lado de Time and Sales').selectOption('buy')
-    await page.getByLabel('Agrupación de Time and Sales').selectOption('price')
-    const selectedRow = tape.getByTestId('time-sales-row').first()
-    await selectedRow.press('Enter')
-    await expect(selectedRow).toHaveAttribute('aria-pressed', 'true')
-
-    await page.getByRole('button', { name: 'Footprint' }).click()
-    await expect(page.getByTestId('cvd-panel')).toBeVisible()
-    await expect(page.locator('.footprint-chart g.is-cross-selected')).toHaveCount(1)
-    await page.getByLabel('Reset de CVD').selectOption('window')
-    await page.getByLabel('Barras de ventana CVD').fill('2')
-    await expect(page.getByLabel('Contribución delta por barra').getByRole('button')).toHaveCount(2)
-    await page.getByRole('button', { name: 'Resetear en barra seleccionada' }).click()
-    await expect(page.getByLabel('Reset de CVD')).toHaveValue('manual')
+    await timeframe.selectOption('5')
+    expect(Number.parseInt(await visibleBars.textContent(), 10)).toBe(34)
+    await timeframe.selectOption('15')
+    await expect(page.locator('.quiet').first()).toContainText('15M')
+    const fifteenMinuteBars = Number.parseInt(await visibleBars.textContent(), 10)
+    expect(fifteenMinuteBars).toBeGreaterThan(10)
+    expect(fifteenMinuteBars).toBeLessThan(34)
+    await timeframe.selectOption('60')
+    await expect(page.locator('.quiet').first()).toContainText('1H')
+    const hourlyBars = Number.parseInt(await visibleBars.textContent(), 10)
+    expect(hourlyBars).toBeGreaterThan(1)
+    expect(hourlyBars).toBeLessThan(fifteenMinuteBars)
   })
 })
