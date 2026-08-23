@@ -102,9 +102,9 @@ Criterio: veredicto `APPROVED` documentado en Kanban.
 
 ## Gates obligatorios
 
-- `npm run lint` o script equivalente sin modo `--fix`.
-- `npm run build`.
-- `CI=1 npm run test:e2e` con servidor local gestionado por Playwright o comando equivalente reproducible.
+- `pnpm run lint` o script equivalente sin modo `--fix`.
+- `pnpm run build`.
+- `CI=1 pnpm run test:e2e` con servidor local gestionado por Playwright o comando equivalente reproducible.
 - Smoke en navegador: carga de la raíz, apertura/cierre de paneles, selección de par, selección de precio de orderbook y ausencia de errores de consola.
 - `git diff --check`.
 - Revisión independiente registrada en Kanban.

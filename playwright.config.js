@@ -97,7 +97,7 @@ const config = {
   /* Run your local dev server before starting the tests */
   webServer: {
     /* Pin the React Vite dev server to the configured base URL. */
-    command: 'npm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
+    command: 'pnpm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
     port: 5173,
     reuseExistingServer: !process.env.CI,
     timeout: 30 * 1000

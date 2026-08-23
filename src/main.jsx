@@ -5,6 +5,7 @@ import { TradingStateProvider } from './app/tradingState.jsx'
 import './styles/tokens.css'
 import './styles/globals.css'
 import './styles/components.css'
+import './styles/professional.css'
 
 createRoot(document.getElementById('app')).render(
   <StrictMode>

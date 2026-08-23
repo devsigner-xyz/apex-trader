@@ -1,0 +1,16 @@
+{
+  "$schema": "https://design.devsigner.xyz/contracts/devsigner-consumer.schema.json",
+  "schemaVersion": 1,
+  "consumer": {
+    "id": "apex-trader",
+    "scope": "data-product"
+  },
+  "designSystem": {
+    "id": "devsigner",
+    "adoption": "migrating",
+    "contractVersion": null,
+    "tokenDigest": null,
+    "extensions": ["market-data", "trading-state"]
+  },
+  "reviewedAt": "2026-08-22"
+}
