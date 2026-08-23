@@ -43,6 +43,21 @@ for (const [route, mode] of views) {
         )
       expect(volumeCenters).toEqual(profileCenters)
     }
+    if (mode === 'footprint') {
+      const cells = page.locator('.footprint-cell')
+      const values = page.locator('.footprint-cell-value')
+      expect(await cells.count()).toBeGreaterThan(20)
+      expect(await values.count()).toBeGreaterThan(40)
+      await expect(values.first()).toBeVisible()
+      const renderedValues = await values.allTextContents()
+      expect(renderedValues.some((value) => value !== '—' && Number.parseFloat(value) > 0)).toBe(
+        true
+      )
+      const sourceValues = await cells.evaluateAll((nodes) =>
+        nodes.map((node) => Number(node.dataset.ask) + Number(node.dataset.bid))
+      )
+      expect(sourceValues.every((value) => Number.isFinite(value) && value > 0)).toBe(true)
+    }
     await page.screenshot({ fullPage: false, path: `output/playwright/${mode}-1920x1080.png` })
     expect(errors).toEqual([])
   })

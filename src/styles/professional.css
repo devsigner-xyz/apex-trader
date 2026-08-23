@@ -378,6 +378,39 @@
   stroke-width: 1.3;
 }
 
+.footprint-bid-bg {
+  fill: #17445a;
+}
+
+.footprint-ask-bg {
+  fill: #743842;
+}
+
+.footprint-divider {
+  stroke: rgb(11 15 18 / 0.9);
+  stroke-width: 1;
+}
+
+.footprint-cell-value {
+  fill: #e4edf1;
+  font: 700 8px 'Roboto Mono', monospace;
+  pointer-events: none;
+}
+
+.footprint-cell-value.bid.is-imbalance {
+  fill: #71dcb1;
+}
+
+.footprint-cell-value.ask.is-imbalance {
+  fill: #ff8e97;
+}
+
+.footprint-poc-outline {
+  fill: none;
+  stroke: var(--pro-accent);
+  stroke-width: 1.4;
+}
+
 .positive-fill,
 .negative-fill {
   font: 700 9px 'Roboto Mono', monospace;

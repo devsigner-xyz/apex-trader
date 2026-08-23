@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { playbackSpeeds } from '../hooks/useProfessionalPlayback.js'
+import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
 
 const fixtureMarkets = [
   ['BTCUSDT', '7,391.62', '7,391.61', '7,391.63', '+0.30%', '5.1K'],
@@ -128,7 +129,16 @@ function uniqueIndexes(length, count) {
   ]
 }
 
-function MarketChart({ mode, view }) {
+function niceDisplayStep(target, sourceTickSize) {
+  if (!Number.isFinite(target) || target <= sourceTickSize) return sourceTickSize
+  const magnitude = 10 ** Math.floor(Math.log10(target))
+  const normalized = target / magnitude
+  const multiplier =
+    normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 : normalized <= 5 ? 5 : 10
+  return Math.max(sourceTickSize, Number((multiplier * magnitude).toFixed(8)))
+}
+
+function MarketChart({ mode, sourceTickSize, view }) {
   const [visibleCount, setVisibleCount] = useState(chartDefaults[mode])
   const [rightOffset, setRightOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -168,6 +178,16 @@ function MarketChart({ mode, view }) {
   const timeIndexes = uniqueIndexes(visible.length, Math.min(6, visible.length))
   const candleWidth = clamp(step * 0.58, 4, 16)
   const volumeWidth = clamp(step * 0.48, 5, 18)
+  const footprintTickSize = niceDisplayStep(range / 28, sourceTickSize)
+  const footprintSettings = {
+    format: 'compact',
+    imbalanceRatio: 3,
+    minimumVolume: 0,
+    mode: 'bidAsk',
+    scale: 'linear',
+    stackedImbalanceSize: 3,
+    tickSize: footprintTickSize
+  }
 
   const zoom = (direction) => {
     const increment = mode === 'candles' ? 4 : 1
@@ -307,7 +327,7 @@ function MarketChart({ mode, view }) {
           {mode === 'candles'
             ? 'CANDLES · VWAP · EMA20'
             : mode === 'footprint'
-            ? 'BID × ASK CLUSTERS'
+            ? `BID × ASK · ${fmt(footprintTickSize)} USD DISPLAY · ${fmt(sourceTickSize)} SOURCE`
             : 'STEP PROFILE · 30M · BID × ASK · VA 70%'}
         </text>
         <text className="quiet" x={plotRight - 170} y="24">
@@ -337,31 +357,98 @@ function MarketChart({ mode, view }) {
         {mode === 'footprint' &&
           visible.map((bar, index) => {
             const center = x(index)
-            const levels = bar.levels.filter((level) => level.price >= low && level.price <= high)
-            const maximum = Math.max(...levels.map((level) => level.ask + level.bid), 1)
-            const barWidth = step * 0.76
+            const footprintBar = deriveFootprintBar(
+              {
+                ...bar,
+                levels: bar.levels.filter(
+                  (level) => level.price >= low - footprintTickSize && level.price <= high
+                )
+              },
+              footprintSettings
+            )
+            const levels = footprintBar.levels.filter(
+              (level) =>
+                level.price + footprintTickSize / 2 >= low &&
+                level.price + footprintTickSize / 2 <= high
+            )
+            const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
+            const barWidth = Math.min(step * 0.86, 88)
+            const halfWidth = barWidth / 2
+            const rowHeight = clamp(
+              (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
+              12,
+              22
+            )
             return (
-              <g key={bar.timestamp}>
+              <g className="footprint-bar" key={bar.timestamp}>
                 {levels.map((level) => {
-                  const intensity = Math.min(1, (level.ask + level.bid) / maximum)
+                  const price = level.price + footprintTickSize / 2
+                  const bidLabel = formatFootprintVolume(level.bid, 'compact')
+                  const askLabel = formatFootprintVolume(level.ask, 'compact')
                   return (
-                    <g key={level.price}>
+                    <g
+                      className={`footprint-cell${level.isPoc ? ' is-poc' : ''}`}
+                      data-ask={level.ask}
+                      data-bid={level.bid}
+                      data-price={level.price}
+                      key={level.price}
+                    >
+                      <title>
+                        {fmt(level.price)}–{fmt(level.price + footprintTickSize)} · Bid{' '}
+                        {fmt(level.bid, 3)} × Ask {fmt(level.ask, 3)}
+                      </title>
                       <rect
-                        fill="#173e52"
-                        fillOpacity={0.45 + intensity * 0.55}
-                        height="8"
-                        width={barWidth / 2}
-                        x={center - barWidth / 2}
-                        y={y(level.price) - 4}
+                        className="footprint-bid-bg"
+                        fillOpacity={0.2 + Math.min(1, level.bid / maximum) * 0.72}
+                        height={rowHeight}
+                        width={halfWidth}
+                        x={center - halfWidth}
+                        y={y(price) - rowHeight / 2}
                       />
                       <rect
-                        fill="#7a3540"
-                        fillOpacity={0.45 + intensity * 0.55}
-                        height="8"
-                        width={barWidth / 2}
+                        className="footprint-ask-bg"
+                        fillOpacity={0.2 + Math.min(1, level.ask / maximum) * 0.72}
+                        height={rowHeight}
+                        width={halfWidth}
                         x={center}
-                        y={y(level.price) - 4}
+                        y={y(price) - rowHeight / 2}
                       />
+                      <line
+                        className="footprint-divider"
+                        x1={center}
+                        x2={center}
+                        y1={y(price) - rowHeight / 2}
+                        y2={y(price) + rowHeight / 2}
+                      />
+                      <text
+                        className={`footprint-cell-value bid${
+                          level.bidImbalance ? ' is-imbalance' : ''
+                        }`}
+                        textAnchor="end"
+                        x={center - 3}
+                        y={y(price) + 3}
+                      >
+                        {bidLabel}
+                      </text>
+                      <text
+                        className={`footprint-cell-value ask${
+                          level.askImbalance ? ' is-imbalance' : ''
+                        }`}
+                        textAnchor="start"
+                        x={center + 3}
+                        y={y(price) + 3}
+                      >
+                        {askLabel}
+                      </text>
+                      {level.isPoc && (
+                        <rect
+                          className="footprint-poc-outline"
+                          height={rowHeight}
+                          width={barWidth}
+                          x={center - halfWidth}
+                          y={y(price) - rowHeight / 2}
+                        />
+                      )}
                     </g>
                   )
                 })}
@@ -870,7 +957,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           }
         />
         <div className="chart-stack">
-          <MarketChart mode={mode} view={view} />
+          <MarketChart mode={mode} sourceTickSize={session.tickSize} view={view} />
           <Activity />
         </div>
         <PanelResizer
