@@ -3,6 +3,7 @@ import test from 'node:test'
 import {
   aggregateProfessionalBars,
   deriveProfessionalView,
+  formatCandleCloseCountdown,
   reconstructBook
 } from '../src/services/proPlayback.js'
 
@@ -135,4 +136,13 @@ test('higher timeframes aggregate real OHLC, volume, delta and footprint levels'
 
 test('unsupported timeframes fail instead of silently approximating market data', () => {
   assert.throws(() => aggregateProfessionalBars([], 7), /multiple/)
+})
+
+test('candle close countdown follows the selected timeframe boundary', () => {
+  const timestamp = Date.UTC(2019, 11, 1, 4, 2, 18, 250)
+  assert.equal(formatCandleCloseCountdown(timestamp, 5), '02:42')
+  assert.equal(formatCandleCloseCountdown(timestamp, 15), '12:42')
+  assert.equal(formatCandleCloseCountdown(Date.UTC(2019, 11, 1, 4, 5), 5), '05:00')
+  assert.throws(() => formatCandleCloseCountdown(Number.NaN, 5), /finite/)
+  assert.throws(() => formatCandleCloseCountdown(timestamp, 0), /positive integer/)
 })

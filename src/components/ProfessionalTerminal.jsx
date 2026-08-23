@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
-import { aggregateProfessionalBars } from '../services/proPlayback.js'
+import { aggregateProfessionalBars, formatCandleCloseCountdown } from '../services/proPlayback.js'
 
 const fixtureMarkets = [
   ['BTCUSDT', '7,391.62', '7,391.61', '7,391.63', '+0.30%', '5.1K'],
@@ -374,6 +374,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     visible.at(-1)?.timestamp ?? view.timestamp
   )}`
   const timeframeLabel = timeframe === 60 ? '1H' : `${timeframe}M`
+  const candleCloseCountdown = formatCandleCloseCountdown(view.timestamp, timeframe)
 
   return (
     <section className="market-chart">
@@ -693,13 +694,21 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
         />
         <rect
           className="current-price-tag"
-          height="20"
+          height="32"
           width={chartWidth - priceAxisX - 4}
           x={priceAxisX + 2}
-          y={y(current.close) - 10}
+          y={y(current.close) - 16}
         />
-        <text className="current-price-text" x={priceAxisX + 6} y={y(current.close) + 4}>
+        <text className="current-price-text" x={priceAxisX + 6} y={y(current.close) - 2}>
           {fmt(current.close)}
+        </text>
+        <text
+          aria-label={`Candle closes in ${candleCloseCountdown}`}
+          className="current-price-countdown"
+          x={priceAxisX + 6}
+          y={y(current.close) + 11}
+        >
+          CLOSE {candleCloseCountdown}
         </text>
 
         {timeIndexes.map((index) => (
@@ -798,7 +807,7 @@ function Dom({ currentPrice, orderbook, onPrice }) {
   )
 
   return (
-    <section className="dom">
+    <section className="dom" data-groups-applied={orderbook.groupsApplied}>
       <header>
         <strong>DOM</strong>
         <span>BTC · 0.01 · x1</span>
@@ -832,7 +841,6 @@ function Dom({ currentPrice, orderbook, onPrice }) {
         <span>
           BID {fmt(orderbook.bids[0]?.price)} ASK {fmt(orderbook.asks[0]?.price)}
         </span>
-        <span>Exact groups applied {orderbook.groupsApplied}</span>
       </footer>
     </section>
   )

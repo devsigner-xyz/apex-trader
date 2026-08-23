@@ -7,7 +7,7 @@ Date: 2026-08-23. Scope: the Apex Trader repository and the explicitly authorize
 - `/price-chart`: candles, volume, CVD, session profile, POC/VAH/VAL and historical tape.
 - `/footprint`: real bid/ask footprint, delta, imbalances by intensity, volume, CVD and session profile.
 - `/step-profile`: interval bid/ask distributions, local POC, high/low spine, volume, CVD and session profile.
-- Shared shell: market header, toolbar, watchlist, DOM with a stable last-price/spread separator, execution ticket, Time & Sales, activity blotter, playback dock and settings modal.
+- Shared shell: market header, toolbar, watchlist, DOM with a stable last-price/spread separator and no internal event counter, price-scale candle-close countdown, execution ticket, Time & Sales, activity blotter, playback dock and settings modal.
 - Working controls: mode route transition, real 5/15/30/60-minute aggregation, chart zoom/pan/reset, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, controlled order type, local non-transmitted order staging, activity tabs with distinct bodies, panel resizing, settings and Escape close. Variable-speed controls were removed from UI and playback state.
 - The nonfunctional `LADDER / AUTO / D42 / CUM` row was removed from the web UI and from the existing `Trading/OrderBook` Figma master (`103:59`) without recreating the component.
 - The same master now owns the `DOM / Last Price & Spread` separator (`310:506`), inherited once by each target screen between the best ask and best bid.

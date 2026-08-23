@@ -17,7 +17,8 @@ test.describe('Professional historical order flow', () => {
     await expect(spreadRow).toHaveCount(1)
     await expect(spreadRow).toContainText('LAST')
     await expect(spreadRow).toContainText('SPREAD')
-    await expect(page.locator('.dom footer')).toContainText(/Exact groups applied \d+/)
+    await expect(page.getByText(/Exact groups applied/)).toHaveCount(0)
+    await expect(page.locator('.dom footer')).toContainText(/BID .* ASK/)
     await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
 
     const separator = await page.locator('.dom-ladder').evaluate((ladder) => {
@@ -59,17 +60,13 @@ test.describe('Professional historical order flow', () => {
     const timeline = page.getByLabel('Historical time')
     const before = Number(await timeline.inputValue())
     const firstTradeBefore = await page.locator('.tape button').first().textContent()
-    const groupsBefore = await page
-      .locator('.dom footer span:last-child')
-      .evaluate((node) => Number(node.textContent.match(/\d+/)?.[0]))
+    const groupsBefore = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
 
     await page.waitForTimeout(1000)
 
     expect(Number(await timeline.inputValue())).toBeGreaterThan(before)
     await expect(page.locator('.tape button').first()).not.toHaveText(firstTradeBefore)
-    const groupsAfter = await page
-      .locator('.dom footer span:last-child')
-      .evaluate((node) => Number(node.textContent.match(/\d+/)?.[0]))
+    const groupsAfter = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
     expect(groupsAfter).toBeGreaterThan(groupsBefore)
   })
 

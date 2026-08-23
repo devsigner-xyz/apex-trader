@@ -48,6 +48,7 @@ for (const [route, mode] of views) {
     expect(activityBox.height).toBeGreaterThanOrEqual(200)
     expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
     await expect(page.locator('.price-tick')).toHaveCount(9)
+    await expect(page.locator('.current-price-countdown')).toHaveText(/CLOSE \d{2}:\d{2}/)
     await expect(page.getByRole('button', { name: 'PAUSE' })).toBeVisible()
     if (mode === 'step-profile') {
       const profileCenters = await page
@@ -113,11 +114,14 @@ for (const [route, mode] of views) {
 test('playback, settings and keyboard controls remain coherent', async ({ page }) => {
   await page.goto('/price-chart')
   const timeline = page.getByLabel('Historical time')
+  const countdown = page.locator('.current-price-countdown')
+  const countdownBefore = await countdown.textContent()
   const before = Number(await timeline.inputValue())
   await page.waitForTimeout(1000)
   const elapsed = Number(await timeline.inputValue()) - before
   expect(elapsed).toBeGreaterThan(500)
   expect(elapsed).toBeLessThan(2000)
+  await expect(countdown).not.toHaveText(countdownBefore)
   await expect(page.getByLabel('Playback speed')).toHaveCount(0)
   await expect(page.getByText(/REPLAYING .*×/)).toHaveCount(0)
   await page.getByRole('button', { name: 'PAUSE' }).click()
@@ -126,8 +130,10 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await expect(timeframe.locator('option')).toHaveCount(4)
   await timeframe.selectOption('15')
   await expect(page.locator('.quiet').first()).toContainText('15M')
+  await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)
   await timeframe.selectOption('60')
   await expect(page.locator('.quiet').first()).toContainText('1H')
+  await expect(countdown).toHaveText(/CLOSE \d{2}:\d{2}/)
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')

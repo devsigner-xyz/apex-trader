@@ -189,6 +189,20 @@ export function aggregateProfessionalBars(bars, timeframeMinutes, sourceMinutes 
   return [...groups.entries()].map(([timestamp, group]) => mergeBars(group, timestamp))
 }
 
+export function formatCandleCloseCountdown(timestamp, timeframeMinutes) {
+  if (!Number.isFinite(timestamp)) throw new TypeError('Timestamp must be finite.')
+  if (!Number.isInteger(timeframeMinutes) || timeframeMinutes <= 0)
+    throw new TypeError('Timeframe must be a positive integer.')
+
+  const intervalMs = timeframeMinutes * 60 * 1000
+  const elapsedMs = ((timestamp % intervalMs) + intervalMs) % intervalMs
+  const remainingMs = elapsedMs === 0 ? intervalMs : intervalMs - elapsedMs
+  const remainingSeconds = Math.ceil(remainingMs / 1000)
+  const minutes = Math.floor(remainingSeconds / 60)
+  const seconds = remainingSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
 function partialBar(base, previous, rawTrades, timestamp, tickSize, priorVolume) {
   const executions = rawTrades.filter((trade) => {
     const time = Math.floor(trade[0] / 1000)

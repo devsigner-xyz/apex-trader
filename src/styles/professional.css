@@ -513,6 +513,13 @@
   fill: #8e5b37;
 }
 
+.current-price-countdown {
+  fill: var(--pro-text);
+  font: 700 8px 'Roboto Mono', monospace;
+  letter-spacing: 0.02em;
+  opacity: 0.82;
+}
+
 .delta-baseline {
   stroke: var(--pro-border);
   stroke-width: 1;

@@ -35,7 +35,7 @@ The three vertical resize handles are 5 px wide. The workspace ends at `y=1026`;
 
 ### Price Chart (`62:1697`)
 
-- Candles and volume are derived from all Binance Spot BTCUSDT trades in the active interval.
+- Candles and volume are derived from all Binance Spot BTCUSDT trades in the active interval; the price-scale marker shows the replay-clock countdown to that interval's close.
 - VWAP, EMA20, session profile, POC, VAH and VAL share the playback clock.
 - The reference uses a dense canvas with a 56 px price scale and a right-aligned split buy/sell profile.
 
