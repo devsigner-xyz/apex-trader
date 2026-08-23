@@ -271,20 +271,13 @@ export function derivePlaybackView(session, timestamp, footprintWindow = 8) {
   }
 }
 
-export function advancePlaybackTime(timestamp, elapsedMs, speed, session) {
-  if (
-    !Number.isFinite(timestamp) ||
-    !Number.isFinite(elapsedMs) ||
-    !Number.isFinite(speed) ||
-    speed <= 0
-  ) {
-    throw new TypeError(
-      'Playback time, elapsed time, and speed must be finite; speed must be positive.'
-    )
+export function advancePlaybackTime(timestamp, elapsedMs, session) {
+  if (!Number.isFinite(timestamp) || !Number.isFinite(elapsedMs)) {
+    throw new TypeError('Playback time and elapsed time must be finite.')
   }
   const playbackStart = session.playbackStart ?? session.sessionStart
   const duration = session.sessionEndExclusive - playbackStart
-  const offset = (timestamp - playbackStart + elapsedMs * speed) % duration
+  const offset = (timestamp - playbackStart + elapsedMs) % duration
   return playbackStart + (offset < 0 ? offset + duration : offset)
 }
 

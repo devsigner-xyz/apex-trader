@@ -6,13 +6,10 @@ import {
   loadProfessionalSession
 } from '../services/proPlayback.js'
 
-export const playbackSpeeds = [1, 10, 60, 300, 1200]
-
 export function useProfessionalPlayback() {
   const [session, setSession] = useState(null)
   const [chunk, setChunk] = useState(null)
   const [timestamp, setTimestamp] = useState(null)
-  const [speed, setSpeed] = useState(60)
   const [playing, setPlaying] = useState(true)
   const [error, setError] = useState(null)
   const tick = useRef(null)
@@ -57,12 +54,12 @@ export function useProfessionalPlayback() {
       const elapsed = now - tick.current
       tick.current = now
       setTimestamp((value) => {
-        const next = value + elapsed * speed
+        const next = value + elapsed
         return next >= session.sessionEndExclusive ? session.playbackStart : next
       })
     }, 50)
     return () => window.clearInterval(timer)
-  }, [chunk?.index, chunkIndex, playing, session, speed])
+  }, [chunk?.index, chunkIndex, playing, session])
 
   const seek = useCallback((next) => setTimestamp(Number(next)), [])
   const currentView = useMemo(
@@ -82,8 +79,6 @@ export function useProfessionalPlayback() {
     seek,
     session,
     setPlaying,
-    setSpeed,
-    speed,
     timestamp,
     view
   }

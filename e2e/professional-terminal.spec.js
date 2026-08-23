@@ -74,10 +74,14 @@ for (const [route, mode] of views) {
 
 test('playback, settings and keyboard controls remain coherent', async ({ page }) => {
   await page.goto('/price-chart')
-  const clock = page.locator('.playback-dock output')
-  const before = await clock.textContent()
-  await page.waitForTimeout(250)
-  expect(await clock.textContent()).not.toBe(before)
+  const timeline = page.getByLabel('Historical time')
+  const before = Number(await timeline.inputValue())
+  await page.waitForTimeout(1000)
+  const elapsed = Number(await timeline.inputValue()) - before
+  expect(elapsed).toBeGreaterThan(500)
+  expect(elapsed).toBeLessThan(2000)
+  await expect(page.getByLabel('Playback speed')).toHaveCount(0)
+  await expect(page.getByText(/REPLAYING .*×/)).toHaveCount(0)
   await page.getByRole('button', { name: 'PAUSE' }).click()
 
   const chart = page.getByLabel('candles historical chart')

@@ -1138,19 +1138,6 @@
   font-family: var(--font-family-mono);
 }
 
-.playback-controls label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.playback-controls select {
-  min-height: 1.75rem;
-  color: var(--color-text);
-  background: var(--color-surface-inset);
-  border: var(--border-width) solid var(--color-border-subtle);
-}
-
 .grid-chart:not(.grid-chart--footprint) .playback-controls > span {
   display: none;
 }

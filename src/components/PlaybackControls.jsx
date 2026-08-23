@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types'
-import { playbackSpeeds } from '../hooks/useTardisPlayback.js'
 
 function formatPlaybackTime(timestamp) {
   return new Date(timestamp).toISOString().slice(11, 19)
 }
 
-export default function PlaybackControls({ onSpeedChange, speed, timestamp }) {
+export default function PlaybackControls({ timestamp }) {
   return (
     <div
       aria-label="Historical playback"
@@ -16,26 +15,10 @@ export default function PlaybackControls({ onSpeedChange, speed, timestamp }) {
       <output aria-live="polite" data-testid="playback-clock">
         {formatPlaybackTime(timestamp)}
       </output>
-      <label>
-        Velocidad
-        <select
-          aria-label="Playback speed"
-          onChange={(event) => onSpeedChange(Number(event.target.value))}
-          value={speed}
-        >
-          {playbackSpeeds.map((option) => (
-            <option key={option} value={option}>
-              {option}×
-            </option>
-          ))}
-        </select>
-      </label>
     </div>
   )
 }
 
 PlaybackControls.propTypes = {
-  onSpeedChange: PropTypes.func.isRequired,
-  speed: PropTypes.number.isRequired,
   timestamp: PropTypes.number.isRequired
 }

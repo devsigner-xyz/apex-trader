@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { playbackSpeeds } from '../hooks/useProfessionalPlayback.js'
 import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
 
 const fixtureMarkets = [
@@ -872,8 +871,7 @@ function PanelResizer({ label, onResize }) {
 }
 
 export default function ProfessionalTerminal({ mode, onMode, playback }) {
-  const { isBuffering, playing, seek, session, setPlaying, setSpeed, speed, timestamp, view } =
-    playback
+  const { isBuffering, playing, seek, session, setPlaying, timestamp, view } = playback
   const [price, setPrice] = useState(Number(view.current.close).toFixed(2))
   const [settings, setSettings] = useState(false)
   const [columns, setColumns] = useState({ dom: 218, execution: 280, watch: 340 })
@@ -987,17 +985,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <button onClick={() => setPlaying(!playing)} type="button">
           {playing ? 'PAUSE' : 'PLAY'}
         </button>
-        <select
-          aria-label="Playback speed"
-          onChange={(event) => setSpeed(Number(event.target.value))}
-          value={speed}
-        >
-          {playbackSpeeds.map((value) => (
-            <option key={value} value={value}>
-              {value}×
-            </option>
-          ))}
-        </select>
         <input
           aria-label="Historical time"
           min={session.playbackStart}
@@ -1011,7 +998,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           {session.date} · {clock(timestamp)} UTC
         </output>
         <span className={playing ? 'replay-status active' : 'replay-status'}>
-          {isBuffering ? 'BUFFERING' : playing ? `● REPLAYING ${speed}×` : 'Ⅱ PAUSED'}
+          {isBuffering ? 'BUFFERING' : playing ? '● REPLAYING' : 'Ⅱ PAUSED'}
         </span>
       </div>
       {settings && (

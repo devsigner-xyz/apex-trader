@@ -62,7 +62,7 @@ test('normalizes the checked-in Tardis session with complete UTC coverage', () =
 
 test('playback wraps at the UTC session boundary and synchronizes its derived views', () => {
   const lastMoment = session.sessionEndExclusive - 1
-  assert.equal(advancePlaybackTime(lastMoment, 10, 1, session), session.playbackStart + 9)
+  assert.equal(advancePlaybackTime(lastMoment, 10, session), session.playbackStart + 9)
 
   const view = derivePlaybackView(session, session.sessionStart + 3 * session.barDurationMs + 1)
   assert.ok(view.orderbook.timestamp <= view.currentTimestamp)

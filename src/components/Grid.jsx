@@ -36,7 +36,6 @@ export default function Grid({
   onChartTimeframeChange,
   onOpenMarkets,
   onOpenSettings,
-  onPlaybackSpeedChange,
   onSelectPrice,
   onSelectTab
 }) {
@@ -52,7 +51,6 @@ export default function Grid({
     footprintBars,
     market,
     orderbook,
-    playbackSpeed,
     playbackTimestamp,
     profile,
     selectedPrice,
@@ -128,11 +126,7 @@ export default function Grid({
             onSmaChange={setShowSma}
             showSma={showSma}
           />
-          <PlaybackControls
-            onSpeedChange={onPlaybackSpeedChange}
-            speed={playbackSpeed}
-            timestamp={playbackTimestamp}
-          />
+          <PlaybackControls timestamp={playbackTimestamp} />
         </div>
         {chartMode === 'footprint' ? (
           <FootprintChart
@@ -198,7 +192,6 @@ Grid.propTypes = {
     footprintBars: PropTypes.arrayOf(PropTypes.object).isRequired,
     market: marketShape.isRequired,
     orderbook: orderbookShape.isRequired,
-    playbackSpeed: PropTypes.number.isRequired,
     playbackTimestamp: PropTypes.number.isRequired,
     profile: PropTypes.object.isRequired,
     selectedPrice: PropTypes.number,
@@ -214,7 +207,6 @@ Grid.propTypes = {
   onChartTimeframeChange: PropTypes.func.isRequired,
   onOpenMarkets: PropTypes.func.isRequired,
   onOpenSettings: PropTypes.func.isRequired,
-  onPlaybackSpeedChange: PropTypes.func.isRequired,
   onSelectPrice: PropTypes.func.isRequired,
   onSelectTab: PropTypes.func.isRequired
 }

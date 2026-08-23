@@ -19,7 +19,8 @@ test.describe('Orderbook Component', () => {
       const orderbook = document.querySelector('.orderbook-row')
       const operativeLabel = document.querySelector('.operative-form .form-element > label')
       return {
-        amountAlignment: getComputedStyle(document.querySelector('.orderbook-row__amount')).textAlign,
+        amountAlignment: getComputedStyle(document.querySelector('.orderbook-row__amount'))
+          .textAlign,
         operativeLabelFontSize: getComputedStyle(operativeLabel).fontSize,
         orderbookRowFontSize: getComputedStyle(orderbook).fontSize,
         priceAlignment: getComputedStyle(document.querySelector('.orderbook-row__price')).textAlign,
@@ -139,7 +140,9 @@ test.describe('React trading flows', () => {
     await expect(page.getByText('Order book', { exact: true })).toHaveCount(0)
     await expect(page.getByText(/ApexTrader by Pablo Carballeda/i)).toHaveCount(0)
     await expect(page.getByText('Ejecutado · Tardis', { exact: true })).toHaveCount(0)
-    await expect(page.getByText('Uses the available price without a limit price.', { exact: true })).toHaveCount(0)
+    await expect(
+      page.getByText('Uses the available price without a limit price.', { exact: true })
+    ).toHaveCount(0)
     await page.getByLabel('Order type').selectOption('stopLimit')
     await expect(page.getByLabel('Trigger price (USD)')).toBeVisible()
     await expect(page.getByLabel('Price (USD)', { exact: true })).toBeVisible()
@@ -195,7 +198,6 @@ test.describe('Historical Tardis playback', () => {
     await expect(page.getByTestId('price-chart').locator('canvas').first()).toBeVisible()
     const clock = page.getByTestId('playback-clock')
     const initialClock = await clock.textContent()
-    await page.getByLabel('Playback speed').selectOption('3600')
 
     await page.getByRole('button', { name: 'Footprint' }).click()
 

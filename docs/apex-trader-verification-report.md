@@ -8,7 +8,7 @@ Date: 2026-08-23. Scope: the Apex Trader repository only. No Figma writes were p
 - `/footprint`: real bid/ask footprint, delta, imbalances by intensity, volume, CVD and session profile.
 - `/step-profile`: interval bid/ask distributions, local POC, high/low spine, volume, CVD and session profile.
 - Shared shell: market header, toolbar, watchlist, DOM, execution ticket, Time & Sales, activity blotter, playback dock and settings modal.
-- Working controls: mode route transition, play/pause, 1×/10×/60×/300×/1200×, whole-session seek, DOM-price selection, buy/sell, order fields, activity tabs, settings and Escape close.
+- Working controls: mode route transition, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, order fields, activity tabs, settings and Escape close. Variable-speed controls were removed from UI and playback state.
 
 The detailed Figma mapping is in `docs/figma-implementation-inventory.md`.
 
@@ -16,10 +16,10 @@ The detailed Figma mapping is in `docs/figma-implementation-inventory.md`.
 
 Source: free Tardis datasets for Binance Spot `BTCUSDT`, UTC date `2019-12-01`.
 
-| Dataset | Compressed bytes | SHA-256 | Data rows |
-| --- | ---: | --- | ---: |
-| `trades` | 6,669,039 | `6a6a2bf2cb8a609f8f2ba4b264d6f3bb31dd3c8b39f93644a87f53e83202e258` | 420,562 |
-| `incremental_book_L2` | 43,947,405 | `f7daa040dc33fc7328ff8468b198731fd5add90bc8cef434aab86726268e8a34` | 6,486,542 |
+| Dataset               | Compressed bytes | SHA-256                                                            | Data rows |
+| --------------------- | ---------------: | ------------------------------------------------------------------ | --------: |
+| `trades`              |        6,669,039 | `6a6a2bf2cb8a609f8f2ba4b264d6f3bb31dd3c8b39f93644a87f53e83202e258` |   420,562 |
+| `incremental_book_L2` |       43,947,405 | `f7daa040dc33fc7328ff8468b198731fd5add90bc8cef434aab86726268e8a34` | 6,486,542 |
 
 Coverage verified from first/last rows: trades `2019-12-01T00:00:03.572Z` through `2019-12-01T23:59:59.868Z`; L2 local timestamps `2019-12-01T00:00:05.045139Z` through `2019-12-01T23:59:59.929296Z`.
 
@@ -38,18 +38,18 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 
 ## Verification results
 
-| Gate | Result |
-| --- | --- |
-| Raw gzip integrity | pass (`gzip -t`) |
-| Raw hashes/counts/date bounds | pass |
-| Derived fragment gzip integrity | pass, 192/192 |
-| Deterministic L2/value-area/clock tests | pass |
-| Complete unit suite | pass, 8 files |
-| ESLint | pass |
-| Vite production build | pass; JS 168.95 kB (55.25 kB gzip), CSS 37.00 kB (7.10 kB gzip) |
-| `git diff --check` | pass (line-ending notices only) |
-| Chromium route/console/interaction/keyboard suite | pass, 4/4 |
-| Figma comparison | inspected at 1920×1080 for all three target frames |
+| Gate                                              | Result                                                          |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| Raw gzip integrity                                | pass (`gzip -t`)                                                |
+| Raw hashes/counts/date bounds                     | pass                                                            |
+| Derived fragment gzip integrity                   | pass, 192/192                                                   |
+| Deterministic L2/value-area/clock tests           | pass                                                            |
+| Complete unit suite                               | pass, 8 files                                                   |
+| ESLint                                            | pass                                                            |
+| Vite production build                             | pass; JS 176.77 kB (58.12 kB gzip), CSS 40.24 kB (7.83 kB gzip) |
+| `git diff --check`                                | pass (line-ending notices only)                                 |
+| Chromium route/console/interaction/keyboard suite | pass, 5/5                                                       |
+| Figma comparison                                  | inspected at 1920×1080 for all three target frames              |
 
 ## Residual deviations and risks
 
