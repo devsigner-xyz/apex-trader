@@ -936,7 +936,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <span className={`feed ${playing ? 'is-playing' : ''}`}>
           ● {isBuffering ? 'BUFFERING' : playing ? 'TARDIS REPLAYING' : 'TARDIS PAUSED'}
         </span>
-        <span>SIM-APX-04</span>
         <span>{clock(timestamp, true)}</span>
       </header>
       <nav className="workspace-toolbar">
@@ -1043,10 +1042,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             <label>
               DOM render rate
               <input disabled value="20 Hz render / exact event replay" />
-            </label>
-            <label>
-              Fixture account
-              <input disabled value="SIM-APX-04" />
             </label>
             <button onClick={() => setSettings(false)} type="button">
               DONE

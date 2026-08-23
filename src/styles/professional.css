@@ -41,7 +41,7 @@
 
 .market-header {
   display: grid;
-  grid-template-columns: 160px 220px 90px 90px 64px minmax(150px, 1fr) 170px 105px 130px;
+  grid-template-columns: 160px 220px 90px 90px 64px minmax(150px, 1fr) 170px 130px;
   align-items: center;
   height: 44px;
   padding: 0 16px;
@@ -59,7 +59,7 @@
   font-size: 11px;
 }
 
-.market-header > *:nth-last-child(-n + 3) {
+.market-header > *:nth-last-child(-n + 2) {
   text-align: right;
 }
 
