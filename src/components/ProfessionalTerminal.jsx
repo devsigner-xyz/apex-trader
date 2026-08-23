@@ -857,7 +857,7 @@ function Activity() {
   )
 }
 
-function PanelResizer({ label, onResize }) {
+function PanelResizer({ className = '', label, onResize }) {
   const startX = useRef(null)
   const handlePointerDown = (event) => {
     startX.current = event.clientX
@@ -877,7 +877,7 @@ function PanelResizer({ label, onResize }) {
   return (
     <button
       aria-label={label}
-      className="panel-resizer"
+      className={`panel-resizer ${className}`.trim()}
       onKeyDown={(event) => {
         if (event.key === 'ArrowLeft') onResize(-8)
         else if (event.key === 'ArrowRight') onResize(8)
@@ -938,44 +938,45 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         </span>
         <span>{clock(timestamp, true)}</span>
       </header>
-      <nav className="workspace-toolbar">
-        <select aria-label="Market">
-          <option>BTCUSDT</option>
-        </select>
-        <select
-          aria-label="Timeframe"
-          onChange={(event) => setTimeframe(Number(event.target.value))}
-          value={timeframe}
-        >
-          <option value="5">5 min</option>
-          <option value="15">15 min</option>
-          <option value="30">30 min</option>
-          <option value="60">1 hour</option>
-        </select>
-        <select
-          aria-label="Chart mode"
-          onChange={(event) => routeMode(event.target.value)}
-          value={mode}
-        >
-          <option value="candles">Candles</option>
-          <option value="footprint">Footprint</option>
-          <option value="step-profile">Step Profile</option>
-        </select>
-        <select aria-label="Tick size">
-          <option>0.01 USD</option>
-        </select>
-        <button onClick={() => setSettings(true)} type="button">
-          Layout 01&nbsp;&nbsp;·&nbsp;&nbsp;Settings
-        </button>
-      </nav>
       <div className="terminal-workspace" style={workspaceStyle}>
         <Watchlist />
         <PanelResizer
+          className="watch-resizer"
           label="Resize watchlist"
           onResize={(delta) =>
             setColumns((current) => ({ ...current, watch: clamp(current.watch + delta, 340, 460) }))
           }
         />
+        <nav className="workspace-toolbar">
+          <select aria-label="Market">
+            <option>BTCUSDT</option>
+          </select>
+          <select
+            aria-label="Timeframe"
+            onChange={(event) => setTimeframe(Number(event.target.value))}
+            value={timeframe}
+          >
+            <option value="5">5 min</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="60">1 hour</option>
+          </select>
+          <select
+            aria-label="Chart mode"
+            onChange={(event) => routeMode(event.target.value)}
+            value={mode}
+          >
+            <option value="candles">Candles</option>
+            <option value="footprint">Footprint</option>
+            <option value="step-profile">Step Profile</option>
+          </select>
+          <select aria-label="Tick size">
+            <option>0.01 USD</option>
+          </select>
+          <button onClick={() => setSettings(true)} type="button">
+            Layout 01&nbsp;&nbsp;·&nbsp;&nbsp;Settings
+          </button>
+        </nav>
         <div className="chart-stack">
           <MarketChart
             mode={mode}
@@ -986,6 +987,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           <Activity />
         </div>
         <PanelResizer
+          className="dom-resizer"
           label="Resize DOM"
           onResize={(delta) =>
             setColumns((current) => ({ ...current, dom: clamp(current.dom - delta, 190, 310) }))
@@ -993,6 +995,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         />
         <Dom onPrice={(next) => setPrice(Number(next).toFixed(2))} orderbook={view.orderbook} />
         <PanelResizer
+          className="execution-resizer"
           label="Resize execution panel"
           onResize={(delta) =>
             setColumns((current) => ({
