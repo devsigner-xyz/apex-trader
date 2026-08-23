@@ -1,5 +1,7 @@
 # Plan: modo Footprint / Order Flow de demostración
 
+> **Superseded — 2026-08-23.** This early plan proposed synthetic local order-flow data. It is not the runtime contract of the current Apex Trader rebuild. The implemented professional Footprint view derives bid/ask cells, volume, delta, CVD, POC and imbalances from the real Binance Spot BTCUSDT Tardis trade stream for 2019-12-01. The document remains only as historical design context and must not be used as market-data provenance.
+
 ## Objetivo
 
 Añadir una visualización opcional de footprint chart para ApexTrader que sea didáctica, visualmente coherente con el terminal actual y basada **exclusivamente en datos sintéticos locales**. No se conectará a exchanges, websockets ni APIs de trading.
@@ -101,15 +103,18 @@ Evitar números redondos, simetría perfecta y alternancias mecánicas. Usar rui
 ### Archivos nuevos
 
 - `src/services/demoOrderFlow.js`
+
   - Generador seeded de trades sintéticos.
   - Agregador por barra/tick.
   - Cálculo de POC, delta, volumen, imbalances y stacked imbalances.
   - Fixtures deterministas por escenario.
 
 - `src/components/ChartModeToggle.jsx`
+
   - Selector accesible `price | footprint`.
 
 - `src/components/FootprintChart.jsx`
+
   - Crea/destroye su instancia Highcharts en mount/cleanup.
   - Renderiza cuadrícula SVG sobre ejes del gráfico con `chart.renderer`.
   - Muestra celdas, texto monoespaciado, POC, imbalances y tooltip.
@@ -120,6 +125,7 @@ Evitar números redondos, simetría perfecta y alternancias mecánicas. Usar rui
 ### Cambios de integración
 
 - Extender `src/app/tradingState.jsx` con:
+
   - `chartMode: 'price' | 'footprint'`.
   - `demoScenario`.
   - `footprintOptions`.
@@ -127,10 +133,12 @@ Evitar números redondos, simetría perfecta y alternancias mecánicas. Usar rui
   - Estado de reproducción local.
 
 - Actualizar `Grid.jsx`:
+
   - Renderizar `Chart` o `FootprintChart` según `chartMode`.
   - Ajustar el layout del área central y colapsar profundidad al activar footprint.
 
 - Extender `src/styles/tokens.css`:
+
   - Intensidad de celda, borde imbalance, selección, POC y estados de simulación.
   - Reutilizar `--color-positive`, `--color-negative`, texto y superficies existentes; no añadir colores saturados independientes.
 
@@ -146,18 +154,22 @@ Razón: una serie heatmap sirve para fondos de intensidad, pero no resuelve corr
 ## Fases de implementación
 
 1. **Modelo y tests puros**
+
    - Implementar generador seeded y agregación.
    - Testear invariantes numéricas, POC e imbalances.
 
 2. **Estado y selector de modo**
+
    - Añadir `ChartModeToggle` y estado React.
    - Mantener `Precio` por defecto y sin regresiones.
 
 3. **Renderer footprint mínimo**
+
    - Implementar 20–30 barras y 8–20 ticks por barra.
    - Añadir tooltip, POC y leyenda DEMO.
 
 4. **Escenarios y reproducción**
+
    - Añadir presets, reinicio de semilla, pausa y paso por barra.
 
 5. **Accesibilidad, responsive y validación**

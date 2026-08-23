@@ -1,6 +1,8 @@
 # Apex Trader Figma implementation inventory
 
-Source file: `Ze9eGnPaNDj8u0oB1iUt3C`, page `00 · Current UI`. Figma is read-only for this implementation.
+Source file: `Ze9eGnPaNDj8u0oB1iUt3C`, page `01 · Proposed UI`.
+
+The original rebuild objective treated Figma as read-only. Later user instructions explicitly authorized synchronizing the current web layout back into the three target frames. Those writes are limited to the Apex Trader file and are recorded below.
 
 ## Current versus legacy
 
@@ -16,15 +18,18 @@ All frames are 1920 × 1080. At narrower viewports the workspace keeps its tradi
 
 ## Shared shell mapping
 
-| Figma node                                                | Dimensions | Implementation responsibility       | Visible states and behavior                                                                 |
-| --------------------------------------------------------- | ---------: | ----------------------------------- | ------------------------------------------------------------------------------------------- |
-| `61:3` / equivalent · Global Market Header                |  1920 × 40 | `MarketHeader`                      | BTCUSDT identity, real last/change, historical session clock, feed and fixture account      |
-| `61:14` / equivalent · Workspace Toolbar                  |  1920 × 40 | `WorkspaceToolbar`                  | symbol, timeframe, chart-mode and tick selectors; studies; layout/settings triggers         |
-| `113:2114` / equivalent · Watchlist                       | 288 × 1000 | `Watchlist`                         | selected BTCUSDT row, hover/focus rows, category select; non-BTC rows are labelled fixtures |
-| `113:2745`, `113:5681`, `169:4821` · MarketChart variants | 1188 × 810 | `MarketWorkspace` + chart renderers | Candles, Footprint, Step Profile; volume, CVD, session VP, POC/VAH/VAL, VWAP/EMA            |
-| `113:4047` / equivalent · ActivityBlotter                 | 1188 × 190 | `ActivityBlotter`                   | Positions, Orders, Fills, Activity, Account & Risk; fixture trading/account rows            |
-| `113:4170` / equivalent · OrderBook                       | 184 × 1000 | `DomLadder`                         | reconstructed real L2, selected price, bid/ask depth, live-at-history-clock footer          |
-| `113:5231` / equivalent · ExecutionPanel                  | 260 × 1000 | `ExecutionPanel` + `TimeAndSales`   | buy/sell, order fields, disabled/active submit states, real market tape                     |
+| Figma node                                                | Geometry at 1920 × 1080 | Implementation responsibility | Visible states and behavior                                                                 |
+| --------------------------------------------------------- | ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| `61:3` / equivalent · Global Market Header                | `x0 y0 w1920 h44`       | `MarketHeader`                | BTCUSDT identity, real last/change, historical session clock and feed state                 |
+| `61:14` / equivalent · Workspace Toolbar                  | `x365 y44 w1047 h44`    | workspace toolbar             | symbol, 5/15/30/60-minute timeframe, chart mode, tick and settings                          |
+| `113:2114` / equivalent · Watchlist                       | `x0 y44 w360 h982`      | `Watchlist`                   | reaches the global header; selected BTCUSDT row; other instruments are explicit demo rows   |
+| `113:2745`, `113:5681`, `169:4821` · MarketChart variants | `x365 y88 w1047 h728`   | `MarketChart` renderers       | Candles, Footprint, Step Profile; price scale, volume, CVD, profiles and chart interaction  |
+| `113:4047` / equivalent · ActivityBlotter                 | `x365 y816 w1047 h210`  | `Activity`                    | functional Positions, Orders, Fills, Activity, Account & Risk tabs; explicit `DEMO DATA`    |
+| `113:4170` / equivalent · OrderBook                       | `x1417 y44 w218 h982`   | `Dom`                         | reconstructed real L2, selected price and exact-event replay at a 20 Hz render cadence      |
+| `113:5231` / equivalent · ExecutionPanel                  | `x1640 y44 w280 h982`   | `Execution` + `TimeSales`     | buy/sell, controlled order type, local non-transmitted staging message and real market tape |
+| `303:2` · `Trading/PlaybackDock` + three screen instances | `x510 y1030 w900 h46`   | playback dock                 | fixed 1× play/pause, whole-session seek, UTC timestamp and replay state; no speed controls  |
+
+The three vertical resize handles are 5 px wide. The workspace ends at `y=1026`; the remaining 54 px is the playback row. The shared Activity master is 1047 × 210 with 10 px labels and BTCUSDT demo positions.
 
 ## Chart contracts
 
@@ -60,5 +65,5 @@ All frames are 1920 × 1080. At narrower viewports the workspace keeps its tradi
 ## Data provenance boundary
 
 - Real market data: BTCUSDT last price, OHLC, volume, footprint, delta, CVD, VWAP, EMA, profiles, DOM and Time & Sales.
-- Fixtures: account identifier, buying power, positions/orders/fills, PnL, fees, execution narrative and non-BTC watchlist instruments. Fixture surfaces are labelled `SIM` or `DEMO` and must not be presented as live market feeds.
+- Fixtures: buying power, positions/orders/fills, PnL, fees, execution narrative and non-BTC watchlist instruments. Fixture surfaces are labelled `SIM`, `DEMO` or `DEMO DATA` and must not be presented as live market feeds.
 - Historical clock: UTC session 2019-12-01; every market module resolves from that clock for fixed 1× playback, pause and seek.

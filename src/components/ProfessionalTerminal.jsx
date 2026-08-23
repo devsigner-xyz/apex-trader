@@ -35,13 +35,132 @@ const fixtureMarkets = [
   ['SPY', '314.31', '314.30', '314.32', '+0.41%', '39M']
 ]
 
-const activity = [
-  ['04:02:18', 'LIMIT', 'BTCUSDT', 'BUY', '0.25', '7,380.50', 'WORKING', '—', 'CANCEL'],
-  ['03:58:40', 'STOP', 'BTCUSDT', 'SELL', '0.25', '7,350.00', 'WORKING', '—', 'CANCEL'],
-  ['03:42:11', 'MARKET', 'BTCUSDT', 'BUY', '0.25', '7,366.42', 'FILLED', '+$6.30', 'DETAILS'],
-  ['02:17:06', 'LIMIT', 'BTCUSDT', 'SELL', '0.10', '7,412.18', 'FILLED', '+$4.58', 'DETAILS'],
-  ['01:48:03', 'STOP', 'BTCUSDT', 'BUY', '0.10', '7,405.00', 'CANCELLED', '—', 'DETAILS']
+const activityTabs = [
+  ['POSITIONS', 'POSITIONS  2'],
+  ['ORDERS', 'ORDERS  4'],
+  ['FILLS', 'FILLS  12'],
+  ['ACTIVITY', 'ACTIVITY'],
+  ['ACCOUNT & RISK', 'ACCOUNT & RISK']
 ]
+
+const activityRows = {
+  POSITIONS: [
+    [
+      '02:17:06',
+      'POSITION',
+      'BTCUSDT',
+      'BUY',
+      '0.25',
+      '7,366.42',
+      'OPEN',
+      '+$6.30',
+      'DEMO',
+      'CLOSE'
+    ],
+    [
+      '01:48:03',
+      'POSITION',
+      'BTCUSDT',
+      'SELL',
+      '0.10',
+      '7,405.00',
+      'OPEN',
+      '+$4.58',
+      'DEMO',
+      'CLOSE'
+    ]
+  ],
+  ORDERS: [
+    ['04:02:18', 'LIMIT', 'BTCUSDT', 'BUY', '0.25', '7,380.50', 'WORKING', '—', 'DEMO', 'CANCEL'],
+    ['03:58:40', 'STOP', 'BTCUSDT', 'SELL', '0.25', '7,350.00', 'WORKING', '—', 'DEMO', 'CANCEL'],
+    [
+      '02:17:06',
+      'LIMIT',
+      'BTCUSDT',
+      'SELL',
+      '0.10',
+      '7,412.18',
+      'FILLED',
+      '+$4.58',
+      'DEMO',
+      'DETAILS'
+    ],
+    ['01:48:03', 'STOP', 'BTCUSDT', 'BUY', '0.10', '7,405.00', 'CANCELLED', '—', 'DEMO', 'DETAILS']
+  ],
+  FILLS: [
+    [
+      '03:42:11',
+      'MARKET',
+      'BTCUSDT',
+      'BUY',
+      '0.25',
+      '7,366.42',
+      'FILLED',
+      '+$6.30',
+      'DEMO',
+      'DETAILS'
+    ],
+    [
+      '02:17:06',
+      'LIMIT',
+      'BTCUSDT',
+      'SELL',
+      '0.10',
+      '7,412.18',
+      'FILLED',
+      '+$4.58',
+      'DEMO',
+      'DETAILS'
+    ],
+    [
+      '01:22:14',
+      'LIMIT',
+      'BTCUSDT',
+      'BUY',
+      '0.15',
+      '7,398.24',
+      'FILLED',
+      '+$7.54',
+      'DEMO',
+      'DETAILS'
+    ]
+  ],
+  ACTIVITY: [
+    ['04:02:18', 'ORDER', 'BTCUSDT', 'BUY', '0.25', '7,380.50', 'ACCEPTED', '—', 'DEMO', 'DETAILS'],
+    [
+      '03:58:40',
+      'RISK',
+      'BTCUSDT',
+      'SELL',
+      '0.25',
+      '7,350.00',
+      'VALIDATED',
+      '—',
+      'DEMO',
+      'DETAILS'
+    ],
+    [
+      '03:42:11',
+      'FILL',
+      'BTCUSDT',
+      'BUY',
+      '0.25',
+      '7,366.42',
+      'COMPLETE',
+      '+$6.30',
+      'DEMO',
+      'DETAILS'
+    ]
+  ],
+  'ACCOUNT & RISK': [
+    ['SESSION', 'RISK', 'BTCUSDT', '—', '0.50', '—', 'WITHIN LIMITS', '+$18.42', 'DEMO', 'DETAILS'],
+    ['SESSION', 'FEES', 'BTCUSDT', '—', '—', '$0.75', 'ESTIMATED', '—', 'DEMO', 'DETAILS']
+  ]
+}
+
+function activityTabId(id) {
+  return `activity-tab-${id.toLowerCase().replaceAll(/[^a-z]+/g, '-')}`
+}
 
 const chartDefaults = { candles: 34, footprint: 10, 'step-profile': 9 }
 const chartMinimums = { candles: 10, footprint: 4, 'step-profile': 4 }
@@ -730,6 +849,8 @@ function TimeSales({ trades }) {
 function Execution({ price, setPrice, trades }) {
   const [side, setSide] = useState('buy')
   const [quantity, setQuantity] = useState('0.10')
+  const [orderType, setOrderType] = useState('Limit')
+  const [status, setStatus] = useState('SIM fixture · no order is transmitted')
   const valid = Number(price) > 0 && Number(quantity) > 0
   return (
     <aside className="execution">
@@ -756,7 +877,7 @@ function Execution({ price, setPrice, trades }) {
         </div>
         <label>
           ORDER TYPE
-          <select>
+          <select onChange={(event) => setOrderType(event.target.value)} value={orderType}>
             <option>Limit</option>
             <option>Market</option>
             <option>Stop</option>
@@ -793,10 +914,21 @@ function Execution({ price, setPrice, trades }) {
           QUANTITY
           <input onChange={(event) => setQuantity(event.target.value)} value={quantity} />
         </label>
-        <button className={`submit ${side}`} disabled={!valid} type="button">
-          PLACE {side.toUpperCase()} LIMIT
+        <button
+          className={`submit ${side}`}
+          disabled={!valid}
+          onClick={() =>
+            setStatus(
+              `SIM ${side.toUpperCase()} ${orderType.toUpperCase()} staged · ${quantity} BTCUSDT${
+                orderType === 'Market' ? '' : ` @ ${fmt(price)}`
+              } · not transmitted`
+            )
+          }
+          type="button"
+        >
+          PLACE {side.toUpperCase()} {orderType.toUpperCase()}
         </button>
-        <small>SIM fixture · no order is transmitted</small>
+        <small aria-live="polite">{status}</small>
       </section>
       <TimeSales trades={trades} />
     </aside>
@@ -805,54 +937,64 @@ function Execution({ price, setPrice, trades }) {
 
 function Activity() {
   const [tab, setTab] = useState('POSITIONS')
-  const tabs = ['POSITIONS  2', 'ORDERS  4', 'FILLS  12', 'ACTIVITY', 'ACCOUNT & RISK']
+  const rows = activityRows[tab]
   return (
     <section aria-label="Orders and positions" className="activity">
       <header>
-        <div>
-          {tabs.map((name) => (
+        <div aria-label="Activity views" role="tablist">
+          {activityTabs.map(([id, label]) => (
             <button
-              aria-selected={tab === name.split('  ')[0]}
-              key={name}
-              onClick={() => setTab(name.split('  ')[0])}
+              aria-controls="activity-panel"
+              aria-selected={tab === id}
+              id={activityTabId(id)}
+              key={id}
+              onClick={() => setTab(id)}
               role="tab"
               type="button"
             >
-              {name}
+              {label}
             </button>
           ))}
         </div>
         <div>
+          <span className="fixture-badge">DEMO DATA</span>
           <span>UPL +$6.30</span>
           <span>RPL +$18.42</span>
           <span>FEES $0.75</span>
         </div>
       </header>
-      <div className="activity-head">
-        {[
-          'TIME',
-          'TYPE',
-          'SYMBOL',
-          'SIDE',
-          'QTY',
-          'PRICE',
-          'STATUS',
-          'PNL',
-          'ACCOUNT',
-          'ACTION'
-        ].map((label) => (
-          <span key={label}>{label}</span>
-        ))}
-      </div>
-      {activity.map((row, index) => (
-        <div className="activity-row" key={index}>
-          {row.map((cell, cellIndex) => (
-            <span className={cell.startsWith('+') ? 'positive' : ''} key={cellIndex}>
-              {cell}
-            </span>
+      <div
+        aria-labelledby={activityTabId(tab)}
+        aria-live="polite"
+        id="activity-panel"
+        role="tabpanel"
+      >
+        <div className="activity-head">
+          {[
+            'TIME',
+            'TYPE',
+            'SYMBOL',
+            'SIDE',
+            'QTY',
+            'PRICE',
+            'STATUS',
+            'PNL',
+            'ACCOUNT',
+            'ACTION'
+          ].map((label) => (
+            <span key={label}>{label}</span>
           ))}
         </div>
-      ))}
+        {rows.map((row, index) => (
+          <div className="activity-row" key={`${tab}-${index}`}>
+            {row.map((cell, cellIndex) => (
+              <span className={cell.startsWith('+') ? 'positive' : ''} key={cellIndex}>
+                {cell}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
     </section>
   )
 }

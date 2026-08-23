@@ -795,6 +795,10 @@
   color: var(--pro-buy);
 }
 
+.activity header .fixture-badge {
+  color: var(--pro-accent);
+}
+
 .activity-head,
 .activity-row {
   display: grid;

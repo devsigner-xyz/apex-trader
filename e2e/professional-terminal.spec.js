@@ -161,6 +161,23 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
     .evaluate((node) => node === window.__firstDomRow)
   expect(sameDomRow).toBe(true)
 
+  const activityPanel = page.getByRole('tabpanel')
+  await expect(activityPanel.locator('.activity-row')).toHaveCount(2)
+  await page.getByRole('tab', { name: /ORDERS/ }).click()
+  await expect(activityPanel).toContainText('WORKING')
+  await expect(activityPanel.locator('.activity-row')).toHaveCount(4)
+  await page.getByRole('tab', { name: /FILLS/ }).click()
+  await expect(activityPanel).toContainText('FILLED')
+  await expect(activityPanel.locator('.activity-row')).toHaveCount(3)
+  await page.getByRole('tab', { name: 'ACCOUNT & RISK' }).click()
+  await expect(activityPanel).toContainText('WITHIN LIMITS')
+
+  const orderType = page.getByText('ORDER TYPE').locator('select')
+  await orderType.selectOption('Market')
+  await page.getByRole('button', { name: 'PLACE BUY MARKET' }).click()
+  await expect(page.getByText(/SIM BUY MARKET staged/)).toBeVisible()
+  await expect(page.getByText(/not transmitted/)).toBeVisible()
+
   await page.getByRole('button', { name: /Layout 01/ }).click()
   await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeVisible()
   await page.keyboard.press('Escape')

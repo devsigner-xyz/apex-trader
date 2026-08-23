@@ -8,8 +8,9 @@ Date: 2026-08-23. Scope: the Apex Trader repository and the explicitly authorize
 - `/footprint`: real bid/ask footprint, delta, imbalances by intensity, volume, CVD and session profile.
 - `/step-profile`: interval bid/ask distributions, local POC, high/low spine, volume, CVD and session profile.
 - Shared shell: market header, toolbar, watchlist, DOM, execution ticket, Time & Sales, activity blotter, playback dock and settings modal.
-- Working controls: mode route transition, real 5/15/30/60-minute aggregation, chart zoom/pan/reset, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, order fields, activity tabs, panel resizing, settings and Escape close. Variable-speed controls were removed from UI and playback state.
+- Working controls: mode route transition, real 5/15/30/60-minute aggregation, chart zoom/pan/reset, fixed 1× play/pause, whole-session seek, DOM-price selection, buy/sell, controlled order type, local non-transmitted order staging, activity tabs with distinct bodies, panel resizing, settings and Escape close. Variable-speed controls were removed from UI and playback state.
 - The nonfunctional `LADDER / AUTO / D42 / CUM` row was removed from the web UI and from the existing `Trading/OrderBook` Figma master (`103:59`) without recreating the component.
+- Later-authorized web → Figma synchronization updated all three target frames: watchlist/DOM/execution begin under the 44 px global header, the secondary toolbar only spans the 1047 px chart column, Activity uses readable 10 px labels and explicit demo content, and the reusable `Trading/PlaybackDock` master (`303:2`) is instantiated in Step (`304:8540`), Footprint (`304:8550`) and Price (`304:8560`).
 
 The detailed Figma mapping is in `docs/figma-implementation-inventory.md`.
 
@@ -31,7 +32,7 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 ## Browser artifacts and frequency
 
 - Base session: 7,376,566 bytes (`session-v2.json`).
-- Fragment assets: 192 gzip files (96 trade + 96 L2), 15 minutes each, 38 MiB total.
+- Fragment assets: 192 gzip files (96 trade + 96 L2), 15 minutes each, 38,835,019 bytes total.
 - Smallest fragment: 27,430 bytes; largest: 520,869 bytes.
 - L2 event groups retained: 815,980.
 - Browser render cadence: 20 Hz (50 ms). Every L2 event group up to the historical clock is applied before each render; the persisted source is not sampled.
@@ -45,18 +46,20 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 | Raw hashes/counts/date bounds                     | pass                                                            |
 | Derived fragment gzip integrity                   | pass, 192/192                                                   |
 | Deterministic L2/value-area/clock/timeframe tests | pass                                                            |
-| Complete unit suite                               | pass, 8 files                                                   |
+| Complete unit suite                               | pass, 8 files / 23 declared cases                               |
 | ESLint                                            | pass                                                            |
-| Vite production build                             | pass; JS 178.39 kB (58.69 kB gzip), CSS 40.34 kB (7.86 kB gzip) |
-| `git diff --check`                                | pass (line-ending notices only)                                 |
+| Vite production build                             | pass; JS 179.78 kB (59.08 kB gzip), CSS 40.70 kB (7.94 kB gzip) |
+| `git diff --check`                                | pass                                                            |
 | Chromium route/console/interaction/keyboard suite | pass, 9/9                                                       |
+| Firefox route/console/interaction/keyboard suite  | pass, 9/9                                                       |
+| WebKit route/console/interaction/keyboard suite   | pass, 9/9                                                       |
 | Figma comparison                                  | inspected at 1920×1080 for all three target frames              |
-| Figma DOM correction                              | pass; master and latest Step instance re-rendered after removal |
+| Figma synchronization                             | pass; shared Activity and Playback Dock masters re-rendered     |
 
 ## Residual deviations and risks
 
 - Chart geometry is structurally aligned to Figma, but the plotted shapes and numeric scales intentionally differ: Figma shows fictional NQ 09-26 values while the implementation shows real BTCUSDT 2019 data.
 - Footprint and Step Profile retain one-cent source levels, but collapse them to available SVG pixels during rendering. The underlying browser artifacts keep maximum source resolution.
 - Non-BTC watchlist rows and all account/order/PnL content are explicit `DEMO`/`SIM` fixtures. Only BTCUSDT market surfaces use real data.
-- Chromium is the verified visual surface. WebKit could not navigate through the host environment proxy (`Unspecified proxy lookup failure`), so no WebKit visual claim is made.
+- The earlier WebKit proxy failure was environmental, not an application defect; bypassing the host proxy for localhost produced the current 9/9 WebKit result.
 - The Playwright skill wrapper has CRLF-corrupted shell headers in this environment; validation used the repository's installed Playwright 1.62.1 instead.
