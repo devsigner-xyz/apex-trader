@@ -18,9 +18,24 @@ for (const [route, mode] of views) {
     await page.goto(route)
     await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
     await expect(page.getByLabel(`${mode} historical chart`)).toBeVisible()
-    await expect(page.getByText('TARDIS HISTORICAL')).toBeVisible()
+    await expect(page.getByText(/TARDIS (REPLAYING|PAUSED|BUFFERING)/)).toBeVisible()
     await expect(page.getByText('DOM', { exact: true })).toBeVisible()
     await expect(page.getByText('TIME & SALES')).toBeVisible()
+    await expect(page.locator('.price-tick')).toHaveCount(9)
+    await expect(page.getByRole('button', { name: 'PAUSE' })).toBeVisible()
+    if (mode === 'step-profile') {
+      const profileCenters = await page
+        .locator('.profile-spine')
+        .evaluateAll((nodes) => nodes.map((node) => Number(node.getAttribute('x1'))))
+      const volumeCenters = await page
+        .locator('.volume-bar')
+        .evaluateAll((nodes) =>
+          nodes.map(
+            (node) => Number(node.getAttribute('x')) + Number(node.getAttribute('width')) / 2
+          )
+        )
+      expect(volumeCenters).toEqual(profileCenters)
+    }
     await page.screenshot({ fullPage: false, path: `output/playwright/${mode}-1920x1080.png` })
     expect(errors).toEqual([])
   })
@@ -30,13 +45,30 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await page.goto('/price-chart')
   const clock = page.locator('.playback-dock output')
   const before = await clock.textContent()
-  await page.keyboard.press('Tab')
-  await expect(page.locator(':focus')).toBeVisible()
-  await page.getByLabel('Playback speed').selectOption('1200')
-  await page.getByRole('button', { name: 'PLAY' }).click()
   await page.waitForTimeout(250)
-  await page.getByRole('button', { name: 'PAUSE' }).click()
   expect(await clock.textContent()).not.toBe(before)
+  await page.getByRole('button', { name: 'PAUSE' }).click()
+
+  const chart = page.getByLabel('candles historical chart')
+  const visibleBars = page.getByLabel('Visible bars')
+  const initialCount = await visibleBars.textContent()
+  await chart.hover()
+  await page.mouse.wheel(0, -300)
+  await expect(visibleBars).not.toHaveText(initialCount)
+
+  const visibleWindow = page.locator('.window-label')
+  const initialWindow = await visibleWindow.textContent()
+  await chart.focus()
+  await page.keyboard.press('ArrowLeft')
+  await expect(visibleWindow).not.toHaveText(initialWindow)
+
+  const watchlist = page.getByLabel('Demo watchlist')
+  const initialWatchlist = await watchlist.boundingBox()
+  await page.getByLabel('Resize watchlist').focus()
+  await page.keyboard.press('ArrowRight')
+  const resizedWatchlist = await watchlist.boundingBox()
+  expect(resizedWatchlist.width).toBeGreaterThan(initialWatchlist.width)
+
   await page.getByRole('button', { name: /Layout 01/ }).click()
   await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeVisible()
   await page.keyboard.press('Escape')

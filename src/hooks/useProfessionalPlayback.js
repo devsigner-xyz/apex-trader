@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { chunkIndexFor, deriveProfessionalView, loadPlaybackChunk, loadProfessionalSession } from '../services/proPlayback.js'
+import {
+  chunkIndexFor,
+  deriveProfessionalView,
+  loadPlaybackChunk,
+  loadProfessionalSession
+} from '../services/proPlayback.js'
 
 export const playbackSpeeds = [1, 10, 60, 300, 1200]
 
@@ -8,27 +13,44 @@ export function useProfessionalPlayback() {
   const [chunk, setChunk] = useState(null)
   const [timestamp, setTimestamp] = useState(null)
   const [speed, setSpeed] = useState(60)
-  const [playing, setPlaying] = useState(false)
+  const [playing, setPlaying] = useState(true)
   const [error, setError] = useState(null)
   const tick = useRef(null)
+  const lastView = useRef(null)
 
   useEffect(() => {
-    loadProfessionalSession().then((next) => {
-      setSession(next)
-      setTimestamp(Math.min(next.playbackStart + 4 * 60 * 60 * 1000, next.sessionEndExclusive - 1))
-    }).catch((reason) => setError(reason.message))
+    loadProfessionalSession()
+      .then((next) => {
+        setSession(next)
+        setTimestamp(
+          Math.min(next.playbackStart + 4 * 60 * 60 * 1000, next.sessionEndExclusive - 1)
+        )
+      })
+      .catch((reason) => setError(reason.message))
   }, [])
 
-  const chunkIndex = session && timestamp !== null ? chunkIndexFor(timestamp, session.sessionStart) : null
+  const chunkIndex =
+    session && timestamp !== null ? chunkIndexFor(timestamp, session.sessionStart) : null
   useEffect(() => {
     if (chunkIndex === null || chunk?.index === chunkIndex) return
     let current = true
-    loadPlaybackChunk(chunkIndex).then((next) => { if (current) setChunk(next) }).catch((reason) => setError(reason.message))
-    return () => { current = false }
+    loadPlaybackChunk(chunkIndex)
+      .then((next) => {
+        if (current) setChunk(next)
+      })
+      .catch((reason) => setError(reason.message))
+    return () => {
+      current = false
+    }
   }, [chunk?.index, chunkIndex])
 
   useEffect(() => {
-    if (!playing || !session) return undefined
+    if (chunkIndex === null || chunkIndex >= 95) return
+    loadPlaybackChunk(chunkIndex + 1).catch(() => undefined)
+  }, [chunkIndex])
+
+  useEffect(() => {
+    if (!playing || !session || chunk?.index !== chunkIndex) return undefined
     tick.current = performance.now()
     const timer = window.setInterval(() => {
       const now = performance.now()
@@ -40,9 +62,29 @@ export function useProfessionalPlayback() {
       })
     }, 50)
     return () => window.clearInterval(timer)
-  }, [playing, session, speed])
+  }, [chunk?.index, chunkIndex, playing, session, speed])
 
   const seek = useCallback((next) => setTimestamp(Number(next)), [])
-  const view = useMemo(() => session && chunk?.index === chunkIndex && timestamp !== null ? deriveProfessionalView(session, chunk, timestamp) : null, [chunk, chunkIndex, session, timestamp])
-  return { error, isLoading: !view && !error, playing, seek, session, setPlaying, setSpeed, speed, timestamp, view }
+  const currentView = useMemo(
+    () =>
+      session && chunk?.index === chunkIndex && timestamp !== null
+        ? deriveProfessionalView(session, chunk, timestamp)
+        : null,
+    [chunk, chunkIndex, session, timestamp]
+  )
+  if (currentView) lastView.current = currentView
+  const view = currentView ?? lastView.current
+  return {
+    error,
+    isBuffering: Boolean(view && !currentView),
+    isLoading: !view && !error,
+    playing,
+    seek,
+    session,
+    setPlaying,
+    setSpeed,
+    speed,
+    timestamp,
+    view
+  }
 }

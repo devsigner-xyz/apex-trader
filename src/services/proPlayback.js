@@ -1,5 +1,6 @@
 const SESSION_URL = 'data/tardis/session-v2.json'
 const CHUNK_MS = 15 * 60 * 1000
+const playbackChunkCache = new Map()
 
 function assetUrl(path) {
   const base = import.meta.env?.BASE_URL ?? '/'
@@ -29,17 +30,30 @@ async function fetchGzipJson(url, fetchImpl = fetch) {
 
 export async function loadProfessionalSession(fetchImpl = fetch) {
   const session = await fetchJson(SESSION_URL, fetchImpl)
-  if (session.schema !== 'apextrader.tardis-session/v2') throw new Error('Unexpected session schema.')
+  if (session.schema !== 'apextrader.tardis-session/v2')
+    throw new Error('Unexpected session schema.')
   return session
 }
 
-export async function loadPlaybackChunk(index, fetchImpl = fetch) {
+async function fetchPlaybackChunk(index, fetchImpl) {
   const suffix = String(index).padStart(3, '0')
   const [book, trades] = await Promise.all([
     fetchGzipJson(`data/tardis/chunks/book-${suffix}.json.gz`, fetchImpl),
     fetchGzipJson(`data/tardis/chunks/trades-${suffix}.json.gz`, fetchImpl)
   ])
   return { book, index, trades }
+}
+
+export function loadPlaybackChunk(index, fetchImpl = fetch) {
+  if (fetchImpl !== globalThis.fetch) return fetchPlaybackChunk(index, fetchImpl)
+  if (!playbackChunkCache.has(index)) {
+    const request = fetchPlaybackChunk(index, fetchImpl).catch((error) => {
+      playbackChunkCache.delete(index)
+      throw error
+    })
+    playbackChunkCache.set(index, request)
+  }
+  return playbackChunkCache.get(index)
 }
 
 function sorted(book, descending) {
@@ -76,7 +90,11 @@ export function tradesThrough(chunk, timestamp, limit = 80) {
     .slice(-limit)
     .reverse()
     .map(([timestampUs, localTimestampUs, price, amount, side]) => ({
-      amount, localTimestampUs, price, side: side ? 'buy' : 'sell', timestamp: Math.floor(timestampUs / 1000)
+      amount,
+      localTimestampUs,
+      price,
+      side: side ? 'buy' : 'sell',
+      timestamp: Math.floor(timestampUs / 1000)
     }))
 }
 
@@ -100,38 +118,88 @@ function partialBar(base, previous, rawTrades, timestamp, tickSize, priorVolume)
   })
   if (!executions.length) {
     const close = previous?.close ?? base.open
-    return { ...base, close, delta: 0, high: close, levels: [], low: close, open: close, poc: close, vah: close, val: close, volume: 0 }
+    return {
+      ...base,
+      close,
+      delta: 0,
+      high: close,
+      levels: [],
+      low: close,
+      open: close,
+      poc: close,
+      vah: close,
+      val: close,
+      volume: 0
+    }
   }
   const levels = new Map()
-  let high = -Infinity; let low = Infinity; let volume = 0; let delta = 0; let numerator = 0
+  let high = -Infinity
+  let low = Infinity
+  let volume = 0
+  let delta = 0
+  let numerator = 0
   for (const [, , price, amount, side] of executions) {
     const key = Number((Math.round(price / tickSize) * tickSize).toFixed(2))
     const level = levels.get(key) ?? { ask: 0, bid: 0, price: key }
-    level[side ? 'ask' : 'bid'] += amount; levels.set(key, level)
-    high = Math.max(high, price); low = Math.min(low, price); volume += amount
-    delta += side ? amount : -amount; numerator += price * amount
+    level[side ? 'ask' : 'bid'] += amount
+    levels.set(key, level)
+    high = Math.max(high, price)
+    low = Math.min(low, price)
+    volume += amount
+    delta += side ? amount : -amount
+    numerator += price * amount
   }
   const sortedLevels = [...levels.values()].sort((a, b) => a.price - b.price)
-  const poc = sortedLevels.reduce((best, level) => !best || level.ask + level.bid > best.ask + best.bid ? level : best, null)?.price
+  const poc = sortedLevels.reduce(
+    (best, level) => (!best || level.ask + level.bid > best.ask + best.bid ? level : best),
+    null
+  )?.price
   const priorNumerator = previous ? previous.vwap * priorVolume : 0
   return {
-    ...base, close: executions.at(-1)[2], cvd: (previous?.cvd ?? 0) + delta, delta,
-    high, levels: sortedLevels, low, open: executions[0][2], poc, vah: high, val: low, volume,
+    ...base,
+    close: executions.at(-1)[2],
+    cvd: (previous?.cvd ?? 0) + delta,
+    delta,
+    high,
+    levels: sortedLevels,
+    low,
+    open: executions[0][2],
+    poc,
+    vah: high,
+    val: low,
+    volume,
     vwap: (priorNumerator + numerator) / (priorVolume + volume)
   }
 }
 
 export function deriveProfessionalView(session, chunk, timestamp) {
-  const index = Math.max(0, Math.min(session.bars.length - 1, Math.floor((timestamp - session.sessionStart) / session.barDurationMs)))
+  const index = Math.max(
+    0,
+    Math.min(
+      session.bars.length - 1,
+      Math.floor((timestamp - session.sessionStart) / session.barDurationMs)
+    )
+  )
   const completeBars = session.bars.slice(0, index)
   const priorVolume = completeBars.reduce((sum, bar) => sum + bar.volume, 0)
-  const current = partialBar(session.bars[index], completeBars.at(-1), chunk.trades.trades, timestamp, session.tickSize, priorVolume)
+  const current = partialBar(
+    session.bars[index],
+    completeBars.at(-1),
+    chunk.trades.trades,
+    timestamp,
+    session.tickSize,
+    priorVolume
+  )
   const bars = [...completeBars, current]
   const open = bars[0].open
   return {
-    bars, change: ((current.close / open) - 1) * 100, current, index,
+    bars,
+    change: (current.close / open - 1) * 100,
+    current,
+    index,
     orderbook: reconstructBook(chunk.book, timestamp),
-    profile: profileThrough(bars, index), timestamp,
+    profile: profileThrough(bars, index),
+    timestamp,
     trades: tradesThrough(chunk.trades, timestamp)
   }
 }
