@@ -25,6 +25,8 @@
 
 .pro-terminal {
   position: relative;
+  display: grid;
+  grid-template-rows: 44px 44px minmax(0, 1fr) 54px;
   width: 100vw;
   height: 100dvh;
   min-width: 1400px;
@@ -135,8 +137,9 @@
   grid-template-columns: var(--watch-width) 5px minmax(680px, 1fr) 5px var(--dom-width) 5px var(
       --execution-width
     );
-  height: calc(100dvh - 88px);
-  min-height: 672px;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
 }
 
 .terminal-workspace > *:not(.panel-resizer) {
@@ -247,8 +250,10 @@
 
 .chart-stack {
   display: grid;
-  grid-template-rows: minmax(490px, 1fr) 210px;
+  grid-template-rows: minmax(0, 1fr) 210px;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   background: var(--pro-panel);
 }
 
@@ -669,6 +674,7 @@
 }
 
 .activity {
+  min-height: 0;
   overflow: hidden;
   background: var(--pro-panel);
 }
@@ -745,16 +751,16 @@
 }
 
 .playback-dock {
-  position: fixed;
+  position: relative;
   z-index: 5;
-  bottom: 10px;
-  left: 50%;
+  align-self: center;
+  justify-self: center;
   display: grid;
   grid-template-columns: 70px 68px minmax(300px, 520px) 190px 128px;
   align-items: center;
+  width: min(900px, calc(100vw - 20px));
   gap: 8px;
   padding: 7px 9px;
-  transform: translateX(-50%);
   background: rgb(16 22 27 / 0.97);
   border: 1px solid var(--pro-strong);
   box-shadow: 0 8px 28px #000;
@@ -884,13 +890,7 @@
   }
 
   .terminal-workspace {
-    height: 1000px;
-  }
-
-  .playback-dock {
-    right: 10px;
-    left: auto;
-    transform: none;
+    height: auto;
   }
 }
 

@@ -701,7 +701,7 @@ function Activity() {
   const [tab, setTab] = useState('POSITIONS')
   const tabs = ['POSITIONS  2', 'ORDERS  4', 'FILLS  12', 'ACTIVITY', 'ACCOUNT & RISK']
   return (
-    <section className="activity">
+    <section aria-label="Orders and positions" className="activity">
       <header>
         <div>
           {tabs.map((name) => (

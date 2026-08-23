@@ -21,6 +21,13 @@ for (const [route, mode] of views) {
     await expect(page.getByText(/TARDIS (REPLAYING|PAUSED|BUFFERING)/)).toBeVisible()
     await expect(page.getByText('DOM', { exact: true })).toBeVisible()
     await expect(page.getByText('TIME & SALES')).toBeVisible()
+    const activity = page.getByLabel('Orders and positions')
+    const playbackDock = page.locator('.playback-dock')
+    await expect(activity).toBeVisible()
+    const activityBox = await activity.boundingBox()
+    const playbackBox = await playbackDock.boundingBox()
+    expect(activityBox.height).toBeGreaterThanOrEqual(200)
+    expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
     await expect(page.locator('.price-tick')).toHaveCount(9)
     await expect(page.getByRole('button', { name: 'PAUSE' })).toBeVisible()
     if (mode === 'step-profile') {
@@ -76,4 +83,19 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await page.getByLabel('Chart mode').selectOption('footprint')
   await expect(page).toHaveURL(/\/footprint$/)
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
+})
+
+test('orders and positions remain visible at a smaller desktop viewport', async ({ page }) => {
+  await page.setViewportSize({ height: 900, width: 1440 })
+  await page.goto('/step-profile')
+
+  const activity = page.getByLabel('Orders and positions')
+  const playbackDock = page.locator('.playback-dock')
+  await expect(activity).toBeVisible()
+
+  const activityBox = await activity.boundingBox()
+  const playbackBox = await playbackDock.boundingBox()
+  expect(activityBox.height).toBeGreaterThanOrEqual(200)
+  expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
+  expect(playbackBox.y + playbackBox.height).toBeLessThanOrEqual(900)
 })
