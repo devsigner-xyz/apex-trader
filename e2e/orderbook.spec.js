@@ -13,8 +13,26 @@ test.describe('Professional historical order flow', () => {
     await expect(rows).toHaveCount(34)
     await expect(page.locator('.dom-row.ask')).toHaveCount(17)
     await expect(page.locator('.dom-row.bid')).toHaveCount(17)
+    const spreadRow = page.locator('.dom-spread-row')
+    await expect(spreadRow).toHaveCount(1)
+    await expect(spreadRow).toContainText('LAST')
+    await expect(spreadRow).toContainText('SPREAD')
     await expect(page.locator('.dom footer')).toContainText(/Exact groups applied \d+/)
     await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
+
+    const separator = await page.locator('.dom-ladder').evaluate((ladder) => {
+      const asks = [...ladder.querySelectorAll('.dom-row.ask')]
+      const bids = [...ladder.querySelectorAll('.dom-row.bid')]
+      const spread = ladder.querySelector('.dom-spread-row')
+      return {
+        askBeforeSpread: asks.at(-1).nextElementSibling === spread,
+        bidAfterSpread: spread.nextElementSibling === bids[0],
+        spread: Number(spread.dataset.spread)
+      }
+    })
+    expect(separator.askBeforeSpread).toBe(true)
+    expect(separator.bidAfterSpread).toBe(true)
+    expect(separator.spread).toBeGreaterThan(0)
 
     const dimensions = await page.locator('.dom').evaluate((dom) => {
       const ladder = dom.querySelector('.dom-ladder')

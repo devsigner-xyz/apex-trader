@@ -769,14 +769,34 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   )
 }
 
-function Dom({ orderbook, onPrice }) {
+function Dom({ currentPrice, orderbook, onPrice }) {
   const asks = [...orderbook.asks].reverse().slice(-17)
   const bids = orderbook.bids.slice(0, 17)
-  const rows = [
-    ...asks.map((row) => ({ ...row, side: 'ask' })),
-    ...bids.map((row) => ({ ...row, side: 'bid' }))
-  ]
+  const rows = [...asks, ...bids]
   const maximum = Math.max(...rows.map((row) => row.amount), 1)
+  const bestAsk = Number(orderbook.asks[0]?.price)
+  const bestBid = Number(orderbook.bids[0]?.price)
+  const spread = Number.isFinite(bestAsk) && Number.isFinite(bestBid) ? bestAsk - bestBid : 0
+
+  const renderRow = (row, side, index) => (
+    <button
+      className={`dom-row ${side}`}
+      data-price={row.price}
+      key={`${side}-${row.price}`}
+      onClick={() => onPrice(row.price)}
+      type="button"
+    >
+      <span>{fmt(row.price)}</span>
+      <span>
+        {index % 3 === 0 ? `${side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}` : ''}
+      </span>
+      <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
+        {fmt(row.amount, 3)}
+      </span>
+      <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
+    </button>
+  )
+
   return (
     <section className="dom">
       <header>
@@ -790,26 +810,23 @@ function Dom({ orderbook, onPrice }) {
         <span>LAST</span>
       </div>
       <div className="dom-ladder">
-        {rows.map((row, index) => (
-          <button
-            className={`dom-row ${row.side}`}
-            data-price={row.price}
-            key={`${row.side}-${row.price}`}
-            onClick={() => onPrice(row.price)}
-            type="button"
-          >
-            <span>{fmt(row.price)}</span>
-            <span>
-              {index % 3 === 0
-                ? `${row.side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}`
-                : ''}
-            </span>
-            <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
-              {fmt(row.amount, 3)}
-            </span>
-            <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
-          </button>
-        ))}
+        {asks.map((row, index) => renderRow(row, 'ask', index))}
+        <div
+          aria-label={`Last price ${fmt(currentPrice)}, spread ${fmt(spread)}`}
+          className="dom-spread-row"
+          data-price={currentPrice}
+          data-spread={spread}
+        >
+          <span>
+            <small>LAST</small>
+            <strong>{fmt(currentPrice)}</strong>
+          </span>
+          <span>
+            <small>SPREAD</small>
+            <strong>{fmt(spread)}</strong>
+          </span>
+        </div>
+        {bids.map((row, index) => renderRow(row, 'bid', index))}
       </div>
       <footer>
         <span>
@@ -1135,7 +1152,11 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             setColumns((current) => ({ ...current, dom: clamp(current.dom - delta, 190, 310) }))
           }
         />
-        <Dom onPrice={(next) => setPrice(Number(next).toFixed(2))} orderbook={view.orderbook} />
+        <Dom
+          currentPrice={view.current.close}
+          onPrice={(next) => setPrice(Number(next).toFixed(2))}
+          orderbook={view.orderbook}
+        />
         <PanelResizer
           className="execution-resizer"
           label="Resize execution panel"

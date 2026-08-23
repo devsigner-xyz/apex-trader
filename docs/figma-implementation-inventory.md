@@ -25,7 +25,7 @@ All frames are 1920 × 1080. At narrower viewports the workspace keeps its tradi
 | `113:2114` / equivalent · Watchlist                       | `x0 y44 w360 h982`      | `Watchlist`                   | reaches the global header; selected BTCUSDT row; other instruments are explicit demo rows   |
 | `113:2745`, `113:5681`, `169:4821` · MarketChart variants | `x365 y88 w1047 h728`   | `MarketChart` renderers       | Candles, Footprint, Step Profile; price scale, volume, CVD, profiles and chart interaction  |
 | `113:4047` / equivalent · ActivityBlotter                 | `x365 y816 w1047 h210`  | `Activity`                    | functional Positions, Orders, Fills, Activity, Account & Risk tabs; explicit `DEMO DATA`    |
-| `113:4170` / equivalent · OrderBook                       | `x1417 y44 w218 h982`   | `Dom`                         | reconstructed real L2, selected price and exact-event replay at a 20 Hz render cadence      |
+| `113:4170` / equivalent · OrderBook                       | `x1417 y44 w218 h982`   | `Dom`                         | reconstructed real L2, stable last-price/spread separator, selected price and 20 Hz replay  |
 | `113:5231` / equivalent · ExecutionPanel                  | `x1640 y44 w280 h982`   | `Execution` + `TimeSales`     | buy/sell, controlled order type, local non-transmitted staging message and real market tape |
 | `303:2` · `Trading/PlaybackDock` + three screen instances | `x510 y1030 w900 h46`   | playback dock                 | fixed 1× play/pause, whole-session seek, UTC timestamp and replay state; no speed controls  |
 
@@ -58,6 +58,7 @@ The three vertical resize handles are 5 px wide. The workspace ends at `y=1026`;
 | Chart mode routes | current view selected                                  | accent text/border       | History API transition without reload               | n/a                                        |
 | Playback          | playing at fixed 1× from the initial historical window | focus ring               | play/pause and seek update one clock                | controls disabled while data loads         |
 | DOM row           | neutral                                                | selected background      | clicking copies the real price into execution limit | no liquidity row omitted                   |
+| DOM separator     | last price and best ask-minus-bid spread               | n/a                      | stable boundary between asks and bids               | falls back to `0.00` only without a book   |
 | Buy/Sell          | Buy default                                            | semantic hover           | active side changes submit label/color              | submit disabled for invalid quantity/price |
 | Activity tabs     | Positions default                                      | raised surface           | tab body and counts change                          | n/a                                        |
 | Settings          | closed                                                 | trigger focus            | modal overlay with close/Escape                     | n/a                                        |
