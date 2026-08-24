@@ -28,6 +28,7 @@
     "cryptocurrency-icons": "^0.18.1",
     "highcharts": "^11.1.0",
     "lightweight-charts": "^5.2.1",
+    "lucide-react": "^1.33.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

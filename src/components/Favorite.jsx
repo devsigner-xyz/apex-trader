@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Star } from 'lucide-react'
 
 export default function Favorite({ favorite, onToggle, ticker }) {
   return (
@@ -9,7 +10,12 @@ export default function Favorite({ favorite, onToggle, ticker }) {
       onClick={onToggle}
       type="button"
     >
-      <span aria-hidden="true">★</span>
+      <Star
+        aria-hidden="true"
+        fill={favorite ? 'currentColor' : 'none'}
+        size={16}
+        strokeWidth={2}
+      />
     </button>
   )
 }

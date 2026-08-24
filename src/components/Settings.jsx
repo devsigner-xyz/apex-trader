@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { X } from 'lucide-react'
 
 const currencies = ['USD', 'EUR']
 
@@ -22,7 +23,7 @@ export default function Settings({ baseCurrency, isOpen, onClose, onCurrencyChan
           onClick={onClose}
           type="button"
         >
-          <span aria-hidden="true">×</span>
+          <X aria-hidden="true" size={18} strokeWidth={2} />
         </button>
       </div>
       <div className="content">

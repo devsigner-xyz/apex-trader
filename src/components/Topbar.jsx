@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { ChevronRight, Settings } from 'lucide-react'
 import AssetIcon from './AssetIcon.jsx'
 import Change from './Change.jsx'
 import Price from './Price.jsx'
@@ -26,9 +27,7 @@ export default function Topbar({
             <span>
               {asset}-{counterpart}
             </span>
-            <span aria-hidden="true" className="topbar-icon">
-              ›
-            </span>
+            <ChevronRight aria-hidden="true" className="topbar-icon" size={18} strokeWidth={2} />
           </button>
         </div>
         <div className="topbar-item">
@@ -52,7 +51,7 @@ export default function Topbar({
           onClick={onOpenSettings}
           type="button"
         >
-          <span aria-hidden="true">⚙</span>
+          <Settings aria-hidden="true" size={18} strokeWidth={2} />
         </button>
       </div>
     </header>

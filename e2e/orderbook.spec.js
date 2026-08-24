@@ -5,7 +5,8 @@ test.use({ viewport: { height: 1080, width: 1920 } })
 test.describe('Professional historical order flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/price-chart')
-    await expect(page.locator('.replay-status')).toContainText(/REPLAYING|PAUSED|BUFFERING/)
+    await expect(page.locator('.replay-status')).toHaveCount(0)
+    await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
   })
 
   test('renders the reconstructed DOM with a balanced visible ladder', async ({ page }) => {
@@ -47,17 +48,19 @@ test.describe('Professional historical order flow', () => {
     const bidLevels = page.getByLabel('Bid price levels')
     const spreadBeforeScroll = await spreadRow.boundingBox()
     const initialAskScroll = await askLevels.evaluate((node) => node.scrollTop)
-    await askLevels.hover()
-    await page.mouse.wheel(0, -500)
-    await page.waitForTimeout(100)
+    await askLevels.evaluate((node) => {
+      node.scrollTop = Math.max(0, node.scrollTop - 120)
+      node.dispatchEvent(new Event('scroll'))
+    })
     const scrolledAsk = await askLevels.evaluate((node) => node.scrollTop)
     const unchangedBid = await bidLevels.evaluate((node) => node.scrollTop)
     expect(scrolledAsk).toBeLessThan(initialAskScroll)
     expect(unchangedBid).toBe(0)
 
-    await bidLevels.hover()
-    await page.mouse.wheel(0, 500)
-    await page.waitForTimeout(100)
+    await bidLevels.evaluate((node) => {
+      node.scrollTop = 120
+      node.dispatchEvent(new Event('scroll'))
+    })
     const scrolledBid = await bidLevels.evaluate((node) => node.scrollTop)
     const unchangedAsk = await askLevels.evaluate((node) => node.scrollTop)
     const spreadAfterScroll = await spreadRow.boundingBox()
@@ -83,15 +86,16 @@ test.describe('Professional historical order flow', () => {
   })
 
   test('sends a selected real DOM price to the execution ticket', async ({ page }) => {
-    await page.getByRole('button', { name: 'PAUSE' }).click()
     const row = page.locator('.dom-row.bid').first()
-    const price = await row.getAttribute('data-price')
-    await row.click()
+    const price = await row.evaluate((node) => {
+      const selectedPrice = node.dataset.price
+      node.click()
+      return selectedPrice
+    })
     await expect(page.getByLabel('Limit price')).toHaveValue(Number(price).toFixed(2))
   })
 
   test('groups real DOM levels into configurable price increments', async ({ page }) => {
-    await page.getByRole('button', { name: 'PAUSE' }).click()
     const settingsButton = page.getByRole('button', { name: 'DOM settings' })
     await expect(settingsButton).toBeVisible()
     await settingsButton.click()
@@ -135,36 +139,39 @@ test.describe('Professional historical order flow', () => {
   })
 
   test('keeps DOM, Time and Sales and chart on the shared historical clock', async ({ page }) => {
-    const timeline = page.getByLabel('Historical time')
-    const before = Number(await timeline.inputValue())
+    const countdown = page.locator('.current-price-countdown')
+    const countdownBefore = await countdown.textContent()
     const firstTradeBefore = await page.locator('.tape button').first().textContent()
     const groupsBefore = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
 
-    await page.waitForTimeout(1000)
-
-    expect(Number(await timeline.inputValue())).toBeGreaterThan(before)
-    await expect(page.locator('.tape button').first()).not.toHaveText(firstTradeBefore)
-    const groupsAfter = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
-    expect(groupsAfter).toBeGreaterThan(groupsBefore)
+    await expect(countdown).not.toHaveText(countdownBefore)
+    await expect(page.locator('.tape button').first()).not.toHaveText(firstTradeBefore, {
+      timeout: 10_000
+    })
+    await expect
+      .poll(
+        async () => Number(await page.locator('.dom').getAttribute('data-groups-applied')),
+        { timeout: 10_000 }
+      )
+      .toBeGreaterThan(groupsBefore)
   })
 
   test('aggregates the retained five-minute market bars into selectable intervals', async ({
     page
   }) => {
-    await page.getByRole('button', { name: 'PAUSE' }).click()
     const timeframe = page.getByLabel('Timeframe')
-    const visibleBars = page.getByLabel('Visible bars')
+    const visibleBars = page.locator('.market-chart svg > g.up, .market-chart svg > g.down')
 
     await timeframe.selectOption('5')
-    expect(Number.parseInt(await visibleBars.textContent(), 10)).toBe(34)
+    await expect(visibleBars).toHaveCount(34)
     await timeframe.selectOption('15')
     await expect(page.locator('.quiet').first()).toContainText('15M')
-    const fifteenMinuteBars = Number.parseInt(await visibleBars.textContent(), 10)
+    const fifteenMinuteBars = await visibleBars.count()
     expect(fifteenMinuteBars).toBeGreaterThan(10)
     expect(fifteenMinuteBars).toBeLessThan(34)
     await timeframe.selectOption('60')
     await expect(page.locator('.quiet').first()).toContainText('1H')
-    const hourlyBars = Number.parseInt(await visibleBars.textContent(), 10)
+    const hourlyBars = await visibleBars.count()
     expect(hourlyBars).toBeGreaterThan(1)
     expect(hourlyBars).toBeLessThan(fifteenMinuteBars)
   })

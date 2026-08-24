@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { X } from 'lucide-react'
 import AssetIcon from './AssetIcon.jsx'
 import Favorite from './Favorite.jsx'
 import { getFormattedCurrency } from '../helpers/helpers.js'
@@ -33,7 +34,7 @@ export default function PairSelector({
           onClick={onClose}
           type="button"
         >
-          <span aria-hidden="true">×</span>
+          <X aria-hidden="true" size={18} strokeWidth={2} />
         </button>
       </div>
       <div className="content markets-content">

@@ -18,15 +18,15 @@ for (const [route, mode] of views) {
     await page.goto(route)
     await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
     await expect(page.getByLabel(`${mode} historical chart`)).toBeVisible()
-    await expect(page.locator('.replay-status')).toContainText(/REPLAYING|PAUSED|BUFFERING/)
+    await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
     await expect(page.getByText('DOM', { exact: true })).toBeVisible()
     await expect(page.getByText('TIME & SALES')).toBeVisible()
     await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
     const activity = page.getByLabel('Orders and positions')
-    const playbackDock = page.locator('.playback-dock')
+    const footer = page.locator('.terminal-footer')
     const marketHeader = page.locator('.market-header')
     const watchlist = page.getByLabel('Markets', { exact: true })
-    const toolbar = page.locator('.workspace-toolbar')
+    const headerControls = marketHeader.locator('.header-controls')
     const chartStack = page.locator('.chart-stack')
     const dom = page.locator('.dom')
     const execution = page.locator('.execution')
@@ -35,13 +35,17 @@ for (const [route, mode] of views) {
     const executionHeader = execution.locator('.ticket header')
     const tapeHeader = tape.locator(':scope > header')
     await expect(activity).toBeVisible()
-    await expect(marketHeader).not.toContainText('TARDIS')
-    await expect(marketHeader).not.toContainText(/\d{2}:\d{2}:\d{2}\.\d{3}/)
+    await expect(marketHeader).toContainText('APEX TRADER')
+    await expect(marketHeader.locator('select')).toHaveCount(4)
+    await expect(marketHeader).not.toContainText('WORKSTATION')
+    await expect(marketHeader).not.toContainText('UTC')
+    await expect(page.locator('.workspace-toolbar')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /Layout 01/ })).toHaveCount(0)
     const activityBox = await activity.boundingBox()
-    const playbackBox = await playbackDock.boundingBox()
+    const footerBox = await footer.boundingBox()
     const marketHeaderBox = await marketHeader.boundingBox()
     const watchlistBox = await watchlist.boundingBox()
-    const toolbarBox = await toolbar.boundingBox()
+    const headerControlsBox = await headerControls.boundingBox()
     const chartStackBox = await chartStack.boundingBox()
     const domBox = await dom.boundingBox()
     const executionBox = await execution.boundingBox()
@@ -49,11 +53,10 @@ for (const [route, mode] of views) {
     const executionHeaderBox = await executionHeader.boundingBox()
     const tapeHeaderBox = await tapeHeader.boundingBox()
     expect(watchlistBox.y).toBeCloseTo(marketHeaderBox.y + marketHeaderBox.height, 0)
-    expect(toolbarBox.x).toBeCloseTo(chartStackBox.x, 0)
-    expect(toolbarBox.width).toBeCloseTo(chartStackBox.width, 0)
-    expect(chartStackBox.y).toBeCloseTo(toolbarBox.y + toolbarBox.height, 0)
-    expect(domBox.y).toBeCloseTo(toolbarBox.y, 0)
-    expect(executionBox.y).toBeCloseTo(toolbarBox.y, 0)
+    expect(headerControlsBox.x).toBeGreaterThan(marketHeaderBox.x)
+    expect(chartStackBox.y).toBeCloseTo(marketHeaderBox.y + marketHeaderBox.height, 0)
+    expect(domBox.y).toBeCloseTo(chartStackBox.y, 0)
+    expect(executionBox.y).toBeCloseTo(chartStackBox.y, 0)
     expect(tapeHeaderBox.height).toBe(44)
     expect(tapeHeaderBox.height).toBe(domHeaderBox.height)
     expect(tapeHeaderBox.height).toBe(executionHeaderBox.height)
@@ -64,15 +67,23 @@ for (const [route, mode] of views) {
       'aria-label',
       /(?:buy|sell) trade at/
     )
+    await expect(executionHeader).toHaveText('EXECUTION')
+    await expect(page.getByText('SIM fixture · no order is transmitted')).toHaveCount(0)
     expect(activityBox.height).toBeGreaterThanOrEqual(200)
-    expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
+    expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(footerBox.y)
+    expect(footerBox.x).toBe(0)
+    expect(footerBox.width).toBe(1920)
+    expect(footerBox.height).toBe(36)
     const chartLeftEdges = await page.getByLabel(`${mode} historical chart`).evaluate((chart) => ({
-      deltaBaseline: Number(chart.querySelector('.delta-baseline').getAttribute('x1')),
       grid: Number(chart.querySelector('.gridline').getAttribute('x1')),
       poc: Number(chart.querySelector('.poc-line').getAttribute('x1')),
       viewBox: chart.viewBox.baseVal.x
     }))
-    expect(chartLeftEdges).toEqual({ deltaBaseline: 0, grid: 0, poc: 0, viewBox: 0 })
+    expect(chartLeftEdges).toEqual({ grid: 0, poc: 0, viewBox: 0 })
+    await expect(page.getByRole('button', { name: /Zoom chart/ })).toHaveCount(0)
+    await expect(page.getByLabel('Visible bars')).toHaveCount(0)
+    await expect(page.getByText('CVD Δ · PER BAR', { exact: true })).toHaveCount(0)
+    await expect(page.locator('.delta-bar')).toHaveCount(0)
     await expect(page.locator('.price-tick')).toHaveCount(9)
     await expect(page.getByText('PRICE · USDT', { exact: true })).toHaveCount(0)
     const priceAxisPadding = await page
@@ -91,7 +102,9 @@ for (const [route, mode] of views) {
       })
     expect(Math.abs(priceAxisPadding.left - priceAxisPadding.right)).toBeLessThanOrEqual(4)
     await expect(page.locator('.current-price-countdown')).toHaveText(/CLOSE \d{2}:\d{2}/)
-    await expect(page.getByRole('button', { name: 'PAUSE' })).toBeVisible()
+    await expect(page.getByLabel('Historical time')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
+    await expect(page.locator('.replay-status')).toHaveCount(0)
     const foregroundSelector = {
       candles: '.up, .down',
       footprint: '.footprint-bar',
@@ -119,6 +132,37 @@ for (const [route, mode] of views) {
           )
         )
       expect(volumeCenters).toEqual(profileCenters)
+      const stepProfileLevels = page.locator('.step-profile-level')
+      expect(await stepProfileLevels.count()).toBeGreaterThan(20)
+      const stepProfileGeometry = await stepProfileLevels.evaluateAll((levels) =>
+        levels.map((level) => {
+          const bid = level.querySelector('.step-profile-bid')
+          const ask = level.querySelector('.step-profile-ask')
+          return {
+            askFill: getComputedStyle(ask).fill,
+            askWidth: Number(ask.getAttribute('width')),
+            askX: Number(ask.getAttribute('x')),
+            bidFill: getComputedStyle(bid).fill,
+            bidWidth: Number(bid.getAttribute('width')),
+            bidX: Number(bid.getAttribute('x'))
+          }
+        })
+      )
+      expect(
+        stepProfileGeometry.some(({ askWidth, bidWidth }) => Math.abs(askWidth - bidWidth) > 0.5)
+      ).toBe(true)
+      expect(
+        stepProfileGeometry.every(
+          ({ askX, bidWidth, bidX }) => Math.abs(bidX + bidWidth - askX) < 0.01
+        )
+      ).toBe(true)
+      expect(stepProfileGeometry.every(({ bidFill }) => bidFill === 'rgb(47, 182, 124)')).toBe(
+        true
+      )
+      expect(stepProfileGeometry.every(({ askFill }) => askFill === 'rgb(225, 91, 100)')).toBe(
+        true
+      )
+      expect(await page.locator('.step-profile-poc-outline').count()).toBeGreaterThan(0)
       const deltaFontSize = await page
         .locator('.step-delta')
         .first()
@@ -139,23 +183,8 @@ for (const [route, mode] of views) {
         .locator('.footprint-bid-bg')
         .first()
         .evaluate((node) => Number(node.getAttribute('width')))
-      for (let index = 0; index < 8; index += 1) {
-        await page.getByRole('button', { name: 'Zoom chart in' }).click()
-      }
-      await expect(page.getByLabel('Visible bars')).toHaveText('4 bars')
-      const zoomedValueFontSize = await page
-        .locator('.footprint-cell-value')
-        .first()
-        .evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize))
-      const zoomedCellWidth = await page
-        .locator('.footprint-bid-bg')
-        .first()
-        .evaluate((node) => Number(node.getAttribute('width')))
       expect(valueFontSize).toBeGreaterThanOrEqual(13)
-      expect(zoomedValueFontSize).toBeGreaterThanOrEqual(valueFontSize)
-      expect(zoomedValueFontSize).toBeGreaterThanOrEqual(13)
       expect(initialCellWidth).toBeLessThanOrEqual(38)
-      expect(zoomedCellWidth).toBeLessThanOrEqual(38)
       const firstBar = page.locator('.footprint-bar').first()
       const deltaGap = await firstBar.evaluate((node) => {
         const delta = node.querySelector('.bar-delta')
@@ -272,20 +301,19 @@ test('panel sizes persist across reloads and later visits', async ({ context, pa
   await returningPage.close()
 })
 
-test('playback, settings and keyboard controls remain coherent', async ({ page }) => {
+test('historical synchronization, settings and keyboard controls remain coherent', async ({
+  page
+}) => {
   await page.goto('/price-chart')
-  const timeline = page.getByLabel('Historical time')
   const countdown = page.locator('.current-price-countdown')
   const countdownBefore = await countdown.textContent()
-  const before = Number(await timeline.inputValue())
   await page.waitForTimeout(1000)
-  const elapsed = Number(await timeline.inputValue()) - before
-  expect(elapsed).toBeGreaterThan(500)
-  expect(elapsed).toBeLessThan(2000)
   await expect(countdown).not.toHaveText(countdownBefore)
+  await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
+  await expect(page.getByLabel('Historical time')).toHaveCount(0)
   await expect(page.getByLabel('Playback speed')).toHaveCount(0)
-  await expect(page.getByText(/REPLAYING .*×/)).toHaveCount(0)
-  await page.getByRole('button', { name: 'PAUSE' }).click()
+  await expect(page.getByText(/REPLAYING|BUFFERING|PAUSED/)).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
 
   const timeframe = page.getByLabel('Timeframe')
   await expect(timeframe.locator('option')).toHaveCount(6)
@@ -302,11 +330,8 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')
-  const visibleBars = page.getByLabel('Visible bars')
-  const initialCount = await visibleBars.textContent()
-  await chart.hover()
-  await page.mouse.wheel(0, -300)
-  await expect(visibleBars).not.toHaveText(initialCount)
+  await expect(page.getByRole('button', { name: /Zoom chart/ })).toHaveCount(0)
+  await expect(page.getByLabel('Visible bars')).toHaveCount(0)
 
   const visibleWindow = page.locator('.window-label')
   const initialWindow = await visibleWindow.textContent()
@@ -374,10 +399,8 @@ test('playback, settings and keyboard controls remain coherent', async ({ page }
   await expect(page.getByText(/SIM BUY MARKET staged/)).toBeVisible()
   await expect(page.getByText(/not transmitted/)).toBeVisible()
 
-  await page.getByRole('button', { name: /Layout 01/ }).click()
-  await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeVisible()
-  await page.keyboard.press('Escape')
-  await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toBeHidden()
+  await expect(page.getByRole('button', { name: /Layout 01/ })).toHaveCount(0)
+  await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toHaveCount(0)
   await page.getByLabel('Chart mode').selectOption('footprint')
   await expect(page).toHaveURL(/\/footprint$/)
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
@@ -414,7 +437,8 @@ test('orders and positions remain visible at a smaller desktop viewport', async 
   await page.goto('/step-profile')
 
   const activity = page.getByLabel('Orders and positions')
-  const playbackDock = page.locator('.playback-dock')
+  const footer = page.locator('.terminal-footer')
+  const marketHeader = page.locator('.market-header')
   const ticket = page.locator('.ticket')
   const tape = page.locator('.tape')
   const dom = page.locator('.dom')
@@ -422,14 +446,18 @@ test('orders and positions remain visible at a smaller desktop viewport', async 
   await expect(activity).toBeVisible()
 
   const activityBox = await activity.boundingBox()
-  const playbackBox = await playbackDock.boundingBox()
+  const footerBox = await footer.boundingBox()
+  const marketHeaderBox = await marketHeader.boundingBox()
   const ticketBox = await ticket.boundingBox()
   const tapeBox = await tape.boundingBox()
   const domBox = await dom.boundingBox()
   const ladderBox = await ladder.boundingBox()
   expect(activityBox.height).toBeGreaterThanOrEqual(200)
-  expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(playbackBox.y)
-  expect(playbackBox.y + playbackBox.height).toBeLessThanOrEqual(900)
+  expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(footerBox.y)
+  expect(footerBox.y + footerBox.height).toBeLessThanOrEqual(900)
+  expect(footerBox.x).toBe(0)
+  expect(footerBox.width).toBe(marketHeaderBox.width)
+  expect(footerBox.width).toBeGreaterThanOrEqual(1440)
   expect(ticketBox.y + ticketBox.height).toBeLessThanOrEqual(tapeBox.y + 1)
   expect(tapeBox.height).toBeGreaterThan(190)
   expect(domBox.height).toBeGreaterThanOrEqual(750)
