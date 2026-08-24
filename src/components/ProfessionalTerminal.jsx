@@ -1,7 +1,12 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
+import {
+  aggregateDomOrderbook,
+  domPriceGroupings,
+  formatDomGrouping
+} from '../services/domPresentation.js'
 import { aggregateProfessionalBars, formatCandleCloseCountdown } from '../services/proPlayback.js'
 
 const fixtureMarkets = [
@@ -34,6 +39,26 @@ const fixtureMarkets = [
   ['QQQ', '205.58', '205.57', '205.59', '+0.35%', '33M'],
   ['SPY', '314.31', '314.30', '314.32', '+0.41%', '39M']
 ]
+
+const watchlistColumns = [
+  { id: 'symbol', label: 'SYM', required: true, sourceIndex: 0, width: 'minmax(0, 1.4fr)' },
+  { id: 'last', label: 'LAST', required: true, sourceIndex: 1, width: 'minmax(0, 1.15fr)' },
+  { id: 'bid', label: 'BID', sourceIndex: 2, width: 'minmax(0, 1fr)' },
+  { id: 'ask', label: 'ASK', sourceIndex: 3, width: 'minmax(0, 1fr)' },
+  { id: 'change', label: 'Δ%', sourceIndex: 4, width: 'minmax(0, 0.82fr)' },
+  { id: 'volume', label: 'VOL', sourceIndex: 5, width: 'minmax(0, 0.9fr)' }
+]
+const optionalWatchlistColumns = watchlistColumns
+  .filter(({ required }) => !required)
+  .map(({ id }) => id)
+const watchlistColumnsStorageKey = 'apex-trader:markets-columns'
+const panelSizesStorageKey = 'apex-trader:panel-sizes:v1'
+const panelSizeDefaults = { dom: 218, execution: 280, watch: 360 }
+const panelSizeLimits = {
+  dom: [218, 340],
+  execution: [250, 380],
+  watch: [340, 460]
+}
 
 const activityTabs = [
   ['POSITIONS', 'POSITIONS  2'],
@@ -162,13 +187,25 @@ function activityTabId(id) {
   return `activity-tab-${id.toLowerCase().replaceAll(/[^a-z]+/g, '-')}`
 }
 
-const chartDefaults = { candles: 34, footprint: 10, 'step-profile': 9 }
+const chartDefaults = { candles: 34, footprint: 12, 'step-profile': 9 }
 const chartMinimums = { candles: 10, footprint: 4, 'step-profile': 4 }
+const chartTimeframes = [
+  { label: '5 min', minutes: 5 },
+  { label: '15 min', minutes: 15 },
+  { label: '30 min', minutes: 30 },
+  { label: '1 hour', minutes: 60 },
+  { label: '4 hours', minutes: 240 },
+  { label: '1 day', minutes: 1440 }
+]
+const footprintTimeframes = chartTimeframes.filter(({ minutes }) => minutes >= 60)
 const chartWidth = 1128
 const chartHeight = 730
-const plotLeft = 48
-const plotRight = 1038
-const priceAxisX = 1046
+const plotLeft = 0
+const chartLabelInset = 8
+const plotRight = 1048
+const profileWidth = 150
+const profileClearance = 20
+const priceAxisX = 1056
 const mainTop = 42
 const mainBottom = 505
 const volumeTop = 558
@@ -178,6 +215,21 @@ const deltaBaseline = 692
 
 function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum)
+}
+
+function loadPanelSizes() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(panelSizesStorageKey))
+    return Object.fromEntries(
+      Object.entries(panelSizeDefaults).map(([panel, fallback]) => {
+        const value = Number(stored?.[panel])
+        const [minimum, maximum] = panelSizeLimits[panel]
+        return [panel, Number.isFinite(value) ? clamp(value, minimum, maximum) : fallback]
+      })
+    )
+  } catch {
+    return { ...panelSizeDefaults }
+  }
 }
 
 function fmt(value, digits = 2) {
@@ -191,30 +243,132 @@ function clock(timestamp, milliseconds = false) {
   return new Date(timestamp).toISOString().slice(11, milliseconds ? 23 : 19)
 }
 
-function Watchlist() {
+function formatTimeframe(timeframe) {
+  if (timeframe === 1440) return '1D'
+  if (timeframe >= 60) return `${timeframe / 60}H`
+  return `${timeframe}M`
+}
+
+function SettingsIcon() {
   return (
-    <section className="pro-watchlist" aria-label="Demo watchlist">
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z" />
+      <path d="m19.2 13.1 1.5 1.2-1.8 3.1-1.8-.7c-.5.4-1 .8-1.6 1l-.3 1.9h-3.6l-.3-1.9a7 7 0 0 1-1.6-1l-1.8.7-1.8-3.1 1.5-1.2a7.2 7.2 0 0 1 0-2.2L6.1 9.7l1.8-3.1 1.8.7c.5-.4 1-.8 1.6-1l.3-1.9h3.6l.3 1.9c.6.2 1.1.6 1.6 1l1.8-.7 1.8 3.1-1.5 1.2a7.2 7.2 0 0 1 0 2.2Z" />
+    </svg>
+  )
+}
+
+function Watchlist() {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [optionalColumns, setOptionalColumns] = useState(() => {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(watchlistColumnsStorageKey))
+      if (!Array.isArray(stored)) return optionalWatchlistColumns
+      return optionalWatchlistColumns.filter((column) => stored.includes(column))
+    } catch {
+      return optionalWatchlistColumns
+    }
+  })
+  const watchlistRef = useRef(null)
+  const visibleColumns = watchlistColumns.filter(
+    ({ id, required }) => required || optionalColumns.includes(id)
+  )
+  const gridTemplateColumns = visibleColumns.map(({ width }) => width).join(' ')
+
+  useEffect(() => {
+    window.localStorage.setItem(watchlistColumnsStorageKey, JSON.stringify(optionalColumns))
+  }, [optionalColumns])
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined
+    const close = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return
+      if (event.type === 'pointerdown' && watchlistRef.current?.contains(event.target)) return
+      setSettingsOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    window.addEventListener('pointerdown', close)
+    return () => {
+      window.removeEventListener('keydown', close)
+      window.removeEventListener('pointerdown', close)
+    }
+  }, [settingsOpen])
+
+  return (
+    <section className="pro-watchlist" aria-label="Markets" ref={watchlistRef}>
       <header>
-        <strong>WATCHLIST</strong>
-        <select aria-label="Watchlist category">
-          <option>Markets · DEMO</option>
-        </select>
+        <strong>MARKETS</strong>
+        <button
+          aria-controls="markets-settings-panel"
+          aria-expanded={settingsOpen}
+          aria-label="Markets settings"
+          className="watch-settings-button"
+          onClick={() => setSettingsOpen((current) => !current)}
+          title="Markets settings"
+          type="button"
+        >
+          <SettingsIcon />
+        </button>
       </header>
-      <div className="watch-head">
-        {['SYM', 'LAST', 'BID', 'ASK', 'Δ%', 'VOL'].map((label) => (
-          <span key={label}>{label}</span>
+      {settingsOpen && (
+        <aside
+          aria-label="Markets columns"
+          className="watch-settings-popover"
+          id="markets-settings-panel"
+          role="dialog"
+        >
+          <strong>VISIBLE COLUMNS</strong>
+          <div className="watch-column-options">
+            {watchlistColumns.map(({ id, label, required }) => (
+              <label key={id}>
+                <input
+                  aria-label={`Show ${label} column`}
+                  checked={required || optionalColumns.includes(id)}
+                  disabled={required}
+                  onChange={() => {
+                    if (required) return
+                    setOptionalColumns((current) =>
+                      current.includes(id)
+                        ? current.filter((column) => column !== id)
+                        : [...current, id]
+                    )
+                  }}
+                  type="checkbox"
+                />
+                <span>{label}</span>
+                {required && <small>ALWAYS</small>}
+              </label>
+            ))}
+          </div>
+        </aside>
+      )}
+      <div className="watch-head" style={{ gridTemplateColumns }}>
+        {visibleColumns.map(({ id, label }) => (
+          <span className={`watch-cell watch-cell--${id}`} key={id}>
+            {label}
+          </span>
         ))}
       </div>
       {fixtureMarkets.map((row, index) => (
-        <button className={index === 0 ? 'selected' : ''} key={row[0]} type="button">
-          {row.map((cell, cellIndex) => (
-            <span
-              className={cellIndex === 4 ? (cell.startsWith('-') ? 'negative' : 'positive') : ''}
-              key={cellIndex}
-            >
-              {cell}
-            </span>
-          ))}
+        <button
+          className={index === 0 ? 'selected' : ''}
+          key={row[0]}
+          style={{ gridTemplateColumns }}
+          type="button"
+        >
+          {visibleColumns.map(({ id, sourceIndex }) => {
+            const cell = row[sourceIndex]
+            return (
+              <span
+                className={`watch-cell watch-cell--${id}${
+                  id === 'change' ? ` ${cell.startsWith('-') ? 'negative' : 'positive'}` : ''
+                }`}
+                key={id}
+              >
+                {cell}
+              </span>
+            )
+          })}
         </button>
       ))}
     </section>
@@ -260,6 +414,7 @@ function niceDisplayStep(target, sourceTickSize) {
 function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const [visibleCount, setVisibleCount] = useState(chartDefaults[mode])
   const [rightOffset, setRightOffset] = useState(0)
+  const [reserveProfileSpace, setReserveProfileSpace] = useState(false)
   const [dragging, setDragging] = useState(false)
   const dragState = useRef(null)
   const bars = useMemo(
@@ -288,10 +443,13 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const rawHigh = Math.max(...visible.map((bar) => bar.high))
   const rawRange = rawHigh - rawLow || Math.max(rawHigh * 0.001, 1)
   const low = rawLow - rawRange * 0.08
-  const high = rawHigh + rawRange * 0.08
+  const high = rawHigh + rawRange * (mode === 'footprint' ? 0.12 : 0.08)
   const range = high - low
   const y = (price) => mainBottom - ((price - low) / range) * (mainBottom - mainTop)
-  const plotWidth = plotRight - plotLeft
+  const dataPlotRight = reserveProfileSpace
+    ? plotRight - profileWidth - profileClearance
+    : plotRight
+  const plotWidth = dataPlotRight - plotLeft
   const step = plotWidth / Math.max(visible.length, 1)
   const x = (index) => plotLeft + (index + 0.5) * step
   const profile = sessionProfile(view.profile, low, high)
@@ -373,7 +531,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const windowLabel = `${clock(visible[0]?.timestamp ?? view.timestamp)} – ${clock(
     visible.at(-1)?.timestamp ?? view.timestamp
   )}`
-  const timeframeLabel = timeframe === 60 ? '1H' : `${timeframe}M`
+  const timeframeLabel = formatTimeframe(timeframe)
   const candleCloseCountdown = formatCandleCloseCountdown(view.timestamp, timeframe)
 
   return (
@@ -399,6 +557,15 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           </button>
           <button onClick={resetViewport} type="button">
             RESET
+          </button>
+          <button
+            aria-label="Reserve space for volume profile"
+            aria-pressed={reserveProfileSpace}
+            onClick={() => setReserveProfileSpace((current) => !current)}
+            title="Keep price bars clear of the session volume profile"
+            type="button"
+          >
+            PROFILE SPACE
           </button>
         </div>
       </header>
@@ -452,7 +619,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           />
         ))}
 
-        <text className="quiet" x={plotLeft} y="24">
+        <text className="quiet" x={chartLabelInset} y="24">
           {mode === 'candles'
             ? `CANDLES · ${timeframeLabel} · VWAP · EMA20`
             : mode === 'footprint'
@@ -464,9 +631,31 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
         <text className="quiet" x={plotRight - 170} y="24">
           SESSION VOLUME PROFILE
         </text>
-        <text className="price-axis-title" x={priceAxisX + 8} y="24">
-          PRICE · USDT
-        </text>
+
+        <g className="session-profile" data-layer="background">
+          {profile.map((level, index) => {
+            const total = level.ask + level.bid
+            const width = (total / maxProfile) * profileWidth
+            return (
+              <g key={index}>
+                <rect
+                  className="session-profile-bar session-profile-bar--bid"
+                  height="8"
+                  width={width * 0.48}
+                  x={plotRight - width}
+                  y={y(level.price) - 4}
+                />
+                <rect
+                  className="session-profile-bar session-profile-bar--ask"
+                  height="8"
+                  width={width * 0.52}
+                  x={plotRight - width * 0.52}
+                  y={y(level.price) - 4}
+                />
+              </g>
+            )
+          })}
+        </g>
 
         {mode === 'candles' &&
           visible.map((bar, index) => {
@@ -503,7 +692,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
                 level.price + footprintTickSize / 2 <= high
             )
             const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
-            const barWidth = Math.min(step * 0.92, 96 * footprintZoomScale)
+            const barWidth = Math.min(step * 0.78, 76)
             const halfWidth = barWidth / 2
             const rowHeight = clamp(
               (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
@@ -590,7 +779,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
                   style={{ fontSize: footprintDeltaFontSize }}
                   textAnchor="middle"
                   x={center}
-                  y={y(bar.high) - 9}
+                  y={Math.max(mainTop + footprintDeltaFontSize, y(bar.high) - 26)}
                 >
                   Δ {fmt(bar.delta, 3)}
                 </text>
@@ -639,29 +828,6 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
               </g>
             )
           })}
-
-        {profile.map((level, index) => {
-          const total = level.ask + level.bid
-          const width = (total / maxProfile) * 150
-          return (
-            <g key={index}>
-              <rect
-                fill="#223e63"
-                height="8"
-                width={width * 0.48}
-                x={plotRight - width}
-                y={y(level.price) - 4}
-              />
-              <rect
-                fill="#315f76"
-                height="8"
-                width={width * 0.52}
-                x={plotRight - width * 0.52}
-                y={y(level.price) - 4}
-              />
-            </g>
-          )
-        })}
 
         <line
           className="poc-line"
@@ -723,7 +889,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           </text>
         ))}
 
-        <text className="label" x={plotLeft} y={volumeTop - 10}>
+        <text className="label" x={chartLabelInset} y={volumeTop - 10}>
           VOLUME · ALIGNED TO PRICE BARS
         </text>
         {visible.map((bar, index) => {
@@ -740,7 +906,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           )
         })}
 
-        <text className="label" x={plotLeft} y={deltaTop - 9}>
+        <text className="label" x={chartLabelInset} y={deltaTop - 9}>
           CVD Δ · PER BAR
         </text>
         <line
@@ -778,14 +944,67 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   )
 }
 
-function Dom({ currentPrice, orderbook, onPrice }) {
-  const asks = [...orderbook.asks].reverse().slice(-17)
-  const bids = orderbook.bids.slice(0, 17)
+function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }) {
+  const [priceGrouping, setPriceGrouping] = useState(sourceTickSize)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const domRef = useRef(null)
+  const askLevelsRef = useRef(null)
+  const bidLevelsRef = useRef(null)
+  const domScrollPosition = useRef({ askFromBottom: 0, bidFromTop: 0 })
+  const previousDomGrouping = useRef(null)
+  const groupingOptions = useMemo(
+    () =>
+      domPriceGroupings.filter((grouping) => {
+        const multiple = grouping / sourceTickSize
+        return grouping >= sourceTickSize && Math.abs(multiple - Math.round(multiple)) < 1e-8
+      }),
+    [sourceTickSize]
+  )
+  const groupedOrderbook = useMemo(
+    () => aggregateDomOrderbook(orderbook, priceGrouping),
+    [orderbook, priceGrouping]
+  )
+  const asks = [...groupedOrderbook.asks].reverse()
+  const bids = groupedOrderbook.bids
   const rows = [...asks, ...bids]
   const maximum = Math.max(...rows.map((row) => row.amount), 1)
   const bestAsk = Number(orderbook.asks[0]?.price)
   const bestBid = Number(orderbook.bids[0]?.price)
   const spread = Number.isFinite(bestAsk) && Number.isFinite(bestBid) ? bestAsk - bestBid : 0
+  const groupingMultiple = Math.round(priceGrouping / sourceTickSize)
+
+  useLayoutEffect(() => {
+    if (previousDomGrouping.current !== priceGrouping) {
+      domScrollPosition.current = { askFromBottom: 0, bidFromTop: 0 }
+      previousDomGrouping.current = priceGrouping
+    }
+
+    const asksElement = askLevelsRef.current
+    const bidsElement = bidLevelsRef.current
+    if (asksElement) {
+      const { askFromBottom } = domScrollPosition.current
+      asksElement.scrollTop = Math.max(
+        0,
+        asksElement.scrollHeight - asksElement.clientHeight - askFromBottom
+      )
+    }
+    if (bidsElement) bidsElement.scrollTop = domScrollPosition.current.bidFromTop
+  }, [groupedOrderbook, priceGrouping])
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined
+    const close = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return
+      if (event.type === 'pointerdown' && domRef.current?.contains(event.target)) return
+      setSettingsOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    window.addEventListener('pointerdown', close)
+    return () => {
+      window.removeEventListener('keydown', close)
+      window.removeEventListener('pointerdown', close)
+    }
+  }, [settingsOpen])
 
   const renderRow = (row, side, index) => (
     <button
@@ -807,11 +1026,58 @@ function Dom({ currentPrice, orderbook, onPrice }) {
   )
 
   return (
-    <section className="dom" data-groups-applied={orderbook.groupsApplied}>
+    <section
+      className="dom"
+      data-groups-applied={orderbook.groupsApplied}
+      data-price-grouping={priceGrouping}
+      ref={domRef}
+    >
       <header>
         <strong>DOM</strong>
-        <span>BTC · 0.01 · x1</span>
+        <div className="dom-header-meta">
+          <span>
+            BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}
+          </span>
+          <button
+            aria-controls="dom-settings-panel"
+            aria-expanded={settingsOpen}
+            aria-label="DOM settings"
+            className="dom-settings-button"
+            onClick={() => setSettingsOpen((current) => !current)}
+            title="DOM settings"
+            type="button"
+          >
+            <SettingsIcon />
+          </button>
+        </div>
       </header>
+      {settingsOpen && (
+        <aside
+          aria-label="DOM settings"
+          className="dom-settings-popover"
+          id="dom-settings-panel"
+          role="dialog"
+        >
+          <strong>DOM SETTINGS</strong>
+          <label>
+            PRICE GROUPING
+            <select
+              aria-label="DOM price grouping"
+              onChange={(event) => setPriceGrouping(Number(event.target.value))}
+              value={priceGrouping}
+            >
+              {groupingOptions.map((grouping) => (
+                <option key={grouping} value={grouping}>
+                  {formatDomGrouping(grouping)} USDT · x{Math.round(grouping / sourceTickSize)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <small>
+            Aggregates real book levels into price increments. Bids round down; asks round up.
+          </small>
+        </aside>
+      )}
       <div className="dom-head">
         <span>PRICE</span>
         <span>Δ</span>
@@ -819,7 +1085,22 @@ function Dom({ currentPrice, orderbook, onPrice }) {
         <span>LAST</span>
       </div>
       <div className="dom-ladder">
-        {asks.map((row, index) => renderRow(row, 'ask', index))}
+        <div
+          aria-label="Ask price levels"
+          className="dom-book-side dom-book-side--asks"
+          data-level-count={asks.length}
+          onScroll={(event) => {
+            const element = event.currentTarget
+            domScrollPosition.current.askFromBottom = Math.max(
+              0,
+              element.scrollHeight - element.clientHeight - element.scrollTop
+            )
+          }}
+          ref={askLevelsRef}
+          tabIndex={0}
+        >
+          {asks.map((row, index) => renderRow(row, 'ask', index))}
+        </div>
         <div
           aria-label={`Last price ${fmt(currentPrice)}, spread ${fmt(spread)}`}
           className="dom-spread-row"
@@ -835,7 +1116,18 @@ function Dom({ currentPrice, orderbook, onPrice }) {
             <strong>{fmt(spread)}</strong>
           </span>
         </div>
-        {bids.map((row, index) => renderRow(row, 'bid', index))}
+        <div
+          aria-label="Bid price levels"
+          className="dom-book-side dom-book-side--bids"
+          data-level-count={bids.length}
+          onScroll={(event) => {
+            domScrollPosition.current.bidFromTop = event.currentTarget.scrollTop
+          }}
+          ref={bidLevelsRef}
+          tabIndex={0}
+        >
+          {bids.map((row, index) => renderRow(row, 'bid', index))}
+        </div>
       </div>
       <footer>
         <span>
@@ -857,14 +1149,17 @@ function TimeSales({ trades }) {
         <span>TIME</span>
         <span>PRICE</span>
         <span>SIZE</span>
-        <span>SIDE</span>
       </div>
       {trades.slice(0, 20).map((trade, index) => (
-        <button className={trade.side} key={`${trade.timestamp}-${index}`} type="button">
+        <button
+          aria-label={`${trade.side} trade at ${fmt(trade.price)} for ${fmt(trade.amount, 4)}`}
+          className={trade.side}
+          key={`${trade.timestamp}-${index}`}
+          type="button"
+        >
           <span>{clock(trade.timestamp, true)}</span>
           <span>{fmt(trade.price)}</span>
           <span>{fmt(trade.amount, 4)}</span>
-          <span>{trade.side.toUpperCase()}</span>
         </button>
       ))}
     </section>
@@ -1061,8 +1356,16 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const { isBuffering, playing, seek, session, setPlaying, timestamp, view } = playback
   const [price, setPrice] = useState(Number(view.current.close).toFixed(2))
   const [settings, setSettings] = useState(false)
-  const [timeframe, setTimeframe] = useState(5)
-  const [columns, setColumns] = useState({ dom: 218, execution: 280, watch: 360 })
+  const [timeframe, setTimeframe] = useState(() => (mode === 'footprint' ? 60 : 5))
+  const [columns, setColumns] = useState(loadPanelSizes)
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(panelSizesStorageKey, JSON.stringify(columns))
+    } catch {
+      // Keep resizing functional when browser storage is unavailable.
+    }
+  }, [columns])
 
   useEffect(() => {
     if (!settings) return undefined
@@ -1073,12 +1376,17 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
     return () => window.removeEventListener('keydown', close)
   }, [settings])
 
+  useEffect(() => {
+    if (mode === 'footprint' && timeframe < 60) setTimeframe(60)
+  }, [mode, timeframe])
+
   const modeTitle = {
     candles: 'PRICE CHART WORKSTATION',
     footprint: 'ORDER FLOW WORKSTATION',
     'step-profile': 'STEP PROFILE WORKSTATION'
   }[mode]
   const routeMode = (next) => {
+    if (next === 'footprint') setTimeframe((current) => Math.max(current, 60))
     onMode(next)
     history.pushState({}, '', next === 'candles' ? '/price-chart' : `/${next}`)
   }
@@ -1100,10 +1408,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           {view.change.toFixed(2)}%
         </span>
         <span>UTC · {clock(timestamp)}</span>
-        <span className={`feed ${playing ? 'is-playing' : ''}`}>
-          ● {isBuffering ? 'BUFFERING' : playing ? 'TARDIS REPLAYING' : 'TARDIS PAUSED'}
-        </span>
-        <span>{clock(timestamp, true)}</span>
       </header>
       <div className="terminal-workspace" style={workspaceStyle}>
         <Watchlist />
@@ -1123,10 +1427,13 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             onChange={(event) => setTimeframe(Number(event.target.value))}
             value={timeframe}
           >
-            <option value="5">5 min</option>
-            <option value="15">15 min</option>
-            <option value="30">30 min</option>
-            <option value="60">1 hour</option>
+            {(mode === 'footprint' ? footprintTimeframes : chartTimeframes).map(
+              ({ label, minutes }) => (
+                <option key={minutes} value={minutes}>
+                  {label}
+                </option>
+              )
+            )}
           </select>
           <select
             aria-label="Chart mode"
@@ -1157,13 +1464,14 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           className="dom-resizer"
           label="Resize DOM"
           onResize={(delta) =>
-            setColumns((current) => ({ ...current, dom: clamp(current.dom - delta, 190, 310) }))
+            setColumns((current) => ({ ...current, dom: clamp(current.dom - delta, 218, 340) }))
           }
         />
         <Dom
           currentPrice={view.current.close}
           onPrice={(next) => setPrice(Number(next).toFixed(2))}
           orderbook={view.orderbook}
+          sourceTickSize={session.tickSize}
         />
         <PanelResizer
           className="execution-resizer"
@@ -1171,7 +1479,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           onResize={(delta) =>
             setColumns((current) => ({
               ...current,
-              dom: clamp(current.dom + delta, 190, 310),
+              dom: clamp(current.dom + delta, 218, 340),
               execution: clamp(current.execution - delta, 250, 380)
             }))
           }
