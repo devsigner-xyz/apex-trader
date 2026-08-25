@@ -57,7 +57,7 @@ export const chartDefaults = { candles: 34, footprint: 12, 'step-profile': 9 }
 export const chartViewportLimits = {
   candles: { maximum: 160, minimum: 12 },
   footprint: { maximum: 24, minimum: 4 },
-  'step-profile': { maximum: 18, minimum: 4 }
+  'step-profile': { maximum: 18, minimum: 1 }
 }
 export const chartTimeframes = [
   { label: '5 min', minutes: 5 },

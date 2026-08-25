@@ -225,14 +225,14 @@ export function deriveFootprintCellGeometry({ plotHeight, range, step, tickSize,
 }
 
 export function deriveStepProfileCellGeometry({ plotHeight, range, step, tickSize, zoomScale }) {
-  const cellWidth = clamp(step * 0.48, 42, 52)
-  const rowHeight = clamp((tickSize / range) * plotHeight * 0.84, 8, 11 * zoomScale)
+  const cellWidth = clamp(step * 0.42, 42, 40 + 20 * zoomScale)
+  const rowHeight = clamp((tickSize / range) * plotHeight * 0.84, 8, 10 + 2.2 * zoomScale)
   return {
     cellWidth,
-    maximumSideWidth: Math.max(2, Math.min((step - cellWidth) * 0.46, 28)),
+    maximumSideWidth: Math.max(2, Math.min((step - cellWidth) * 0.46, 80 * zoomScale)),
     rowHeight,
     sideHeight: Math.max(4, rowHeight - 2),
-    valueFontSize: clamp(rowHeight - 1.5, 7, 8.5)
+    valueFontSize: clamp(rowHeight - 2, 7, 16)
   }
 }
 

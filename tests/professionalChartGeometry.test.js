@@ -211,7 +211,29 @@ test('derives mode-specific primitive geometry without rendering dependencies', 
       tickSize: 0.5,
       zoomScale: 1
     }),
-    { cellWidth: 48, maximumSideWidth: 23.92, rowHeight: 10.5, sideHeight: 8.5, valueFontSize: 8.5 }
+    {
+      cellWidth: 42,
+      maximumSideWidth: 26.68,
+      rowHeight: 10.5,
+      sideHeight: 8.5,
+      valueFontSize: 8.5
+    }
+  )
+  assert.deepEqual(
+    deriveStepProfileCellGeometry({
+      plotHeight: 500,
+      range: 20,
+      step: 524,
+      tickSize: 1,
+      zoomScale: 4.5
+    }),
+    {
+      cellWidth: 130,
+      maximumSideWidth: 181.24,
+      rowHeight: 19.9,
+      sideHeight: 17.9,
+      valueFontSize: 16
+    }
   )
   assert.deepEqual(
     deriveVolumeBarGeometry({ close: 2, open: 1, volume: 50 }, 25, 10, 100, 10, 90),

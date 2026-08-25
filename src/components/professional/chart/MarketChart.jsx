@@ -140,10 +140,13 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const footprintZoomScale = clamp(chartDefaults.footprint / visible.length, 1, 1.6)
   const footprintFontSize = clamp(10 + (footprintZoomScale - 1) * 7, 10, 14)
   const footprintDeltaFontSize = clamp(11 + (footprintZoomScale - 1) * 5, 11, 14)
-  const stepZoomScale = clamp(chartDefaults['step-profile'] / visible.length, 1, 1.5)
-  const stepDeltaFontSize = clamp(13 + (stepZoomScale - 1) * 4, 13, 15)
+  const stepZoomScale = clamp(chartDefaults['step-profile'] / visible.length, 1, 9)
+  const stepDeltaFontSize = clamp(13 + (stepZoomScale - 1) * 1.25, 13, 19)
   const footprintTickSize = niceDisplayStep((range / 28) * footprintZoomScale, sourceTickSize)
-  const stepProfileTickSize = niceDisplayStep(range / 64, sourceTickSize)
+  const stepProfileTickSize = niceDisplayStep(
+    (range / 64) * Math.sqrt(stepZoomScale),
+    sourceTickSize
+  )
   const footprintSettings = {
     format: 'compact',
     imbalanceRatio: 3,

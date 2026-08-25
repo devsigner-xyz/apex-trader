@@ -455,6 +455,56 @@ test('time-axis wheel zoom anchors the latest candle and chart drag reveals hist
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 })
 
+test('step profile supports deep legible zoom without sparse profile bars', async ({ page }) => {
+  await page.goto('/step-profile')
+  const chart = page.getByLabel('step-profile historical chart')
+  const chartBounds = await chart.boundingBox()
+
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.5,
+    chartBounds.y + chartBounds.height * 0.5
+  )
+  await page.mouse.wheel(0, -1000)
+  await expect(chart).toHaveAttribute('data-visible-count', '2')
+
+  const twoBarGeometry = await page.locator('.step-profile-bar').evaluateAll((bars) =>
+    bars.map((bar) => {
+      const cells = [...bar.querySelectorAll('.step-profile-cell-bg')]
+      const sides = [...bar.querySelectorAll('.step-profile-bid, .step-profile-ask')]
+      const shapes = [...cells, ...sides]
+      const left = Math.min(...shapes.map((shape) => Number(shape.getAttribute('x'))))
+      const right = Math.max(
+        ...shapes.map(
+          (shape) => Number(shape.getAttribute('x')) + Number(shape.getAttribute('width'))
+        )
+      )
+      return {
+        center: Number(bar.querySelector('.profile-spine').getAttribute('x1')),
+        width: right - left
+      }
+    })
+  )
+  expect(twoBarGeometry).toHaveLength(2)
+  const centerSpacing = twoBarGeometry[1].center - twoBarGeometry[0].center
+  expect(Math.min(...twoBarGeometry.map(({ width }) => width))).toBeGreaterThan(
+    centerSpacing * 0.55
+  )
+
+  await page.mouse.wheel(0, -1000)
+  await expect(chart).toHaveAttribute('data-visible-count', '1')
+  const maximumZoomGeometry = await page
+    .locator('.step-profile-cell-bg')
+    .first()
+    .evaluate((cell) => ({
+      fontSize: Number.parseFloat(
+        getComputedStyle(cell.parentElement.querySelector('.step-profile-value')).fontSize
+      ),
+      width: Number(cell.getAttribute('width'))
+    }))
+  expect(maximumZoomGeometry.fontSize).toBeGreaterThanOrEqual(14)
+  expect(maximumZoomGeometry.width).toBeGreaterThanOrEqual(160)
+})
+
 test('historical synchronization, settings and keyboard controls remain coherent', async ({
   page
 }) => {
