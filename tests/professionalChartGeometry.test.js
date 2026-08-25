@@ -10,6 +10,8 @@ import {
   deriveFootprintCellGeometry,
   derivePannedOffset,
   derivePriceDomain,
+  derivePriceScaleFactor,
+  deriveScaledPriceDomain,
   deriveSessionProfileBarGeometry,
   deriveStepProfileCellGeometry,
   deriveVolumeBarGeometry,
@@ -109,6 +111,17 @@ test('derives the existing padded price domains and a deterministic price scale'
   assert.equal(scale.toY(100), 320)
   assert.equal(scale.toY(90), 600)
   assert.deepEqual(createPriceTicks({ high: 110, low: 90, range: 20 }, 3), [110, 100, 90])
+})
+
+test('rescales the price domain around its center with bounded drag sensitivity', () => {
+  assert.deepEqual(deriveScaledPriceDomain({ high: 110, low: 90, range: 20 }, 2), {
+    high: 120,
+    low: 80,
+    range: 40
+  })
+  assert.ok(Math.abs(derivePriceScaleFactor(1, 100) - Math.exp(0.6)) < 1e-12)
+  assert.equal(derivePriceScaleFactor(1, 10000), 4)
+  assert.equal(derivePriceScaleFactor(1, -10000), 0.25)
 })
 
 test('uses one temporal slot model for every chart rendering mode', () => {

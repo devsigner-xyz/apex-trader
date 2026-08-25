@@ -460,6 +460,30 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(chart).toHaveAttribute('data-visible-count', String(initialVisibleCount))
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 
+  const priceScaleResizer = page.getByLabel('Resize price scale')
+  await expect(priceScaleResizer).toHaveAttribute('aria-valuenow', '100')
+  const priceScaleBounds = await priceScaleResizer.boundingBox()
+  const visibleCountBeforePriceScale = await chart.getAttribute('data-visible-count')
+  await page.mouse.move(
+    priceScaleBounds.x + priceScaleBounds.width / 2,
+    priceScaleBounds.y + priceScaleBounds.height / 2
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    priceScaleBounds.x + priceScaleBounds.width / 2,
+    priceScaleBounds.y + priceScaleBounds.height / 2 + 80,
+    { steps: 8 }
+  )
+  await page.mouse.up()
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-price-scale-factor')))
+    .toBeGreaterThan(1.5)
+  await expect(chart).toHaveAttribute('data-visible-count', visibleCountBeforePriceScale)
+  await chart.focus()
+  await page.keyboard.press('0')
+  await expect(chart).toHaveAttribute('data-price-scale-factor', '1.0000')
+  await expect(priceScaleResizer).toHaveAttribute('aria-valuenow', '100')
+
   const watchlist = page.getByLabel('Markets', { exact: true })
   const initialWatchlist = await watchlist.boundingBox()
   const initialWatchCells = await watchlist

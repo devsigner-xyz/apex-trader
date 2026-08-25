@@ -812,6 +812,20 @@
   stroke-width: 1;
 }
 
+.price-axis-resizer {
+  cursor: ns-resize;
+  outline: none;
+}
+
+.price-axis-resizer:focus-visible {
+  stroke: var(--pro-accent);
+  stroke-width: 2;
+}
+
+.price-chart-panel > svg.resizing-price-scale {
+  cursor: ns-resize;
+}
+
 .price-tick-mark {
   stroke: var(--pro-strong);
   stroke-width: 1;

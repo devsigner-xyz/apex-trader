@@ -89,6 +89,38 @@ export function derivePriceDomain(visibleBars, mode) {
   return { high, low, range: high - low }
 }
 
+export function derivePriceScaleFactor(
+  initialScaleFactor,
+  pixelDelta,
+  minimumScaleFactor = 0.25,
+  maximumScaleFactor = 4
+) {
+  if (!Number.isFinite(initialScaleFactor) || initialScaleFactor <= 0)
+    throw new TypeError('Initial price scale factor must be positive.')
+  if (!Number.isFinite(pixelDelta)) throw new TypeError('Price scale pixel delta must be finite.')
+  return clamp(
+    initialScaleFactor * Math.exp(pixelDelta * 0.006),
+    minimumScaleFactor,
+    maximumScaleFactor
+  )
+}
+
+export function deriveScaledPriceDomain(domain, scaleFactor) {
+  if (
+    !Number.isFinite(domain?.high) ||
+    !Number.isFinite(domain?.low) ||
+    !Number.isFinite(domain?.range) ||
+    domain.range <= 0
+  )
+    throw new TypeError('Price domain must contain a finite positive range.')
+  if (!Number.isFinite(scaleFactor) || scaleFactor <= 0)
+    throw new TypeError('Price scale factor must be positive.')
+
+  const center = (domain.high + domain.low) / 2
+  const range = domain.range * scaleFactor
+  return { high: center + range / 2, low: center - range / 2, range }
+}
+
 export function createPriceScale(domain, top, bottom) {
   if (!Number.isFinite(top) || !Number.isFinite(bottom) || bottom <= top)
     throw new TypeError('Price scale bounds must be finite and increasing.')

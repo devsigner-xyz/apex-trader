@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Settings as SettingsIcon } from 'lucide-react'
 import { useChartViewport } from '../../../hooks/useChartViewport.js'
 import { usePersistentState } from '../../../hooks/usePersistentState.js'
+import { usePriceAxisScale } from '../../../hooks/usePriceAxisScale.js'
 import {
   buildSessionProfile,
   clamp,
@@ -105,7 +106,19 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     return () => chart.removeEventListener('wheel', handleWheel)
   }, [handleWheel])
 
-  const { high, low, range } = derivePriceDomain(visible, mode)
+  const automaticPriceDomain = derivePriceDomain(visible, mode)
+  const {
+    domain: priceDomain,
+    handleDoubleClick: handlePriceScaleDoubleClick,
+    handleKeyDown: handlePriceScaleKeyDown,
+    handlePointerDown: handlePriceScalePointerDown,
+    handlePointerMove: handlePriceScalePointerMove,
+    resetPriceScale,
+    resizing: resizingPriceScale,
+    scaleFactor: priceScaleFactor,
+    stopResizing: stopPriceScaleResize
+  } = usePriceAxisScale({ automaticDomain: automaticPriceDomain, mode, timeframe })
+  const { high, low, range } = priceDomain
   const priceScale = createPriceScale({ high, low, range }, mainTop, mainBottom)
   const y = priceScale.toY
   const plotWidth = plotRight - plotLeft
@@ -152,6 +165,14 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     '--volume-panel-height': panelVisibility.volume ? `${panelSizes.volume}px` : '0px',
     '--volume-resizer-height': panelVisibility.volume ? '7px' : '0px'
   }
+  const resetChart = () => {
+    resetViewport()
+    resetPriceScale()
+  }
+  const handleChartKeyDown = (event) => {
+    if (event.key === '0') resetPriceScale()
+    handleKeyDown(event)
+  }
 
   return (
     <section className="market-chart" ref={chartRef}>
@@ -163,7 +184,7 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
           </span>
         </div>
         <div className="chart-controls" aria-label="Chart controls">
-          <button onClick={resetViewport} type="button">
+          <button onClick={resetChart} type="button">
             RESET
           </button>
           <button
@@ -227,14 +248,15 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
       >
         <div className="price-chart-panel">
           <svg
-            aria-description="Use the wheel to zoom around the cursor. Scroll horizontally, hold Shift while scrolling, drag, or use the arrow keys to pan. Press zero to reset to the latest data."
+            aria-description="Use the wheel to zoom around the cursor. Scroll horizontally, hold Shift while scrolling, drag, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
-            className={dragging ? 'dragging' : ''}
+            className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}
+            data-price-scale-factor={priceScaleFactor.toFixed(4)}
             data-visible-count={visibleCount}
             data-window-end={visible.at(-1)?.timestamp ?? ''}
             data-window-start={visible[0]?.timestamp ?? ''}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleChartKeyDown}
             onPointerCancel={stopDragging}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -404,6 +426,30 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
             >
               {windowLabel}
             </text>
+
+            <rect
+              aria-label="Resize price scale"
+              aria-orientation="vertical"
+              aria-valuemax="400"
+              aria-valuemin="25"
+              aria-valuenow={Math.round(priceScaleFactor * 100)}
+              aria-valuetext={`${Math.round(priceScaleFactor * 100)}% of automatic price range`}
+              className="price-axis-resizer"
+              fill="transparent"
+              height={mainBottom - mainTop}
+              onDoubleClick={handlePriceScaleDoubleClick}
+              onKeyDown={handlePriceScaleKeyDown}
+              onPointerCancel={stopPriceScaleResize}
+              onPointerDown={handlePriceScalePointerDown}
+              onPointerMove={handlePriceScalePointerMove}
+              onPointerUp={stopPriceScaleResize}
+              pointerEvents="all"
+              role="slider"
+              tabIndex="0"
+              width={chartWidth - priceAxisX}
+              x={priceAxisX}
+              y={mainTop}
+            />
           </svg>
         </div>
         {panelVisibility.volume && (
