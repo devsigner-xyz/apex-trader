@@ -22,7 +22,14 @@ import {
   aggregateProfessionalBars,
   formatCandleCloseCountdown
 } from '../../../services/proPlayback.js'
-import { chartDefaults, chartDimensions, chartViewportLimits, storageKeys } from '../config.js'
+import {
+  chartDefaults,
+  chartDimensions,
+  chartTimeframes,
+  chartViewportLimits,
+  footprintTimeframes,
+  storageKeys
+} from '../config.js'
 import { formatClock as clock, formatNumber as fmt } from '../formatters.js'
 import CandlesLayer from './CandlesLayer.jsx'
 import FootprintLayer from './FootprintLayer.jsx'
@@ -45,7 +52,14 @@ const {
   chartPanelVisibility: chartPanelVisibilityStorageKey
 } = storageKeys
 
-export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
+export default function MarketChart({
+  mode,
+  onMode,
+  onTimeframe,
+  sourceTickSize,
+  timeframe,
+  view
+}) {
   const [panelSizes, setPanelSizes] = usePersistentState(
     chartPanelSizesStorageKey,
     normalizeChartPanelSizes
@@ -86,7 +100,6 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     handlePointerDown,
     handlePointerMove,
     handleWheel,
-    resetViewport,
     safeOffset,
     stopDragging,
     visible,
@@ -169,10 +182,6 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     '--volume-panel-height': panelVisibility.volume ? `${panelSizes.volume}px` : '0px',
     '--volume-resizer-height': panelVisibility.volume ? '7px' : '0px'
   }
-  const resetChart = () => {
-    resetViewport()
-    resetPriceScale()
-  }
   const handleChartKeyDown = (event) => {
     if (event.key === '0') resetPriceScale()
     handleKeyDown(event)
@@ -187,10 +196,31 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
             {fmt(current.close)} · Δ {fmt(current.delta)} · V {fmt(current.volume)}
           </span>
         </div>
-        <div className="chart-controls" aria-label="Chart controls">
-          <button onClick={resetChart} type="button">
-            RESET
-          </button>
+        <div aria-label="Chart controls" className="chart-controls" role="toolbar">
+          <select
+            aria-label="Timeframe"
+            className="chart-timeframe-select"
+            onChange={(event) => onTimeframe(Number(event.target.value))}
+            value={timeframe}
+          >
+            {(mode === 'footprint' ? footprintTimeframes : chartTimeframes).map(
+              ({ label, minutes }) => (
+                <option key={minutes} value={minutes}>
+                  {label}
+                </option>
+              )
+            )}
+          </select>
+          <select
+            aria-label="Chart mode"
+            className="chart-mode-select"
+            onChange={(event) => onMode(event.target.value)}
+            value={mode}
+          >
+            <option value="candles">Candles</option>
+            <option value="footprint">Footprint</option>
+            <option value="step-profile">Step Profile</option>
+          </select>
           <button
             aria-controls="chart-settings-panel"
             aria-expanded={settingsOpen}

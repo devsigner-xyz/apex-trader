@@ -6,7 +6,7 @@ import { clamp } from '../services/professionalChartGeometry.js'
 import { normalizePanelSizes } from '../services/professionalTerminalPersistence.js'
 import Activity from './professional/Activity.jsx'
 import MarketChart from './professional/chart/MarketChart.jsx'
-import { chartTimeframes, footprintTimeframes, storageKeys } from './professional/config.js'
+import { storageKeys } from './professional/config.js'
 import Dom from './professional/Dom.jsx'
 import Execution from './professional/execution/Execution.jsx'
 import PanelResizer from './professional/PanelResizer.jsx'
@@ -39,33 +39,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
     <div className="pro-terminal">
       <header className="market-header">
         <strong>APEX TRADER</strong>
-        <nav aria-label="Chart configuration" className="header-controls">
-          <select aria-label="Market">
-            <option>BTCUSDT</option>
-          </select>
-          <select
-            aria-label="Timeframe"
-            onChange={(event) => setTimeframe(Number(event.target.value))}
-            value={timeframe}
-          >
-            {(mode === 'footprint' ? footprintTimeframes : chartTimeframes).map(
-              ({ label, minutes }) => (
-                <option key={minutes} value={minutes}>
-                  {label}
-                </option>
-              )
-            )}
-          </select>
-          <select
-            aria-label="Chart mode"
-            onChange={(event) => routeMode(event.target.value)}
-            value={mode}
-          >
-            <option value="candles">Candles</option>
-            <option value="footprint">Footprint</option>
-            <option value="step-profile">Step Profile</option>
-          </select>
-        </nav>
       </header>
       <div className="terminal-workspace" style={workspaceStyle}>
         <Watchlist />
@@ -79,6 +52,8 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         <div className="chart-stack">
           <MarketChart
             mode={mode}
+            onMode={routeMode}
+            onTimeframe={setTimeframe}
             sourceTickSize={session.tickSize}
             timeframe={timeframe}
             view={view}

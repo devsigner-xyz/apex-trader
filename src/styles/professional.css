@@ -44,7 +44,6 @@
   align-items: center;
   height: 44px;
   padding: 0 16px;
-  gap: 24px;
   background: var(--pro-top);
   border-bottom: 1px solid var(--pro-border);
 }
@@ -61,13 +60,6 @@
   color: var(--pro-sell) !important;
 }
 
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.header-controls select,
 .ticket select,
 .ticket input {
   height: 30px;
@@ -77,19 +69,6 @@
   border: 1px solid var(--pro-border);
   border-radius: 3px;
   font: 500 11px inherit;
-}
-
-.header-controls select:nth-child(1) {
-  width: 122px;
-}
-
-.header-controls select:nth-child(2),
-.header-controls select:nth-child(4) {
-  width: 90px;
-}
-
-.header-controls select:nth-child(3) {
-  width: 126px;
 }
 
 .terminal-workspace {
@@ -470,6 +449,29 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.chart-controls select {
+  height: 28px;
+  padding: 0 8px;
+  color: var(--pro-text);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 500 11px inherit;
+}
+
+.chart-controls select:hover,
+.chart-controls select:focus-visible {
+  border-color: var(--pro-accent);
+}
+
+.chart-timeframe-select {
+  width: 90px;
+}
+
+.chart-mode-select {
+  width: 126px;
 }
 
 .chart-controls button {
