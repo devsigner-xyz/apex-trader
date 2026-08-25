@@ -65,6 +65,16 @@ test('normalizes wheel units and derives deterministic horizontal panning', () =
     }),
     25
   )
+  assert.equal(
+    derivePannedOffset({
+      maximumOffset: 100,
+      pixelDelta: 100,
+      plotWidth: 1000,
+      rightOffset: 20,
+      visibleCount: 50
+    }),
+    15
+  )
 })
 
 test('zooms the temporal viewport around the cursor anchor', () => {
@@ -97,6 +107,20 @@ test('zooms the temporal viewport around the cursor anchor', () => {
     }),
     { rightOffset: 20, visibleCount: 12 }
   )
+})
+
+test('keeps the last visible candle fixed while resizing the time axis', () => {
+  const current = { barCount: 200, rightOffset: 20, visibleCount: 40 }
+  const next = deriveZoomedViewport({
+    ...current,
+    anchorRatio: 1,
+    delta: -480,
+    maximumVisibleCount: 160,
+    minimumVisibleCount: 12
+  })
+
+  assert.deepEqual(next, { rightOffset: 20, visibleCount: 19 })
+  assert.equal(current.barCount - current.rightOffset - 1, current.barCount - next.rightOffset - 1)
 })
 
 test('derives the existing padded price domains and a deterministic price scale', () => {

@@ -401,6 +401,60 @@ test('panel sizes persist across reloads and later visits', async ({ context, pa
   await returningPage.close()
 })
 
+test('time-axis wheel zoom anchors the latest candle and chart drag reveals history', async ({
+  page
+}) => {
+  await page.goto('/price-chart')
+  const chart = page.getByLabel('candles historical chart')
+  const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
+  const initialWindowEnd = await chart.getAttribute('data-window-end')
+  const chartBounds = await chart.boundingBox()
+
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.25,
+    chartBounds.y + chartBounds.height * 0.5
+  )
+  await page.mouse.wheel(0, -480)
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-visible-count')))
+    .toBeLessThan(initialVisibleCount)
+  await expect(chart).toHaveAttribute('data-window-end', initialWindowEnd)
+  await expect(chart).toHaveAttribute('data-right-offset', '0')
+  await expect(chart).toHaveAttribute('data-follow-latest', 'true')
+
+  const zoomedWindowEnd = Number(await chart.getAttribute('data-window-end'))
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.5,
+    chartBounds.y + chartBounds.height * 0.5
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.7,
+    chartBounds.y + chartBounds.height * 0.5,
+    { steps: 8 }
+  )
+  await page.mouse.up()
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-window-end')))
+    .toBeLessThan(zoomedWindowEnd)
+  await expect(chart).toHaveAttribute('data-follow-latest', 'false')
+
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.7,
+    chartBounds.y + chartBounds.height * 0.5
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.5,
+    chartBounds.y + chartBounds.height * 0.5,
+    { steps: 8 }
+  )
+  await page.mouse.up()
+  await expect(chart).toHaveAttribute('data-window-end', String(zoomedWindowEnd))
+  await expect(chart).toHaveAttribute('data-right-offset', '0')
+  await expect(chart).toHaveAttribute('data-follow-latest', 'true')
+})
+
 test('historical synchronization, settings and keyboard controls remain coherent', async ({
   page
 }) => {
@@ -439,26 +493,6 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.keyboard.press('ArrowLeft')
   await expect(visibleWindow).not.toHaveText(initialWindow)
   await page.getByRole('button', { name: 'RESET' }).click()
-
-  const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
-  const chartBounds = await chart.boundingBox()
-  await page.mouse.move(
-    chartBounds.x + chartBounds.width * 0.25,
-    chartBounds.y + chartBounds.height * 0.5
-  )
-  await page.mouse.wheel(0, -480)
-  await expect
-    .poll(async () => Number(await chart.getAttribute('data-visible-count')))
-    .toBeLessThan(initialVisibleCount)
-  await expect(chart).toHaveAttribute('data-follow-latest', 'false')
-
-  const zoomedWindowStart = await chart.getAttribute('data-window-start')
-  await page.mouse.wheel(-320, 0)
-  await expect.poll(() => chart.getAttribute('data-window-start')).not.toBe(zoomedWindowStart)
-  await chart.focus()
-  await page.keyboard.press('0')
-  await expect(chart).toHaveAttribute('data-visible-count', String(initialVisibleCount))
-  await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 
   const priceScaleResizer = page.getByLabel('Resize price scale')
   await expect(priceScaleResizer).toHaveAttribute('aria-valuenow', '100')

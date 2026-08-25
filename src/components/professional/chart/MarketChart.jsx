@@ -87,6 +87,7 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     handlePointerMove,
     handleWheel,
     resetViewport,
+    safeOffset,
     stopDragging,
     visible,
     visibleCount
@@ -248,11 +249,12 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
       >
         <div className="price-chart-panel">
           <svg
-            aria-description="Use the wheel to zoom around the cursor. Scroll horizontally, hold Shift while scrolling, drag, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
+            aria-description="Use the wheel to resize the time axis around the last visible candle. Drag the chart right to reveal older candles and left to return toward the latest data. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
             className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}
             data-price-scale-factor={priceScaleFactor.toFixed(4)}
+            data-right-offset={safeOffset}
             data-visible-count={visibleCount}
             data-window-end={visible.at(-1)?.timestamp ?? ''}
             data-window-start={visible[0]?.timestamp ?? ''}
@@ -426,6 +428,17 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
             >
               {windowLabel}
             </text>
+
+            <rect
+              aria-hidden="true"
+              className="chart-pan-surface"
+              fill="transparent"
+              height={priceChartHeight}
+              pointerEvents="all"
+              width={plotWidth}
+              x={plotLeft}
+              y="0"
+            />
 
             <rect
               aria-label="Resize price scale"

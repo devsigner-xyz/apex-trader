@@ -21,7 +21,7 @@ export function useChartViewport({
   const [dragging, setDragging] = useState(false)
   const dragState = useRef(null)
   const previousBarCount = useRef(bars.length)
-  const wheelState = useRef({ anchorRatio: 0.5, delta: 0, frame: null, kind: 'zoom' })
+  const wheelState = useRef({ delta: 0, frame: null, kind: 'zoom' })
   const { maximumOffset, safeOffset, visible } = selectVisibleWindow(
     bars,
     visibleCount,
@@ -67,6 +67,7 @@ export function useChartViewport({
 
   const handlePointerDown = (event) => {
     if (event.button !== 0) return
+    event.currentTarget.focus({ preventScroll: true })
     event.currentTarget.setPointerCapture(event.pointerId)
     dragState.current = { offset: safeOffset, startX: event.clientX }
     setDragging(true)
@@ -83,8 +84,10 @@ export function useChartViewport({
       rightOffset: dragState.current.offset,
       visibleCount
     })
-    if (nextOffset !== safeOffset) setFollowLatest(false)
-    setRightOffset(nextOffset)
+    if (nextOffset !== safeOffset) {
+      setFollowLatest(nextOffset === 0)
+      setRightOffset(nextOffset)
+    }
   }
 
   const stopDragging = (event) => {
@@ -106,11 +109,9 @@ export function useChartViewport({
     if (accumulator.kind !== kind) accumulator.delta = 0
     accumulator.kind = kind
     accumulator.delta += horizontal ? (event.shiftKey ? normalized.y : normalized.x) : normalized.y
-    accumulator.anchorRatio = clamp((event.clientX - bounds.left) / Math.max(plotWidth, 1), 0, 1)
-
     if (accumulator.frame !== null) return
     accumulator.frame = requestAnimationFrame(() => {
-      const { anchorRatio, delta, kind: action } = wheelState.current
+      const { delta, kind: action } = wheelState.current
       wheelState.current.delta = 0
       wheelState.current.frame = null
       const current = viewportState.current
@@ -125,13 +126,13 @@ export function useChartViewport({
         })
         if (nextOffset !== current.rightOffset) {
           setRightOffset(nextOffset)
-          setFollowLatest(false)
+          setFollowLatest(nextOffset === 0)
         }
         return
       }
 
       const next = deriveZoomedViewport({
-        anchorRatio,
+        anchorRatio: 1,
         barCount: current.barCount,
         delta,
         maximumVisibleCount: limits.maximum,
@@ -142,7 +143,7 @@ export function useChartViewport({
       if (next.visibleCount === current.visibleCount) return
       setVisibleCount(next.visibleCount)
       setRightOffset(next.rightOffset)
-      if (next.rightOffset > 0) setFollowLatest(false)
+      setFollowLatest(next.rightOffset === 0)
     })
   }
 
@@ -155,7 +156,7 @@ export function useChartViewport({
 
     if (nextOffset !== undefined && nextOffset !== safeOffset) {
       setRightOffset(nextOffset)
-      setFollowLatest(false)
+      setFollowLatest(nextOffset === 0)
     }
     event.preventDefault()
   }
