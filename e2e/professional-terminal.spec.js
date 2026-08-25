@@ -36,7 +36,8 @@ for (const [route, mode] of views) {
     const tapeHeader = tape.locator(':scope > header')
     await expect(activity).toBeVisible()
     await expect(marketHeader).toContainText('APEX TRADER')
-    await expect(marketHeader.locator('select')).toHaveCount(4)
+    await expect(marketHeader.locator('select')).toHaveCount(3)
+    await expect(page.getByLabel('Tick size')).toHaveCount(0)
     await expect(marketHeader).not.toContainText('WORKSTATION')
     await expect(marketHeader).not.toContainText('UTC')
     await expect(page.locator('.workspace-toolbar')).toHaveCount(0)
@@ -102,24 +103,28 @@ for (const [route, mode] of views) {
       })
     expect(Math.abs(priceAxisPadding.left - priceAxisPadding.right)).toBeLessThanOrEqual(4)
     await expect(page.locator('.current-price-countdown')).toHaveText(/CLOSE \d{2}:\d{2}/)
+    await expect(page.locator('.chart-summary > span')).toHaveCount(1)
+    await expect(page.locator('.chart-summary')).toContainText(/O .* H .* L .* C .* Δ .* V /)
+    await expect(page.getByText(/VOLUME · ALIGNED TO PRICE BARS/i)).toHaveCount(0)
+    await expect(page.getByText('SESSION VOLUME PROFILE', { exact: true })).toHaveCount(0)
+    await expect(page.locator('.quiet')).toHaveCount(0)
+    await expect(
+      page.getByRole('button', { name: 'Reserve space for volume profile' })
+    ).toHaveCount(0)
     await expect(page.getByLabel('Historical time')).toHaveCount(0)
     await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
     await expect(page.locator('.replay-status')).toHaveCount(0)
-    const foregroundSelector = {
-      candles: '.up, .down',
-      footprint: '.footprint-bar',
-      'step-profile': '.profile-spine'
-    }[mode]
-    const profileIsBehindPriceSeries = await page
-      .locator('.session-profile')
-      .evaluate((profile, selector) => {
-        const foreground = document.querySelector(selector)
-        return Boolean(
-          foreground &&
-            profile.compareDocumentPosition(foreground) & Node.DOCUMENT_POSITION_FOLLOWING
-        )
-      }, foregroundSelector)
-    expect(profileIsBehindPriceSeries).toBe(true)
+    const pricePanelBox = await page.locator('.price-chart-panel').boundingBox()
+    const volumePanelBox = await page
+      .getByRole('img', { name: 'Volume panel', exact: true })
+      .boundingBox()
+    const profilePanelBox = await page
+      .getByRole('img', { name: 'Session volume profile panel', exact: true })
+      .boundingBox()
+    expect(pricePanelBox.x + pricePanelBox.width).toBeLessThanOrEqual(profilePanelBox.x)
+    expect(pricePanelBox.y + pricePanelBox.height).toBeLessThanOrEqual(volumePanelBox.y)
+    await expect(page.getByLabel('Resize volume panel')).toBeVisible()
+    await expect(page.getByLabel('Resize session volume profile panel')).toBeVisible()
     if (mode === 'step-profile') {
       const profileCenters = await page
         .locator('.profile-spine')
@@ -133,18 +138,25 @@ for (const [route, mode] of views) {
         )
       expect(volumeCenters).toEqual(profileCenters)
       const stepProfileLevels = page.locator('.step-profile-level')
+      const stepProfileValues = page.locator('.step-profile-value')
       expect(await stepProfileLevels.count()).toBeGreaterThan(20)
+      expect(await stepProfileValues.count()).toBe(await stepProfileLevels.count())
       const stepProfileGeometry = await stepProfileLevels.evaluateAll((levels) =>
         levels.map((level) => {
           const bid = level.querySelector('.step-profile-bid')
           const ask = level.querySelector('.step-profile-ask')
+          const cell = level.querySelector('.step-profile-cell-bg')
+          const value = level.querySelector('.step-profile-value')
           return {
             askFill: getComputedStyle(ask).fill,
             askWidth: Number(ask.getAttribute('width')),
             askX: Number(ask.getAttribute('x')),
             bidFill: getComputedStyle(bid).fill,
             bidWidth: Number(bid.getAttribute('width')),
-            bidX: Number(bid.getAttribute('x'))
+            bidX: Number(bid.getAttribute('x')),
+            cellWidth: Number(cell.getAttribute('width')),
+            cellX: Number(cell.getAttribute('x')),
+            label: value.textContent
           }
         })
       )
@@ -153,15 +165,41 @@ for (const [route, mode] of views) {
       ).toBe(true)
       expect(
         stepProfileGeometry.every(
-          ({ askX, bidWidth, bidX }) => Math.abs(bidX + bidWidth - askX) < 0.01
+          ({ bidWidth, bidX, cellX }) => Math.abs(bidX + bidWidth - cellX) < 0.01
         )
       ).toBe(true)
-      expect(stepProfileGeometry.every(({ bidFill }) => bidFill === 'rgb(47, 182, 124)')).toBe(
+      expect(
+        stepProfileGeometry.every(
+          ({ askX, cellWidth, cellX }) => Math.abs(cellX + cellWidth - askX) < 0.01
+        )
+      ).toBe(true)
+      expect(stepProfileGeometry.every(({ cellWidth }) => cellWidth >= 42 && cellWidth <= 52)).toBe(
         true
       )
-      expect(stepProfileGeometry.every(({ askFill }) => askFill === 'rgb(225, 91, 100)')).toBe(
-        true
+      expect(stepProfileGeometry.every(({ label }) => label.includes('×'))).toBe(true)
+      const profileSpacing = Math.min(
+        ...profileCenters.slice(1).map((center, index) => center - profileCenters[index])
       )
+      const profileWidths = await page.locator('.step-profile-bar').evaluateAll((bars) =>
+        bars.map((bar) => {
+          const levels = [...bar.querySelectorAll('.step-profile-level')]
+          const left = Math.min(
+            ...levels.map((level) =>
+              Number(level.querySelector('.step-profile-bid').getAttribute('x'))
+            )
+          )
+          const right = Math.max(
+            ...levels.map((level) => {
+              const ask = level.querySelector('.step-profile-ask')
+              return Number(ask.getAttribute('x')) + Number(ask.getAttribute('width'))
+            })
+          )
+          return right - left
+        })
+      )
+      expect(profileWidths.every((width) => width < profileSpacing)).toBe(true)
+      expect(stepProfileGeometry.every(({ bidFill }) => bidFill === 'rgb(47, 182, 124)')).toBe(true)
+      expect(stepProfileGeometry.every(({ askFill }) => askFill === 'rgb(225, 91, 100)')).toBe(true)
       expect(await page.locator('.step-profile-poc-outline').count()).toBeGreaterThan(0)
       const deltaFontSize = await page
         .locator('.step-delta')
@@ -185,6 +223,19 @@ for (const [route, mode] of views) {
         .evaluate((node) => Number(node.getAttribute('width')))
       expect(valueFontSize).toBeGreaterThanOrEqual(13)
       expect(initialCellWidth).toBeLessThanOrEqual(38)
+      const verticalAlignment = await cells.evaluateAll((nodes) =>
+        nodes.flatMap((node) => {
+          const background = node.querySelector('.footprint-bid-bg')
+          const backgroundBox = background.getBoundingClientRect()
+          const cellCenter = backgroundBox.top + backgroundBox.height / 2
+
+          return [...node.querySelectorAll('.footprint-cell-value')].map((value) => {
+            const valueBox = value.getBoundingClientRect()
+            return Math.abs(valueBox.top + valueBox.height / 2 - cellCenter)
+          })
+        })
+      )
+      expect(Math.max(...verticalAlignment)).toBeLessThanOrEqual(0.75)
       const firstBar = page.locator('.footprint-bar').first()
       const deltaGap = await firstBar.evaluate((node) => {
         const delta = node.querySelector('.bar-delta')
@@ -266,7 +317,53 @@ test('Markets columns can be configured while required columns remain visible', 
   await page.getByRole('button', { name: 'Markets settings' }).click()
   await page.getByLabel('Show ASK column').check()
   await expect(reloadedMarkets.locator('.watch-head .watch-cell')).toHaveCount(5)
-  await expect(reloadedMarkets.locator('.watch-cell--ask')).toHaveCount(29)
+  await expect(reloadedMarkets.locator('.watch-cell--ask')).toHaveCount(51)
+})
+
+test('Markets can be filtered and its rows scroll independently', async ({ page }) => {
+  await page.goto('/price-chart')
+
+  const markets = page.getByLabel('Markets', { exact: true })
+  const search = page.getByRole('searchbox', { name: 'Search markets' })
+  const columnHeader = markets.locator('.watch-head')
+  const rowsViewport = page.getByLabel('Market symbols')
+  const rows = rowsViewport.locator('.market-row')
+
+  await expect(rows).toHaveCount(50)
+  await expect(search).toHaveAttribute('placeholder', 'Search symbol')
+
+  const [panelHeaderBox, searchBox, columnHeaderBox] = await Promise.all([
+    markets.locator(':scope > header').boundingBox(),
+    search.boundingBox(),
+    columnHeader.boundingBox()
+  ])
+  expect(searchBox.y).toBeGreaterThanOrEqual(panelHeaderBox.y + panelHeaderBox.height)
+  expect(columnHeaderBox.y).toBeGreaterThanOrEqual(searchBox.y + searchBox.height)
+
+  await search.fill('ltc')
+  await expect(rows).toHaveCount(1)
+  await expect(rows.first()).toContainText('LTCUSDT')
+
+  await search.fill('not-a-symbol')
+  await expect(rows).toHaveCount(0)
+  await expect(markets.getByText('No markets found', { exact: true })).toBeVisible()
+
+  await search.clear()
+  await expect(rows).toHaveCount(50)
+  const scrollState = await rowsViewport.evaluate((node) => {
+    const pageScrollBefore = window.scrollY
+    node.scrollTop = node.scrollHeight
+    return {
+      clientHeight: node.clientHeight,
+      pageScrollAfter: window.scrollY,
+      pageScrollBefore,
+      scrollHeight: node.scrollHeight,
+      scrollTop: node.scrollTop
+    }
+  })
+  expect(scrollState.scrollHeight).toBeGreaterThan(scrollState.clientHeight)
+  expect(scrollState.scrollTop).toBeGreaterThan(0)
+  expect(scrollState.pageScrollAfter).toBe(scrollState.pageScrollBefore)
 })
 
 test('panel sizes persist across reloads and later visits', async ({ context, page }) => {
@@ -318,15 +415,15 @@ test('historical synchronization, settings and keyboard controls remain coherent
   const timeframe = page.getByLabel('Timeframe')
   await expect(timeframe.locator('option')).toHaveCount(6)
   await timeframe.selectOption('15')
-  await expect(page.locator('.quiet').first()).toContainText('15M')
+  await expect(timeframe).toHaveValue('15')
   await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)
   await timeframe.selectOption('60')
-  await expect(page.locator('.quiet').first()).toContainText('1H')
+  await expect(timeframe).toHaveValue('60')
   await expect(countdown).toHaveText(/CLOSE \d{2}:\d{2}/)
   await timeframe.selectOption('240')
-  await expect(page.locator('.quiet').first()).toContainText('4H')
+  await expect(timeframe).toHaveValue('240')
   await timeframe.selectOption('1440')
-  await expect(page.locator('.quiet').first()).toContainText('1D')
+  await expect(timeframe).toHaveValue('1440')
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')
@@ -393,11 +490,32 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.getByRole('tab', { name: 'ACCOUNT & RISK' }).click()
   await expect(activityPanel).toContainText('WITHIN LIMITS')
 
-  const orderType = page.getByText('ORDER TYPE').locator('select')
-  await orderType.selectOption('Market')
+  const orderType = page.getByLabel('Order type')
+  await expect(page.getByLabel('Limit price', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Quantity')).toHaveValue('0.10')
+  await expect(page.getByLabel('Time in force')).toHaveValue('GTC')
+
+  await orderType.selectOption('market')
+  await expect(page.getByLabel('Limit price', { exact: true })).toHaveCount(0)
+  await expect(page.getByLabel('Stop price')).toHaveCount(0)
+  await expect(page.getByLabel('Take profit price')).toHaveCount(0)
+  await expect(page.getByLabel('Time in force')).toHaveValue('IOC')
+  await expect(page.getByLabel('Time in force')).toBeDisabled()
   await page.getByRole('button', { name: 'PLACE BUY MARKET' }).click()
   await expect(page.getByText(/SIM BUY MARKET staged/)).toBeVisible()
   await expect(page.getByText(/not transmitted/)).toBeVisible()
+
+  await orderType.selectOption('stop-limit')
+  await expect(page.getByLabel('Stop price')).toBeVisible()
+  await expect(page.getByLabel('Limit price', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Take profit price')).toHaveCount(0)
+
+  await orderType.selectOption('oco')
+  await expect(page.getByLabel('Take profit price')).toBeVisible()
+  await expect(page.getByLabel('Stop price')).toBeVisible()
+  await expect(page.getByLabel('Stop limit price')).toBeVisible()
+  await expect(page.getByLabel('Limit price', { exact: true })).toHaveCount(0)
+  await expect(page.getByLabel('Time in force')).toHaveValue('GTC')
 
   await expect(page.getByRole('button', { name: /Layout 01/ })).toHaveCount(0)
   await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toHaveCount(0)
@@ -412,23 +530,28 @@ test('historical synchronization, settings and keyboard controls remain coherent
     '1 day'
   ])
 
-  const lastFootprintCenterBefore = await page
-    .locator('.footprint-divider')
-    .last()
-    .getAttribute('x1')
-  await page.getByRole('button', { name: 'Reserve space for volume profile' }).click()
-  const lastFootprintCenterAfter = await page
-    .locator('.footprint-divider')
-    .last()
-    .getAttribute('x1')
-  const profileLeftEdge = await page
-    .locator('.session-profile-bar')
-    .evaluateAll((nodes) => Math.min(...nodes.map((node) => Number(node.getAttribute('x')))))
-  expect(Number(lastFootprintCenterAfter)).toBeLessThan(Number(lastFootprintCenterBefore))
-  expect(Number(lastFootprintCenterAfter)).toBeLessThan(profileLeftEdge)
+  const profilePanel = page.getByRole('img', {
+    name: 'Session volume profile panel',
+    exact: true
+  })
+  const volumePanel = page.getByRole('img', { name: 'Volume panel', exact: true })
+  const initialProfileWidth = (await profilePanel.boundingBox()).width
+  const initialVolumeHeight = (await volumePanel.boundingBox()).height
+  await page.getByLabel('Resize session volume profile panel').focus()
+  await page.keyboard.press('ArrowLeft')
+  await page.getByLabel('Resize volume panel').focus()
+  await page.keyboard.press('ArrowUp')
+  expect((await profilePanel.boundingBox()).width).toBeGreaterThan(initialProfileWidth)
+  expect((await volumePanel.boundingBox()).height).toBeGreaterThan(initialVolumeHeight)
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-panel-sizes:v1')))
+  ).toEqual({ profile: 188, volume: 118 })
+  await page.reload()
+  expect((await profilePanel.boundingBox()).width).toBeCloseTo(188, 0)
+  expect((await volumePanel.boundingBox()).height).toBeCloseTo(118, 0)
   await page.screenshot({
     fullPage: false,
-    path: 'output/playwright/footprint-profile-space-1920x1080.png'
+    path: 'output/playwright/footprint-resizable-chart-panels-1920x1080.png'
   })
 })
 

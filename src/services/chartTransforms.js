@@ -4,6 +4,23 @@ function toChartTime(timestamp) {
   return Math.floor(timestamp / 1000)
 }
 
+export function createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth) {
+  if (!Number.isInteger(itemCount) || itemCount < 0)
+    throw new TypeError('Chart item count must be a non-negative integer.')
+  if (!Number.isInteger(slotCount) || slotCount < 1 || itemCount > slotCount)
+    throw new TypeError(
+      'Chart slot count must be a positive integer at least as large as item count.'
+    )
+  if (!Number.isFinite(plotLeft) || !Number.isFinite(plotWidth) || plotWidth <= 0)
+    throw new TypeError('Chart plot geometry must be finite and have positive width.')
+
+  const step = plotWidth / slotCount
+  return {
+    positions: Array.from({ length: itemCount }, (_, index) => plotLeft + (index + 0.5) * step),
+    step
+  }
+}
+
 export function createCandlestickData(candlesticks) {
   return candlesticks.map(([timestamp, open, high, low, close]) => ({
     close,

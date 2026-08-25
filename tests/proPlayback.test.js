@@ -1,11 +1,63 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { gzipSync } from 'node:zlib'
 import {
   aggregateProfessionalBars,
   deriveProfessionalView,
   formatCandleCloseCountdown,
+  loadPlaybackChunk,
+  loadProfessionalSession,
   reconstructBook
 } from '../src/services/proPlayback.js'
+
+const runtimeManifest = {
+  assets: {
+    bookChunkTemplate: 'datasets/v3-test/chunks/book-{index}.json.gz',
+    session: 'datasets/v3-test/session.json.gz',
+    tradeChunkTemplate: 'datasets/v3-test/chunks/trades-{index}.json.gz'
+  },
+  cache: { chunkLimit: 16 },
+  datasetVersion: 'v3-test',
+  schema: 'apextrader.tardis-runtime-manifest/v3'
+}
+
+function gzipResponse(value) {
+  return new Response(gzipSync(`${JSON.stringify(value)}\n`), {
+    headers: { 'content-type': 'application/gzip' }
+  })
+}
+
+test('runtime manifest resolves the compressed session and versioned chunk assets', async () => {
+  const requested = []
+  const session = {
+    bars: [],
+    schema: 'apextrader.tardis-session/v2',
+    sessionStart: 0
+  }
+  const fetchImpl = async (url) => {
+    requested.push(url)
+    if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
+    if (url.endsWith('session.json.gz')) return gzipResponse(session)
+    if (url.endsWith('book-095.json.gz'))
+      return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
+    if (url.endsWith('trades-095.json.gz')) return gzipResponse({ trades: [] })
+    return new Response(null, { status: 404 })
+  }
+
+  assert.deepEqual(await loadProfessionalSession(fetchImpl), session)
+  assert.deepEqual(await loadPlaybackChunk(95, fetchImpl), {
+    book: { checkpoint: { asks: [], bids: [] }, groups: [] },
+    index: 95,
+    trades: { trades: [] }
+  })
+  assert.deepEqual(requested, [
+    '/data/tardis/manifest-v3.json',
+    '/data/tardis/datasets/v3-test/session.json.gz',
+    '/data/tardis/manifest-v3.json',
+    '/data/tardis/datasets/v3-test/chunks/book-095.json.gz',
+    '/data/tardis/datasets/v3-test/chunks/trades-095.json.gz'
+  ])
+})
 
 test('browser L2 reconstruction applies only groups at or before the shared clock', () => {
   const chunk = {

@@ -18,18 +18,27 @@ All frames are 1920 × 1080. At narrower viewports the workspace keeps its tradi
 
 ## Shared shell mapping
 
-| Figma node                                                | Geometry at 1920 × 1080 | Implementation responsibility | Visible states and behavior                                                                 |
-| --------------------------------------------------------- | ----------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
-| `61:3` / equivalent · Global Market Header                | `x0 y0 w1920 h44`       | `MarketHeader`                | BTCUSDT identity, real last/change, historical session clock and feed state                 |
-| `61:14` / equivalent · Workspace Toolbar                  | `x365 y44 w1047 h44`    | workspace toolbar             | symbol, 5/15/30/60-minute timeframe, chart mode, tick and settings                          |
-| `113:2114` / equivalent · Watchlist                       | `x0 y44 w360 h982`      | `Watchlist`                   | reaches the global header; selected BTCUSDT row; other instruments are explicit demo rows   |
-| `113:2745`, `113:5681`, `169:4821` · MarketChart variants | `x365 y88 w1047 h728`   | `MarketChart` renderers       | Candles, Footprint, Step Profile; price scale, volume, CVD, profiles and chart interaction  |
-| `113:4047` / equivalent · ActivityBlotter                 | `x365 y816 w1047 h210`  | `Activity`                    | functional Positions, Orders, Fills, Activity, Account & Risk tabs; explicit `DEMO DATA`    |
-| `113:4170` / equivalent · OrderBook                       | `x1417 y44 w218 h982`   | `Dom`                         | reconstructed real L2, stable last-price/spread separator, selected price and 20 Hz replay  |
-| `113:5231` / equivalent · ExecutionPanel                  | `x1640 y44 w280 h982`   | `Execution` + `TimeSales`     | buy/sell, controlled order type, local non-transmitted staging message and real market tape |
-| `303:2` · `Trading/PlaybackDock` + three screen instances | `x510 y1030 w900 h46`   | playback dock                 | fixed 1× play/pause, whole-session seek, UTC timestamp and replay state; no speed controls  |
+| Figma node                                                | Geometry at 1920 × 1080 | Implementation responsibility | Visible states and behavior                                                                   |
+| --------------------------------------------------------- | ----------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
+| `61:3` / equivalent · Global Market Header                | `x0 y0 w1920 h44`       | `MarketHeader`                | BTCUSDT identity, real last/change, historical session clock and feed state                   |
+| `61:14` / equivalent · Workspace Toolbar                  | `x365 y44 w1047 h44`    | workspace toolbar             | symbol, 5/15/30/60-minute timeframe, chart mode, tick and settings                            |
+| `113:2114` / equivalent · Markets                         | `x0 y44 w360 h982`      | `Watchlist`                   | fixed title/search/columns; independently scrolling rows; non-BTC instruments are demo data   |
+| `113:2745`, `113:5681`, `169:4821` · MarketChart variants | `x365 y88 w1047 h728`   | `MarketChart` renderers       | Candles, Footprint, Step Profile; price scale, volume, CVD, profiles and chart interaction    |
+| `113:4047` / equivalent · ActivityBlotter                 | `x365 y816 w1047 h210`  | `Activity`                    | functional Positions, Orders, Fills, Activity, Account & Risk tabs; explicit `DEMO DATA`      |
+| `113:4170` / equivalent · OrderBook                       | `x1417 y44 w218 h982`   | `Dom`                         | reconstructed real L2, stable last-price/spread separator, selected price and 20 Hz replay    |
+| `113:5231` / equivalent · ExecutionPanel                  | `x1640 y44 w280 h982`   | `Execution` + `TimeSales`     | buy/sell, contextual order fields, local non-transmitted staging message and real market tape |
+| `303:2` · `Trading/PlaybackDock` + three screen instances | `x510 y1030 w900 h46`   | playback dock                 | fixed 1× play/pause, whole-session seek, UTC timestamp and replay state; no speed controls    |
 
 The three vertical resize handles are 5 px wide. The workspace ends at `y=1026`; the remaining 54 px is the playback row. The shared Activity master is 1047 × 210 with 10 px labels and BTCUSDT demo positions.
+
+## Markets contract
+
+`Trading/Markets` (`102:55`) keeps the panel title, symbol search and column header fixed while
+only `Market rows · Scroll viewport` scrolls vertically. The search input is its own 42 px row
+between the title and table header, reuses `Control/InputCompact`, and pairs it with the official
+Lucide Search SVG. The Figma fixture contains 57 symbols, including 18 additions; the web fixture
+contains 50 symbols. Search filters the web list by symbol without changing the user's persisted
+column visibility preferences.
 
 ## Chart contracts
 
@@ -50,18 +59,36 @@ The three vertical resize handles are 5 px wide. The workspace ends at `y=1026`;
 - Each interval renders an irregular bid/ask distribution, local POC, high/low spine and totals.
 - Session VP, VWAP/EMA, volume and CVD remain aligned with the same interval and playback clock.
 
+## Execution order contracts
+
+`Trading/ExecutionPanel` (`150:6255`) exposes a `Side` axis (`Buy`, `Sell`) and an
+`Order Type` axis (`Limit`, `Market`, `Stop Market`, `Stop Limit`, `OCO`) for a total of
+10 variants. The order form is contextual instead of showing protective fields for every order:
+
+| Order type  | Price fields                                    | Time in force   |
+| ----------- | ----------------------------------------------- | --------------- |
+| Market      | none                                            | IOC, implicit   |
+| Limit       | Limit Price                                     | GTC / IOC / FOK |
+| Stop Market | Stop Price                                      | GTC             |
+| Stop Limit  | Stop Price, Limit Price                         | GTC             |
+| OCO         | Take Profit Price, Stop Price, Stop Limit Price | GTC             |
+
+Every price input carries a `USDT` affix and Quantity carries `BTC`. Quantity precedes
+Time in Force, which is always the final field before the action. Take profit is not a universal
+field: it appears only as one leg of the OCO pair.
+
 ## Interaction and overlay inventory
 
-| Control           | Default                                                | Hover/focus              | Active/open                                         | Disabled                                   |
-| ----------------- | ------------------------------------------------------ | ------------------------ | --------------------------------------------------- | ------------------------------------------ |
-| Compact selects   | inset surface                                          | strong border/focus ring | native list, selected value reflected in route/view | unavailable option muted                   |
-| Chart mode routes | current view selected                                  | accent text/border       | History API transition without reload               | n/a                                        |
-| Playback          | playing at fixed 1× from the initial historical window | focus ring               | play/pause and seek update one clock                | controls disabled while data loads         |
-| DOM row           | neutral                                                | selected background      | clicking copies the real price into execution limit | no liquidity row omitted                   |
-| DOM separator     | last price and best ask-minus-bid spread               | n/a                      | stable boundary between asks and bids               | falls back to `0.00` only without a book   |
-| Buy/Sell          | Buy default                                            | semantic hover           | active side changes submit label/color              | submit disabled for invalid quantity/price |
-| Activity tabs     | Positions default                                      | raised surface           | tab body and counts change                          | n/a                                        |
-| Settings          | closed                                                 | trigger focus            | modal overlay with close/Escape                     | n/a                                        |
+| Control           | Default                                                | Hover/focus              | Active/open                                         | Disabled                                      |
+| ----------------- | ------------------------------------------------------ | ------------------------ | --------------------------------------------------- | --------------------------------------------- |
+| Compact selects   | inset surface                                          | strong border/focus ring | native list, selected value reflected in route/view | unavailable option muted                      |
+| Chart mode routes | current view selected                                  | accent text/border       | History API transition without reload               | n/a                                           |
+| Playback          | playing at fixed 1× from the initial historical window | focus ring               | play/pause and seek update one clock                | controls disabled while data loads            |
+| DOM row           | neutral                                                | selected background      | clicking copies the real price into execution limit | no liquidity row omitted                      |
+| DOM separator     | last price and best ask-minus-bid spread               | n/a                      | stable boundary between asks and bids               | falls back to `0.00` only without a book      |
+| Buy/Sell          | Buy default                                            | semantic hover           | active side changes submit label/color              | submit disabled for invalid contextual inputs |
+| Activity tabs     | Positions default                                      | raised surface           | tab body and counts change                          | n/a                                           |
+| Settings          | closed                                                 | trigger focus            | modal overlay with close/Escape                     | n/a                                           |
 
 ## Data provenance boundary
 

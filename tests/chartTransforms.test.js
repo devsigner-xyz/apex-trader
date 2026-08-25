@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   chartTypes,
+  createFixedChartSlots,
   createHeikinAshiData,
   createLineData,
   createSmaData,
@@ -13,6 +14,16 @@ const candles = [
   [300_000, 104, 110, 101, 102],
   [600_000, 102, 112, 100, 110]
 ]
+
+test('keeps chart item spacing fixed when fewer items than slots are available', () => {
+  const shortLayout = createFixedChartSlots(3, 12, 40, 960)
+  const fullLayout = createFixedChartSlots(12, 12, 40, 960)
+
+  assert.equal(shortLayout.step, 80)
+  assert.deepEqual(shortLayout.positions, [80, 160, 240])
+  assert.deepEqual(shortLayout.positions, fullLayout.positions.slice(0, 3))
+  assert.equal(fullLayout.positions.at(-1), 960)
+})
 
 test('converts historical OHLCV bars to Lightweight Charts time-based series', () => {
   assert.deepEqual(chartTypes, ['candlestick', 'line', 'heikinAshi'])

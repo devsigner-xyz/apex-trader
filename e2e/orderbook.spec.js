@@ -149,10 +149,9 @@ test.describe('Professional historical order flow', () => {
       timeout: 10_000
     })
     await expect
-      .poll(
-        async () => Number(await page.locator('.dom').getAttribute('data-groups-applied')),
-        { timeout: 10_000 }
-      )
+      .poll(async () => Number(await page.locator('.dom').getAttribute('data-groups-applied')), {
+        timeout: 10_000
+      })
       .toBeGreaterThan(groupsBefore)
   })
 
@@ -165,12 +164,12 @@ test.describe('Professional historical order flow', () => {
     await timeframe.selectOption('5')
     await expect(visibleBars).toHaveCount(34)
     await timeframe.selectOption('15')
-    await expect(page.locator('.quiet').first()).toContainText('15M')
+    await expect(timeframe).toHaveValue('15')
     const fifteenMinuteBars = await visibleBars.count()
     expect(fifteenMinuteBars).toBeGreaterThan(10)
     expect(fifteenMinuteBars).toBeLessThan(34)
     await timeframe.selectOption('60')
-    await expect(page.locator('.quiet').first()).toContainText('1H')
+    await expect(timeframe).toHaveValue('60')
     const hourlyBars = await visibleBars.count()
     expect(hourlyBars).toBeGreaterThan(1)
     expect(hourlyBars).toBeLessThan(fifteenMinuteBars)

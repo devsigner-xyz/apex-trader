@@ -61,7 +61,11 @@ function urlFor(options, dataset) {
 async function download(url, destination) {
   await mkdir(path.dirname(destination), { recursive: true })
   const response = await new Promise((resolve, reject) => {
-    const request = https.get(url, { headers: { 'user-agent': 'apextrader-tardis-ingest/2.0' } }, resolve)
+    const request = https.get(
+      url,
+      { headers: { 'user-agent': 'apextrader-tardis-ingest/2.0' } },
+      resolve
+    )
     request.setTimeout(60_000, () => request.destroy(new Error(`Timed out downloading ${url}`)))
     request.on('error', reject)
   })
@@ -69,7 +73,8 @@ async function download(url, destination) {
     response.resume()
     return download(new URL(response.headers.location, url).toString(), destination)
   }
-  if (response.statusCode !== 200) throw new Error(`Download failed (${response.statusCode}) for ${url}`)
+  if (response.statusCode !== 200)
+    throw new Error(`Download failed (${response.statusCode}) for ${url}`)
   await pipeline(response, (await import('node:fs')).createWriteStream(destination))
 }
 
@@ -80,7 +85,10 @@ async function hashFile(file) {
 }
 
 async function lines(file, visit) {
-  const input = createInterface({ crlfDelay: Infinity, input: createReadStream(file).pipe(createGunzip()) })
+  const input = createInterface({
+    crlfDelay: Infinity,
+    input: createReadStream(file).pipe(createGunzip())
+  })
   for await (const line of input) if (line) await visit(line)
 }
 
@@ -137,10 +145,17 @@ function finishBars(bars) {
       .map(([price, level]) => ({ ask: round(level.ask), bid: round(level.bid), price }))
       .sort((a, b) => a.price - b.price)
     return {
-      close: round(close), cvd: round(cvd), delta: round(bar.delta),
-      high: round(bar.high ?? close), levels, low: round(bar.low ?? close),
-      open: round(bar.open ?? close), timestamp: bar.timestamp, volume: round(bar.volume),
-      vwap: round(sessionVwapNumerator / sessionVolume), ...valueArea(levels)
+      close: round(close),
+      cvd: round(cvd),
+      delta: round(bar.delta),
+      high: round(bar.high ?? close),
+      levels,
+      low: round(bar.low ?? close),
+      open: round(bar.open ?? close),
+      timestamp: bar.timestamp,
+      volume: round(bar.volume),
+      vwap: round(sessionVwapNumerator / sessionVolume),
+      ...valueArea(levels)
     }
   })
 }
@@ -149,11 +164,24 @@ async function writeCompressedJson(file, value) {
   const bytes = gzipSync(`${JSON.stringify(value)}\n`, { level: 9 })
   await mkdir(path.dirname(file), { recursive: true })
   await writeFile(file, bytes)
-  return { bytes: bytes.length, filename: file, sha256: createHash('sha256').update(bytes).digest('hex') }
+  return {
+    bytes: bytes.length,
+    filename: file,
+    sha256: createHash('sha256').update(bytes).digest('hex')
+  }
 }
 
 async function ingestTrades(file, options, session) {
-  const columns = ['exchange', 'symbol', 'timestamp', 'local_timestamp', 'id', 'side', 'price', 'amount']
+  const columns = [
+    'exchange',
+    'symbol',
+    'timestamp',
+    'local_timestamp',
+    'id',
+    'side',
+    'price',
+    'amount'
+  ]
   const duration = options.barMinutes * 60_000
   const chunkDurationUs = options.chunkMinutes * 60_000_000
   const startUs = session.start * 1000
@@ -171,9 +199,15 @@ async function ingestTrades(file, options, session) {
     const name = `chunks/trades-${String(chunkIndex).padStart(3, '0')}.json.gz`
     const result = await writeCompressedJson(path.join(options.outputDir, name), {
       chunkStartUs: startUs + chunkIndex * chunkDurationUs,
-      schema: 'apextrader.trades-chunk/v2', trades: chunkTrades
+      schema: 'apextrader.trades-chunk/v2',
+      trades: chunkTrades
     })
-    chunks.push({ bytes: result.bytes, filename: name, sha256: result.sha256, trades: chunkTrades.length })
+    chunks.push({
+      bytes: result.bytes,
+      filename: name,
+      sha256: result.sha256,
+      trades: chunkTrades.length
+    })
   }
 
   await lines(file, async (line) => {
@@ -194,7 +228,11 @@ async function ingestTrades(file, options, session) {
       chunkTrades = []
     }
     const timestamp = Math.floor(timestampUs / 1000)
-    addTrade(bars[Math.floor((timestamp - session.start) / duration)], { amount, price, side: row.side }, options.tickSize)
+    addTrade(
+      bars[Math.floor((timestamp - session.start) / duration)],
+      { amount, price, side: row.side },
+      options.tickSize
+    )
     chunkTrades.push([timestampUs, localTimestampUs, price, amount, row.side === 'buy' ? 1 : 0])
     firstTimestampUs ??= timestampUs
     lastTimestampUs = timestampUs
@@ -205,7 +243,16 @@ async function ingestTrades(file, options, session) {
 }
 
 async function ingestBook(file, options, session) {
-  const columns = ['exchange', 'symbol', 'timestamp', 'local_timestamp', 'is_snapshot', 'side', 'price', 'amount']
+  const columns = [
+    'exchange',
+    'symbol',
+    'timestamp',
+    'local_timestamp',
+    'is_snapshot',
+    'side',
+    'price',
+    'amount'
+  ]
   const state = createBookState()
   const chunkDurationUs = options.chunkMinutes * 60_000_000
   const startUs = session.start * 1000
@@ -226,10 +273,17 @@ async function ingestBook(file, options, session) {
     if (chunkIndex < 0) return
     const name = `chunks/book-${String(chunkIndex).padStart(3, '0')}.json.gz`
     const result = await writeCompressedJson(path.join(options.outputDir, name), {
-      checkpoint: chunkCheckpoint, chunkStartUs: startUs + chunkIndex * chunkDurationUs,
-      groups: chunkGroups, schema: 'apextrader.book-chunk/v2'
+      checkpoint: chunkCheckpoint,
+      chunkStartUs: startUs + chunkIndex * chunkDurationUs,
+      groups: chunkGroups,
+      schema: 'apextrader.book-chunk/v2'
     })
-    chunks.push({ bytes: result.bytes, filename: name, groups: chunkGroups.length, sha256: result.sha256 })
+    chunks.push({
+      bytes: result.bytes,
+      filename: name,
+      groups: chunkGroups.length,
+      sha256: result.sha256
+    })
   }
 
   const processGroup = async () => {
@@ -269,7 +323,12 @@ async function ingestBook(file, options, session) {
       group = []
     }
     groupTimestampUs = localTimestampUs
-    group.push({ amount: Number(row.amount), isSnapshot: row.is_snapshot === 'true', price: Number(row.price), side: row.side })
+    group.push({
+      amount: Number(row.amount),
+      isSnapshot: row.is_snapshot === 'true',
+      price: Number(row.price),
+      side: row.side
+    })
     count += 1
   })
   await processGroup()
@@ -283,41 +342,127 @@ async function main() {
   const session = bounds(options.date)
   const sources = [
     { dataset: 'trades', file: path.join(options.inputDir, 'trades.csv.gz') },
-    { dataset: 'incremental_book_L2', file: path.join(options.inputDir, 'incremental_book_L2.csv.gz') }
+    {
+      dataset: 'incremental_book_L2',
+      file: path.join(options.inputDir, 'incremental_book_L2.csv.gz')
+    }
   ]
-  if (options.download) for (const source of sources) await download(urlFor(options, source.dataset), source.file)
+  if (options.download)
+    for (const source of sources) await download(urlFor(options, source.dataset), source.file)
   for (const source of sources) {
     source.bytes = (await stat(source.file)).size
     source.sha256 = await hashFile(source.file)
     source.url = urlFor(options, source.dataset)
   }
   await mkdir(options.outputDir, { recursive: true })
-  const trades = await ingestTrades(sources[0].file, options, session)
-  const book = await ingestBook(sources[1].file, options, session)
-  const sessionName = 'session-v2.json'
+  const datasetDigest = createHash('sha256')
+    .update(
+      JSON.stringify({
+        normalizationSchema: 'apextrader.tardis-dataset/v3',
+        options: {
+          barMinutes: options.barMinutes,
+          chunkMinutes: options.chunkMinutes,
+          date: options.date,
+          exchange: options.exchange,
+          symbol: options.symbol,
+          tickSize: options.tickSize
+        },
+        sources: sources.map(({ dataset, sha256 }) => ({ dataset, sha256 }))
+      })
+    )
+    .digest('hex')
+    .slice(0, 16)
+  const datasetVersion = `v3-${datasetDigest}`
+  const datasetRelativeDir = path.posix.join('datasets', datasetVersion)
+  const datasetOutputDir = path.join(options.outputDir, datasetRelativeDir)
+  const datasetOptions = { ...options, outputDir: datasetOutputDir }
+  const trades = await ingestTrades(sources[0].file, datasetOptions, session)
+  const book = await ingestBook(sources[1].file, datasetOptions, session)
+  const sessionName = 'session.json.gz'
   const sessionPayload = {
-    barDurationMs: options.barMinutes * 60_000, bars: trades.bars, date: options.date,
-    exchange: options.exchange, playbackStart: Math.floor(book.firstTimestampUs / 1000),
-    schema: 'apextrader.tardis-session/v2', sessionEndExclusive: session.end,
-    sessionStart: session.start, symbol: options.symbol, tickSize: options.tickSize
+    barDurationMs: options.barMinutes * 60_000,
+    bars: trades.bars,
+    date: options.date,
+    exchange: options.exchange,
+    playbackStart: Math.floor(book.firstTimestampUs / 1000),
+    schema: 'apextrader.tardis-session/v2',
+    sessionEndExclusive: session.end,
+    sessionStart: session.start,
+    symbol: options.symbol,
+    tickSize: options.tickSize
   }
-  const sessionText = `${JSON.stringify(sessionPayload)}\n`
-  await writeFile(path.join(options.outputDir, sessionName), sessionText)
-  const sessionAsset = { bytes: Buffer.byteLength(sessionText), filename: sessionName, sha256: createHash('sha256').update(sessionText).digest('hex') }
-  const manifest = {
+  const sessionResult = await writeCompressedJson(
+    path.join(datasetOutputDir, sessionName),
+    sessionPayload
+  )
+  const sessionAsset = {
+    bytes: sessionResult.bytes,
+    filename: path.posix.join(datasetRelativeDir, sessionName),
+    sha256: sessionResult.sha256
+  }
+  const prefixAsset = (asset) => ({
+    ...asset,
+    filename: path.posix.join(datasetRelativeDir, asset.filename)
+  })
+  const provenance = {
     assets: { bookChunks: book.chunks, session: sessionAsset, tradeChunks: trades.chunks },
-    generatedFrom: sources.map(({ bytes, dataset, sha256, url }) => ({ bytes, dataset, sha256, url })),
+    datasetVersion,
+    generatedFrom: sources.map(({ bytes, dataset, sha256, url }) => ({
+      bytes,
+      dataset,
+      sha256,
+      url
+    })),
     normalization: {
       book: 'All rows grouped by exact local_timestamp; pre-snapshot deltas ignored; snapshots reset state; zero amounts delete levels; chunks contain an exact starting checkpoint.',
       chunkDurationMs: options.chunkMinutes * 60_000,
       footprintTickSize: options.tickSize,
-      trades: 'Every trade retained in chunk assets; aggressor buy maps to ask and sell maps to bid.'
+      trades:
+        'Every trade retained in chunk assets; aggressor buy maps to ask and sell maps to bid.'
     },
-    schema: 'apextrader.tardis-manifest/v2', session: { date: options.date, exchange: options.exchange, symbol: options.symbol },
-    statistics: { bars: trades.bars.length, bookGroups: book.chunks.reduce((n, c) => n + c.groups, 0), bookRows: book.count, ignoredPreSnapshotRows: book.ignoredPreSnapshotRows, snapshotResets: book.resets, trades: trades.count }
+    schema: 'apextrader.tardis-provenance/v3',
+    session: { date: options.date, exchange: options.exchange, symbol: options.symbol },
+    statistics: {
+      bars: trades.bars.length,
+      bookGroups: book.chunks.reduce((n, c) => n + c.groups, 0),
+      bookRows: book.count,
+      ignoredPreSnapshotRows: book.ignoredPreSnapshotRows,
+      snapshotResets: book.resets,
+      trades: trades.count
+    }
   }
-  await writeFile(path.join(options.outputDir, 'manifest-v2.json'), `${JSON.stringify(manifest, null, 2)}\n`)
-  console.log(JSON.stringify(manifest.statistics))
+  provenance.assets.bookChunks = provenance.assets.bookChunks.map(prefixAsset)
+  provenance.assets.tradeChunks = provenance.assets.tradeChunks.map(prefixAsset)
+  const provenanceName = path.posix.join(datasetRelativeDir, 'provenance.json')
+  await writeFile(
+    path.join(options.outputDir, provenanceName),
+    `${JSON.stringify(provenance, null, 2)}\n`
+  )
+  const manifest = {
+    assets: {
+      bookChunkTemplate: path.posix.join(datasetRelativeDir, 'chunks/book-{index}.json.gz'),
+      provenance: provenanceName,
+      session: sessionAsset.filename,
+      tradeChunkTemplate: path.posix.join(datasetRelativeDir, 'chunks/trades-{index}.json.gz')
+    },
+    cache: { chunkLimit: 16, immutableMaxAgeSeconds: 31_536_000 },
+    datasetVersion,
+    schema: 'apextrader.tardis-runtime-manifest/v3',
+    session: { date: options.date, exchange: options.exchange, symbol: options.symbol },
+    statistics: {
+      bars: trades.bars.length,
+      bookChunks: book.chunks.length,
+      tradeChunks: trades.chunks.length
+    }
+  }
+  await writeFile(
+    path.join(options.outputDir, 'manifest-v3.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`
+  )
+  console.log(JSON.stringify({ datasetVersion, ...provenance.statistics }))
 }
 
-main().catch((error) => { console.error(error.stack || error.message); process.exitCode = 1 })
+main().catch((error) => {
+  console.error(error.stack || error.message)
+  process.exitCode = 1
+})

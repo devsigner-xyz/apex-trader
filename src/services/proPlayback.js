@@ -1,6 +1,15 @@
-const SESSION_URL = 'data/tardis/session-v2.json'
+import {
+  fetchPersistentAsset,
+  historicalCacheName,
+  recordPersistentChunk,
+  removeStaleHistoricalCaches
+} from './historicalAssetCache.js'
+
+const RUNTIME_MANIFEST_URL = 'data/tardis/manifest-v3.json'
+const EXPECTED_MANIFEST_SCHEMA = 'apextrader.tardis-runtime-manifest/v3'
 const CHUNK_MS = 15 * 60 * 1000
 const playbackChunkCache = new Map()
+let runtimeManifestPromise = null
 
 function assetUrl(path) {
   const base = import.meta.env?.BASE_URL ?? '/'
@@ -11,14 +20,14 @@ export function chunkIndexFor(timestamp, sessionStart) {
   return Math.max(0, Math.min(95, Math.floor((timestamp - sessionStart) / CHUNK_MS)))
 }
 
-async function fetchJson(url, fetchImpl = fetch) {
-  const response = await fetchImpl(assetUrl(url))
+async function fetchJson(url, fetchImpl = fetch, init) {
+  const response = await fetchImpl(assetUrl(url), init)
   if (!response.ok) throw new Error(`Unable to load historical asset (${response.status})`)
   return response.json()
 }
 
-async function fetchGzipJson(url, fetchImpl = fetch) {
-  const response = await fetchImpl(assetUrl(url))
+async function fetchGzipJson(url, fetchImpl = fetch, cacheName) {
+  const response = await fetchPersistentAsset(assetUrl(url), { cacheName, fetchImpl })
   if (!response.ok) throw new Error(`Unable to load historical chunk (${response.status})`)
   // Vite and correctly configured CDNs transparently decode Content-Encoding.
   if (response.headers.get('content-encoding') === 'gzip') return response.json()
@@ -28,19 +37,76 @@ async function fetchGzipJson(url, fetchImpl = fetch) {
   return JSON.parse(await new Response(stream).text())
 }
 
+function validateRuntimeManifest(manifest) {
+  if (
+    manifest?.schema !== EXPECTED_MANIFEST_SCHEMA ||
+    !manifest.datasetVersion ||
+    !manifest.assets?.session ||
+    !manifest.assets?.bookChunkTemplate ||
+    !manifest.assets?.tradeChunkTemplate
+  )
+    throw new Error('Unexpected historical runtime manifest.')
+  return manifest
+}
+
+async function fetchRuntimeManifest(fetchImpl) {
+  const manifest = validateRuntimeManifest(await fetchJson(RUNTIME_MANIFEST_URL, fetchImpl))
+  if (fetchImpl === globalThis.fetch)
+    await removeStaleHistoricalCaches(historicalCacheName(manifest.datasetVersion))
+  return manifest
+}
+
+export function loadRuntimeManifest(fetchImpl = fetch) {
+  if (fetchImpl !== globalThis.fetch) return fetchRuntimeManifest(fetchImpl)
+  if (!runtimeManifestPromise)
+    runtimeManifestPromise = fetchRuntimeManifest(fetchImpl).catch((error) => {
+      runtimeManifestPromise = null
+      throw error
+    })
+  return runtimeManifestPromise
+}
+
+function runtimeAssetPath(filename) {
+  return `data/tardis/${filename}`
+}
+
+function chunkAssetPaths(manifest, index) {
+  const suffix = String(index).padStart(3, '0')
+  return {
+    book: runtimeAssetPath(manifest.assets.bookChunkTemplate.replace('{index}', suffix)),
+    trades: runtimeAssetPath(manifest.assets.tradeChunkTemplate.replace('{index}', suffix))
+  }
+}
+
 export async function loadProfessionalSession(fetchImpl = fetch) {
-  const session = await fetchJson(SESSION_URL, fetchImpl)
+  const manifest = await loadRuntimeManifest(fetchImpl)
+  const session = await fetchGzipJson(
+    runtimeAssetPath(manifest.assets.session),
+    fetchImpl,
+    historicalCacheName(manifest.datasetVersion)
+  )
   if (session.schema !== 'apextrader.tardis-session/v2')
     throw new Error('Unexpected session schema.')
   return session
 }
 
 async function fetchPlaybackChunk(index, fetchImpl) {
-  const suffix = String(index).padStart(3, '0')
+  const manifest = await loadRuntimeManifest(fetchImpl)
+  const paths = chunkAssetPaths(manifest, index)
+  const cacheName = historicalCacheName(manifest.datasetVersion)
   const [book, trades] = await Promise.all([
-    fetchGzipJson(`data/tardis/chunks/book-${suffix}.json.gz`, fetchImpl),
-    fetchGzipJson(`data/tardis/chunks/trades-${suffix}.json.gz`, fetchImpl)
+    fetchGzipJson(paths.book, fetchImpl, cacheName),
+    fetchGzipJson(paths.trades, fetchImpl, cacheName)
   ])
+  if (fetchImpl === globalThis.fetch)
+    await recordPersistentChunk(
+      {
+        cacheName,
+        index,
+        urls: (nextIndex) => Object.values(chunkAssetPaths(manifest, nextIndex)).map(assetUrl)
+      },
+      { limit: manifest.cache?.chunkLimit }
+    )
   return { book, index, trades }
 }
 

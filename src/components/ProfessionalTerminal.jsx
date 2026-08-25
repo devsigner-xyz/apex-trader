@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { Settings as SettingsIcon } from 'lucide-react'
+import { Search as SearchIcon, Settings as SettingsIcon } from 'lucide-react'
+import { createFixedChartSlots } from '../services/chartTransforms.js'
 import { deriveFootprintBar, formatFootprintVolume } from '../services/footprintPresentation.js'
 import {
   aggregateDomOrderbook,
@@ -38,7 +39,29 @@ const fixtureMarkets = [
   ['DAX', '13,236', '—', '—', '+0.59%', '43M'],
   ['VIX', '12.62', '—', '—', '-5.50%', '—'],
   ['QQQ', '205.58', '205.57', '205.59', '+0.35%', '33M'],
-  ['SPY', '314.31', '314.30', '314.32', '+0.41%', '39M']
+  ['SPY', '314.31', '314.30', '314.32', '+0.41%', '39M'],
+  ['ADAUSDT', '0.0391', '0.0390', '0.0392', '+1.38%', '41M'],
+  ['LINKUSDT', '2.24', '2.23', '2.25', '+3.70%', '7.8M'],
+  ['LTCUSDT', '48.31', '48.30', '48.32', '-0.52%', '3.4M'],
+  ['BCHUSDT', '213.76', '213.74', '213.78', '+0.64%', '841K'],
+  ['TRXUSDT', '0.0147', '0.0146', '0.0148', '-0.21%', '73M'],
+  ['XLMUSDT', '0.0568', '0.0567', '0.0569', '+0.92%', '19M'],
+  ['ETCUSDT', '3.91', '3.90', '3.92', '-1.13%', '2.2M'],
+  ['EOSUSDT', '2.68', '2.67', '2.69', '+0.45%', '8.9M'],
+  ['ZB', "159'120", "159'115", "159'125", '+0.18%', '412K'],
+  ['ZF', "118'207", "118'205", "118'210", '-0.09%', '603K'],
+  ['6E', '1.1020', '1.1019', '1.1021', '+0.05%', '176K'],
+  ['6J', '0.00913', '0.00912', '0.00914', '-0.16%', '94K'],
+  ['6B', '1.2906', '1.2905', '1.2907', '+0.08%', '81K'],
+  ['NG', '2.31', '2.30', '2.32', '+1.76%', '228K'],
+  ['HG', '2.65', '2.64', '2.66', '+0.71%', '76K'],
+  ['JPM', '131.76', '131.75', '131.77', '-0.44%', '11M'],
+  ['INTC', '24.87', '24.86', '24.88', '+0.57%', '21M'],
+  ['ORCL', '56.08', '56.07', '56.09', '+0.33%', '9.4M'],
+  ['XMRUSDT', '54.11', '54.10', '54.12', '+1.04%', '318K'],
+  ['DASHUSDT', '51.24', '51.23', '51.25', '-0.74%', '296K'],
+  ['ZECUSDT', '27.94', '27.93', '27.95', '+0.62%', '521K'],
+  ['IOTAUSDT', '0.2051', '0.2050', '0.2052', '-0.38%', '12M']
 ]
 
 const watchlistColumns = [
@@ -54,6 +77,35 @@ const optionalWatchlistColumns = watchlistColumns
   .map(({ id }) => id)
 const watchlistColumnsStorageKey = 'apex-trader:markets-columns'
 const panelSizesStorageKey = 'apex-trader:panel-sizes:v1'
+const chartPanelSizesStorageKey = 'apex-trader:chart-panel-sizes:v1'
+const chartPanelVisibilityStorageKey = 'apex-trader:chart-panel-visibility:v1'
+const executionOrderTypes = {
+  limit: {
+    label: 'Limit',
+    priceFields: ['limitPrice'],
+    timeInForce: ['GTC', 'IOC', 'FOK']
+  },
+  market: {
+    label: 'Market',
+    priceFields: [],
+    timeInForce: ['IOC']
+  },
+  'stop-market': {
+    label: 'Stop Market',
+    priceFields: ['stopPrice'],
+    timeInForce: ['GTC']
+  },
+  'stop-limit': {
+    label: 'Stop Limit',
+    priceFields: ['stopPrice', 'limitPrice'],
+    timeInForce: ['GTC']
+  },
+  oco: {
+    label: 'OCO',
+    priceFields: ['takeProfitPrice', 'stopPrice', 'stopLimitPrice'],
+    timeInForce: ['GTC']
+  }
+}
 const panelSizeDefaults = { dom: 218, execution: 280, watch: 360 }
 const panelSizeLimits = {
   dom: [218, 340],
@@ -199,18 +251,23 @@ const chartTimeframes = [
 ]
 const footprintTimeframes = chartTimeframes.filter(({ minutes }) => minutes >= 60)
 const chartWidth = 1128
-const chartHeight = 730
+const priceChartHeight = 646
+const volumeChartHeight = 100
+const profileChartWidth = 180
 const plotLeft = 0
-const chartLabelInset = 8
 const plotRight = 1048
-const profileWidth = 150
-const profileClearance = 20
 const priceAxisX = 1056
 const mainTop = 42
 const mainBottom = 585
 const timeTickY = 615
-const volumeTop = 638
-const volumeBottom = 705
+const volumeTop = 10
+const volumeBottom = 90
+const chartPanelSizeDefaults = { profile: 180, volume: 110 }
+const chartPanelSizeLimits = {
+  profile: [120, 280],
+  volume: [72, 200]
+}
+const chartPanelVisibilityDefaults = { profile: true, volume: true }
 
 function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum)
@@ -231,6 +288,35 @@ function loadPanelSizes() {
   }
 }
 
+function loadChartPanelSizes() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(chartPanelSizesStorageKey))
+    return Object.fromEntries(
+      Object.entries(chartPanelSizeDefaults).map(([panel, fallback]) => {
+        const value = Number(stored?.[panel])
+        const [minimum, maximum] = chartPanelSizeLimits[panel]
+        return [panel, Number.isFinite(value) ? clamp(value, minimum, maximum) : fallback]
+      })
+    )
+  } catch {
+    return { ...chartPanelSizeDefaults }
+  }
+}
+
+function loadChartPanelVisibility() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(chartPanelVisibilityStorageKey))
+    return Object.fromEntries(
+      Object.entries(chartPanelVisibilityDefaults).map(([panel, fallback]) => [
+        panel,
+        typeof stored?.[panel] === 'boolean' ? stored[panel] : fallback
+      ])
+    )
+  } catch {
+    return { ...chartPanelVisibilityDefaults }
+  }
+}
+
 function fmt(value, digits = 2) {
   return Number(value).toLocaleString('en-US', {
     maximumFractionDigits: digits,
@@ -242,14 +328,9 @@ function clock(timestamp, milliseconds = false) {
   return new Date(timestamp).toISOString().slice(11, milliseconds ? 23 : 19)
 }
 
-function formatTimeframe(timeframe) {
-  if (timeframe === 1440) return '1D'
-  if (timeframe >= 60) return `${timeframe / 60}H`
-  return `${timeframe}M`
-}
-
 function Watchlist() {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [marketQuery, setMarketQuery] = useState('')
   const [optionalColumns, setOptionalColumns] = useState(() => {
     try {
       const stored = JSON.parse(window.localStorage.getItem(watchlistColumnsStorageKey))
@@ -264,6 +345,11 @@ function Watchlist() {
     ({ id, required }) => required || optionalColumns.includes(id)
   )
   const gridTemplateColumns = visibleColumns.map(({ width }) => width).join(' ')
+  const filteredMarkets = useMemo(() => {
+    const query = marketQuery.trim().toUpperCase()
+    if (!query) return fixtureMarkets
+    return fixtureMarkets.filter(([symbol]) => symbol.includes(query))
+  }, [marketQuery])
 
   useEffect(() => {
     window.localStorage.setItem(watchlistColumnsStorageKey, JSON.stringify(optionalColumns))
@@ -300,6 +386,53 @@ function Watchlist() {
           <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
         </button>
       </header>
+      <label className="markets-search">
+        <SearchIcon aria-hidden="true" size={15} strokeWidth={2} />
+        <input
+          aria-label="Search markets"
+          onChange={(event) => setMarketQuery(event.target.value)}
+          placeholder="Search symbol"
+          spellCheck="false"
+          type="search"
+          value={marketQuery}
+        />
+      </label>
+      <div className="watch-head" style={{ gridTemplateColumns }}>
+        {visibleColumns.map(({ id, label }) => (
+          <span className={`watch-cell watch-cell--${id}`} key={id}>
+            {label}
+          </span>
+        ))}
+      </div>
+      <div className="markets-scroll" aria-label="Market symbols">
+        {filteredMarkets.map((row) => (
+          <button
+            className={`market-row${row[0] === 'BTCUSDT' ? ' selected' : ''}`}
+            key={row[0]}
+            style={{ gridTemplateColumns }}
+            type="button"
+          >
+            {visibleColumns.map(({ id, sourceIndex }) => {
+              const cell = row[sourceIndex]
+              return (
+                <span
+                  className={`watch-cell watch-cell--${id}${
+                    id === 'change' ? ` ${cell.startsWith('-') ? 'negative' : 'positive'}` : ''
+                  }`}
+                  key={id}
+                >
+                  {cell}
+                </span>
+              )
+            })}
+          </button>
+        ))}
+        {filteredMarkets.length === 0 && (
+          <p className="markets-empty" role="status">
+            No markets found
+          </p>
+        )}
+      </div>
       {settingsOpen && (
         <aside
           aria-label="Markets columns"
@@ -332,35 +465,6 @@ function Watchlist() {
           </div>
         </aside>
       )}
-      <div className="watch-head" style={{ gridTemplateColumns }}>
-        {visibleColumns.map(({ id, label }) => (
-          <span className={`watch-cell watch-cell--${id}`} key={id}>
-            {label}
-          </span>
-        ))}
-      </div>
-      {fixtureMarkets.map((row, index) => (
-        <button
-          className={index === 0 ? 'selected' : ''}
-          key={row[0]}
-          style={{ gridTemplateColumns }}
-          type="button"
-        >
-          {visibleColumns.map(({ id, sourceIndex }) => {
-            const cell = row[sourceIndex]
-            return (
-              <span
-                className={`watch-cell watch-cell--${id}${
-                  id === 'change' ? ` ${cell.startsWith('-') ? 'negative' : 'positive'}` : ''
-                }`}
-                key={id}
-              >
-                {cell}
-              </span>
-            )
-          })}
-        </button>
-      ))}
     </section>
   )
 }
@@ -403,8 +507,11 @@ function niceDisplayStep(target, sourceTickSize) {
 
 function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const [rightOffset, setRightOffset] = useState(0)
-  const [reserveProfileSpace, setReserveProfileSpace] = useState(false)
   const [dragging, setDragging] = useState(false)
+  const [panelSizes, setPanelSizes] = useState(loadChartPanelSizes)
+  const [panelVisibility, setPanelVisibility] = useState(loadChartPanelVisibility)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const chartRef = useRef(null)
   const dragState = useRef(null)
   const bars = useMemo(
     () => aggregateProfessionalBars(view.bars, timeframe),
@@ -415,6 +522,37 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   useEffect(() => {
     setRightOffset(0)
   }, [mode, timeframe])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(chartPanelSizesStorageKey, JSON.stringify(panelSizes))
+    } catch {
+      // Keep resizing functional when browser storage is unavailable.
+    }
+  }, [panelSizes])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(chartPanelVisibilityStorageKey, JSON.stringify(panelVisibility))
+    } catch {
+      // Keep chart visibility controls functional when browser storage is unavailable.
+    }
+  }, [panelVisibility])
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined
+    const close = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return
+      if (event.type === 'pointerdown' && chartRef.current?.contains(event.target)) return
+      setSettingsOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    window.addEventListener('pointerdown', close)
+    return () => {
+      window.removeEventListener('keydown', close)
+      window.removeEventListener('pointerdown', close)
+    }
+  }, [settingsOpen])
 
   const visibleCount = chartDefaults[mode]
   const maximumOffset = Math.max(0, bars.length - Math.min(visibleCount, bars.length))
@@ -434,14 +572,17 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const high = rawHigh + rawRange * (mode === 'footprint' ? 0.12 : 0.08)
   const range = high - low
   const y = (price) => mainBottom - ((price - low) / range) * (mainBottom - mainTop)
-  const dataPlotRight = reserveProfileSpace
-    ? plotRight - profileWidth - profileClearance
-    : plotRight
-  const plotWidth = dataPlotRight - plotLeft
-  const step = plotWidth / Math.max(visible.length, 1)
-  const x = (index) => plotLeft + (index + 0.5) * step
+  const plotWidth = plotRight - plotLeft
+  const chartSlots = createFixedChartSlots(visible.length, visibleCount, plotLeft, plotWidth)
+  const step = chartSlots.step
+  const x = (index) => chartSlots.positions[index]
   const profile = sessionProfile(view.profile, low, high)
   const maxProfile = Math.max(...profile.map((level) => level.ask + level.bid), 1)
+  const profileMarkers = [
+    { label: 'VAH', price: current.vah, tone: 'value-area' },
+    { label: 'NPOC', price: current.poc, tone: 'npoc' },
+    { label: 'VAL', price: current.val, tone: 'value-area' }
+  ]
   const maxVolume = Math.max(...visible.map((bar) => bar.volume), 1)
   const priceTicks = Array.from({ length: 9 }, (_, index) => high - (range * index) / 8)
   const timeIndexes = uniqueIndexes(visible.length, Math.min(6, visible.length))
@@ -453,6 +594,7 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const stepZoomScale = clamp(chartDefaults['step-profile'] / visible.length, 1, 1.5)
   const stepDeltaFontSize = clamp(13 + (stepZoomScale - 1) * 4, 13, 15)
   const footprintTickSize = niceDisplayStep((range / 28) * footprintZoomScale, sourceTickSize)
+  const stepProfileTickSize = niceDisplayStep(range / 64, sourceTickSize)
   const footprintSettings = {
     format: 'compact',
     imbalanceRatio: 3,
@@ -461,6 +603,10 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     scale: 'linear',
     stackedImbalanceSize: 3,
     tickSize: footprintTickSize
+  }
+  const stepProfileSettings = {
+    ...footprintSettings,
+    tickSize: stepProfileTickSize
   }
 
   const resetViewport = () => {
@@ -501,407 +647,593 @@ function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   const windowLabel = `${clock(visible[0]?.timestamp ?? view.timestamp)} – ${clock(
     visible.at(-1)?.timestamp ?? view.timestamp
   )}`
-  const timeframeLabel = formatTimeframe(timeframe)
   const candleCloseCountdown = formatCandleCloseCountdown(view.timestamp, timeframe)
+  const chartPanelStyle = {
+    '--profile-panel-width': panelVisibility.profile ? `${panelSizes.profile}px` : '0px',
+    '--profile-resizer-width': panelVisibility.profile ? '7px' : '0px',
+    '--volume-panel-height': panelVisibility.volume ? `${panelSizes.volume}px` : '0px',
+    '--volume-resizer-height': panelVisibility.volume ? '7px' : '0px'
+  }
 
   return (
-    <section className="market-chart">
+    <section className="market-chart" ref={chartRef}>
       <header>
         <div className="chart-summary">
           <span>
-            O {fmt(current.open)} H {fmt(current.high)} L {fmt(current.low)} C {fmt(current.close)}
-          </span>
-          <span>
-            {mode === 'footprint'
-              ? `Δ ${fmt(current.delta)} · V ${fmt(current.volume)}`
-              : `VWAP ${fmt(current.vwap)} · POC ${fmt(current.poc)}`}
+            O {fmt(current.open)} · H {fmt(current.high)} · L {fmt(current.low)} · C{' '}
+            {fmt(current.close)} · Δ {fmt(current.delta)} · V {fmt(current.volume)}
           </span>
         </div>
-        <div className="chart-controls" aria-label="Chart navigation controls">
+        <div className="chart-controls" aria-label="Chart controls">
           <button onClick={resetViewport} type="button">
             RESET
           </button>
           <button
-            aria-label="Reserve space for volume profile"
-            aria-pressed={reserveProfileSpace}
-            onClick={() => setReserveProfileSpace((current) => !current)}
-            title="Keep price bars clear of the session volume profile"
+            aria-controls="chart-settings-panel"
+            aria-expanded={settingsOpen}
+            aria-label="Chart settings"
+            className="chart-settings-button"
+            onClick={() => setSettingsOpen((current) => !current)}
+            title="Chart settings"
             type="button"
           >
-            PROFILE SPACE
+            <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
           </button>
         </div>
       </header>
-      <svg
-        aria-description="Drag horizontally or use the arrow keys to pan. Press zero to reset."
-        aria-label={`${mode} historical chart`}
-        className={dragging ? 'dragging' : ''}
-        onKeyDown={handleKeyDown}
-        onPointerCancel={stopDragging}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={stopDragging}
-        preserveAspectRatio="none"
-        role="application"
-        tabIndex={0}
-        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+      {settingsOpen && (
+        <aside
+          aria-label="Chart settings"
+          className="chart-settings-popover"
+          id="chart-settings-panel"
+          role="dialog"
+        >
+          <strong>CHART SETTINGS</strong>
+          <div className="chart-panel-options">
+            <label>
+              <input
+                aria-label="Show session volume profile"
+                checked={panelVisibility.profile}
+                onChange={(event) =>
+                  setPanelVisibility((current) => ({
+                    ...current,
+                    profile: event.target.checked
+                  }))
+                }
+                type="checkbox"
+              />
+              <span>SESSION VOLUME PROFILE</span>
+            </label>
+            <label>
+              <input
+                aria-label="Show volume"
+                checked={panelVisibility.volume}
+                onChange={(event) =>
+                  setPanelVisibility((current) => ({
+                    ...current,
+                    volume: event.target.checked
+                  }))
+                }
+                type="checkbox"
+              />
+              <span>VOLUME</span>
+            </label>
+          </div>
+        </aside>
+      )}
+      <div
+        className="market-chart-panels"
+        data-show-profile={panelVisibility.profile}
+        data-show-volume={panelVisibility.volume}
+        style={chartPanelStyle}
       >
-        <rect width={chartWidth} height={chartHeight} fill="#0b0f12" />
-        <rect
-          className="price-axis-bg"
-          x={priceAxisX}
-          y="0"
-          width={chartWidth - priceAxisX}
-          height={chartHeight}
-        />
-
-        {priceTicks.map((price) => (
-          <g key={price}>
-            <line className="gridline" x1={plotLeft} x2={plotRight} y1={y(price)} y2={y(price)} />
-            <line
-              className="price-tick-mark"
-              x1={plotRight}
-              x2={priceAxisX}
-              y1={y(price)}
-              y2={y(price)}
-            />
-            <text className="price-tick" x={priceAxisX + 8} y={y(price) + 4}>
-              {fmt(price)}
-            </text>
-          </g>
-        ))}
-        {timeIndexes.map((index) => (
-          <line
-            className="gridline faint"
-            key={visible[index]?.timestamp}
-            x1={x(index)}
-            x2={x(index)}
-            y1={mainTop}
-            y2={chartHeight}
-          />
-        ))}
-
-        <text className="quiet" x={chartLabelInset} y="24">
-          {mode === 'candles'
-            ? `CANDLES · ${timeframeLabel} · VWAP · EMA20`
-            : mode === 'footprint'
-            ? `BID × ASK · ${timeframeLabel} · ${fmt(footprintTickSize)} USD DISPLAY · ${fmt(
-                sourceTickSize
-              )} SOURCE`
-            : `STEP PROFILE · ${timeframeLabel} · BID × ASK · VA 70%`}
-        </text>
-        <text className="quiet" x={plotRight - 170} y="24">
-          SESSION VOLUME PROFILE
-        </text>
-
-        <g className="session-profile" data-layer="background">
-          {profile.map((level, index) => {
-            const total = level.ask + level.bid
-            const width = (total / maxProfile) * profileWidth
-            return (
-              <g key={index}>
-                <rect
-                  className="session-profile-bar session-profile-bar--bid"
-                  height="8"
-                  width={width * 0.48}
-                  x={plotRight - width}
-                  y={y(level.price) - 4}
-                />
-                <rect
-                  className="session-profile-bar session-profile-bar--ask"
-                  height="8"
-                  width={width * 0.52}
-                  x={plotRight - width * 0.52}
-                  y={y(level.price) - 4}
-                />
-              </g>
-            )
-          })}
-        </g>
-
-        {mode === 'candles' &&
-          visible.map((bar, index) => {
-            const center = x(index)
-            const rising = bar.close >= bar.open
-            return (
-              <g className={rising ? 'up' : 'down'} key={bar.timestamp}>
-                <line x1={center} x2={center} y1={y(bar.high)} y2={y(bar.low)} />
-                <rect
-                  height={Math.max(2, Math.abs(y(bar.open) - y(bar.close)))}
-                  width={candleWidth}
-                  x={center - candleWidth / 2}
-                  y={Math.min(y(bar.open), y(bar.close))}
-                />
-              </g>
-            )
-          })}
-
-        {mode === 'footprint' &&
-          visible.map((bar, index) => {
-            const center = x(index)
-            const footprintBar = deriveFootprintBar(
-              {
-                ...bar,
-                levels: bar.levels.filter(
-                  (level) => level.price >= low - footprintTickSize && level.price <= high
-                )
-              },
-              footprintSettings
-            )
-            const levels = footprintBar.levels.filter(
-              (level) =>
-                level.price + footprintTickSize / 2 >= low &&
-                level.price + footprintTickSize / 2 <= high
-            )
-            const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
-            const barWidth = Math.min(step * 0.78, 76)
-            const halfWidth = barWidth / 2
-            const rowHeight = clamp(
-              (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
-              16,
-              24 * footprintZoomScale
-            )
-            return (
-              <g className="footprint-bar" key={bar.timestamp}>
-                {levels.map((level) => {
-                  const price = level.price + footprintTickSize / 2
-                  const bidLabel = formatFootprintVolume(level.bid, 'compact')
-                  const askLabel = formatFootprintVolume(level.ask, 'compact')
-                  return (
-                    <g
-                      className={`footprint-cell${level.isPoc ? ' is-poc' : ''}`}
-                      data-ask={level.ask}
-                      data-bid={level.bid}
-                      data-price={level.price}
-                      key={level.price}
-                    >
-                      <title>
-                        {fmt(level.price)}–{fmt(level.price + footprintTickSize)} · Bid{' '}
-                        {fmt(level.bid, 3)} × Ask {fmt(level.ask, 3)}
-                      </title>
-                      <rect
-                        className="footprint-bid-bg"
-                        fillOpacity={0.2 + Math.min(1, level.bid / maximum) * 0.72}
-                        height={rowHeight}
-                        width={halfWidth}
-                        x={center - halfWidth}
-                        y={y(price) - rowHeight / 2}
-                      />
-                      <rect
-                        className="footprint-ask-bg"
-                        fillOpacity={0.2 + Math.min(1, level.ask / maximum) * 0.72}
-                        height={rowHeight}
-                        width={halfWidth}
-                        x={center}
-                        y={y(price) - rowHeight / 2}
-                      />
-                      <line
-                        className="footprint-divider"
-                        x1={center}
-                        x2={center}
-                        y1={y(price) - rowHeight / 2}
-                        y2={y(price) + rowHeight / 2}
-                      />
-                      <text
-                        className={`footprint-cell-value bid${
-                          level.bidImbalance ? ' is-imbalance' : ''
-                        }`}
-                        dominantBaseline="middle"
-                        style={{ fontSize: footprintFontSize }}
-                        textAnchor="end"
-                        x={center - 3}
-                        y={y(price)}
-                      >
-                        {bidLabel}
-                      </text>
-                      <text
-                        className={`footprint-cell-value ask${
-                          level.askImbalance ? ' is-imbalance' : ''
-                        }`}
-                        dominantBaseline="middle"
-                        style={{ fontSize: footprintFontSize }}
-                        textAnchor="start"
-                        x={center + 3}
-                        y={y(price)}
-                      >
-                        {askLabel}
-                      </text>
-                      {level.isPoc && (
-                        <rect
-                          className="footprint-poc-outline"
-                          height={rowHeight}
-                          width={barWidth}
-                          x={center - halfWidth}
-                          y={y(price) - rowHeight / 2}
-                        />
-                      )}
-                    </g>
-                  )
-                })}
-                <text
-                  className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
-                  style={{ fontSize: footprintDeltaFontSize }}
-                  textAnchor="middle"
-                  x={center}
-                  y={Math.max(mainTop + footprintDeltaFontSize, y(bar.high) - 26)}
-                >
-                  Δ {fmt(bar.delta, 3)}
-                </text>
-              </g>
-            )
-          })}
-
-        {mode === 'step-profile' &&
-          visible.map((bar, index) => {
-            const center = x(index)
-            const levels = bar.levels.filter((level) => level.price >= low && level.price <= high)
-            const maximumSide = Math.max(
-              ...levels.flatMap((level) => [level.ask, level.bid]),
-              1
-            )
-            const maximumHalfWidth = step * 0.37
-            return (
-              <g key={bar.timestamp}>
-                {levels.map((level) => {
-                  const bidWidth = (level.bid / maximumSide) * maximumHalfWidth
-                  const askWidth = (level.ask / maximumSide) * maximumHalfWidth
-                  return (
-                    <g className="step-profile-level" key={level.price}>
-                      <rect
-                        className="step-profile-bid"
-                        height="4"
-                        width={bidWidth}
-                        x={center - bidWidth}
-                        y={y(level.price) - 2}
-                      />
-                      <rect
-                        className="step-profile-ask"
-                        height="4"
-                        width={askWidth}
-                        x={center}
-                        y={y(level.price) - 2}
-                      />
-                      {level.price === bar.poc && (
-                        <rect
-                          className="step-profile-poc-outline"
-                          height="6"
-                          width={bidWidth + askWidth}
-                          x={center - bidWidth}
-                          y={y(level.price) - 3}
-                        />
-                      )}
-                    </g>
-                  )
-                })}
-                <line
-                  className="profile-spine"
-                  x1={center}
-                  x2={center}
-                  y1={y(bar.high)}
-                  y2={y(bar.low)}
-                />
-                <text
-                  className={`bar-delta step-delta ${
-                    bar.delta >= 0 ? 'positive-fill' : 'negative-fill'
-                  }`}
-                  style={{ fontSize: stepDeltaFontSize }}
-                  textAnchor="middle"
-                  x={center}
-                  y={Math.max(mainTop + stepDeltaFontSize, y(bar.high) - 26)}
-                >
-                  Δ {fmt(bar.delta, 2)}
-                </text>
-              </g>
-            )
-          })}
-
-        <line
-          className="poc-line"
-          x1={plotLeft}
-          x2={plotRight}
-          y1={y(current.poc)}
-          y2={y(current.poc)}
-        />
-        <line
-          className="value-line"
-          x1={plotLeft}
-          x2={plotRight}
-          y1={y(current.vah)}
-          y2={y(current.vah)}
-        />
-        <line
-          className="value-line"
-          x1={plotLeft}
-          x2={plotRight}
-          y1={y(current.val)}
-          y2={y(current.val)}
-        />
-
-        <line
-          className="current-price-line"
-          x1={plotRight - 18}
-          x2={priceAxisX}
-          y1={y(current.close)}
-          y2={y(current.close)}
-        />
-        <rect
-          className="current-price-tag"
-          height="32"
-          width={chartWidth - priceAxisX - 4}
-          x={priceAxisX + 2}
-          y={y(current.close) - 16}
-        />
-        <text className="current-price-text" x={priceAxisX + 6} y={y(current.close) - 2}>
-          {fmt(current.close)}
-        </text>
-        <text
-          aria-label={`Candle closes in ${candleCloseCountdown}`}
-          className="current-price-countdown"
-          x={priceAxisX + 6}
-          y={y(current.close) + 11}
-        >
-          CLOSE {candleCloseCountdown}
-        </text>
-
-        {timeIndexes.map((index) => (
-          <text
-            className="time-tick"
-            key={`time-${visible[index]?.timestamp}`}
-            textAnchor="middle"
-            x={x(index)}
-            y={timeTickY}
+        <div className="price-chart-panel">
+          <svg
+            aria-description="Drag horizontally or use the arrow keys to pan. Press zero to reset."
+            aria-label={`${mode} historical chart`}
+            className={dragging ? 'dragging' : ''}
+            onKeyDown={handleKeyDown}
+            onPointerCancel={stopDragging}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={stopDragging}
+            preserveAspectRatio="none"
+            role="application"
+            tabIndex={0}
+            viewBox={`0 0 ${chartWidth} ${priceChartHeight}`}
           >
-            {clock(visible[index]?.timestamp ?? view.timestamp).slice(0, 5)}
-          </text>
-        ))}
-
-        <text className="label" x={chartLabelInset} y={volumeTop - 10}>
-          VOLUME · ALIGNED TO PRICE BARS
-        </text>
-        {visible.map((bar, index) => {
-          const height = Math.max(2, (bar.volume / maxVolume) * (volumeBottom - volumeTop))
-          return (
+            <rect width={chartWidth} height={priceChartHeight} fill="#0b0f12" />
             <rect
-              className={`volume-bar ${bar.close >= bar.open ? 'volume-up' : 'volume-down'}`}
-              height={height}
-              key={`volume-${bar.timestamp}`}
-              width={volumeWidth}
-              x={x(index) - volumeWidth / 2}
-              y={volumeBottom - height}
+              className="price-axis-bg"
+              x={priceAxisX}
+              y="0"
+              width={chartWidth - priceAxisX}
+              height={priceChartHeight}
             />
-          )
-        })}
 
-        <text
-          aria-label="Visible chart window"
-          className="window-label"
-          x={plotRight}
-          y="718"
-          textAnchor="end"
-        >
-          {windowLabel}
-        </text>
-      </svg>
+            {priceTicks.map((price) => (
+              <g key={price}>
+                <line
+                  className="gridline"
+                  x1={plotLeft}
+                  x2={plotRight}
+                  y1={y(price)}
+                  y2={y(price)}
+                />
+                <line
+                  className="price-tick-mark"
+                  x1={plotRight}
+                  x2={priceAxisX}
+                  y1={y(price)}
+                  y2={y(price)}
+                />
+                <text className="price-tick" x={priceAxisX + 8} y={y(price) + 4}>
+                  {fmt(price)}
+                </text>
+              </g>
+            ))}
+            {timeIndexes.map((index) => (
+              <line
+                className="gridline faint"
+                key={visible[index]?.timestamp}
+                x1={x(index)}
+                x2={x(index)}
+                y1={mainTop}
+                y2={priceChartHeight}
+              />
+            ))}
+
+            {mode === 'candles' &&
+              visible.map((bar, index) => {
+                const center = x(index)
+                const rising = bar.close >= bar.open
+                return (
+                  <g className={rising ? 'up' : 'down'} key={bar.timestamp}>
+                    <line x1={center} x2={center} y1={y(bar.high)} y2={y(bar.low)} />
+                    <rect
+                      height={Math.max(2, Math.abs(y(bar.open) - y(bar.close)))}
+                      width={candleWidth}
+                      x={center - candleWidth / 2}
+                      y={Math.min(y(bar.open), y(bar.close))}
+                    />
+                  </g>
+                )
+              })}
+
+            {mode === 'footprint' &&
+              visible.map((bar, index) => {
+                const center = x(index)
+                const footprintBar = deriveFootprintBar(
+                  {
+                    ...bar,
+                    levels: bar.levels.filter(
+                      (level) => level.price >= low - footprintTickSize && level.price <= high
+                    )
+                  },
+                  footprintSettings
+                )
+                const levels = footprintBar.levels.filter(
+                  (level) =>
+                    level.price + footprintTickSize / 2 >= low &&
+                    level.price + footprintTickSize / 2 <= high
+                )
+                const maximum = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
+                const barWidth = Math.min(step * 0.78, 76)
+                const halfWidth = barWidth / 2
+                const rowHeight = clamp(
+                  (footprintTickSize / range) * (mainBottom - mainTop) * 0.88,
+                  16,
+                  24 * footprintZoomScale
+                )
+                return (
+                  <g className="footprint-bar" key={bar.timestamp}>
+                    {levels.map((level) => {
+                      const price = level.price + footprintTickSize / 2
+                      const bidLabel = formatFootprintVolume(level.bid, 'compact')
+                      const askLabel = formatFootprintVolume(level.ask, 'compact')
+                      return (
+                        <g
+                          className={`footprint-cell${level.isPoc ? ' is-poc' : ''}`}
+                          data-ask={level.ask}
+                          data-bid={level.bid}
+                          data-price={level.price}
+                          key={level.price}
+                        >
+                          <title>
+                            {fmt(level.price)}–{fmt(level.price + footprintTickSize)} · Bid{' '}
+                            {fmt(level.bid, 3)} × Ask {fmt(level.ask, 3)}
+                          </title>
+                          <rect
+                            className="footprint-bid-bg"
+                            fillOpacity={0.2 + Math.min(1, level.bid / maximum) * 0.72}
+                            height={rowHeight}
+                            width={halfWidth}
+                            x={center - halfWidth}
+                            y={y(price) - rowHeight / 2}
+                          />
+                          <rect
+                            className="footprint-ask-bg"
+                            fillOpacity={0.2 + Math.min(1, level.ask / maximum) * 0.72}
+                            height={rowHeight}
+                            width={halfWidth}
+                            x={center}
+                            y={y(price) - rowHeight / 2}
+                          />
+                          <line
+                            className="footprint-divider"
+                            x1={center}
+                            x2={center}
+                            y1={y(price) - rowHeight / 2}
+                            y2={y(price) + rowHeight / 2}
+                          />
+                          <text
+                            className={`footprint-cell-value bid${
+                              level.bidImbalance ? ' is-imbalance' : ''
+                            }`}
+                            dy="0.075em"
+                            dominantBaseline="middle"
+                            style={{ fontSize: footprintFontSize }}
+                            textAnchor="end"
+                            x={center - 3}
+                            y={y(price)}
+                          >
+                            {bidLabel}
+                          </text>
+                          <text
+                            className={`footprint-cell-value ask${
+                              level.askImbalance ? ' is-imbalance' : ''
+                            }`}
+                            dy="0.075em"
+                            dominantBaseline="middle"
+                            style={{ fontSize: footprintFontSize }}
+                            textAnchor="start"
+                            x={center + 3}
+                            y={y(price)}
+                          >
+                            {askLabel}
+                          </text>
+                          {level.isPoc && (
+                            <rect
+                              className="footprint-poc-outline"
+                              height={rowHeight}
+                              width={barWidth}
+                              x={center - halfWidth}
+                              y={y(price) - rowHeight / 2}
+                            />
+                          )}
+                        </g>
+                      )
+                    })}
+                    <text
+                      className={`bar-delta ${bar.delta >= 0 ? 'positive-fill' : 'negative-fill'}`}
+                      style={{ fontSize: footprintDeltaFontSize }}
+                      textAnchor="middle"
+                      x={center}
+                      y={Math.max(mainTop + footprintDeltaFontSize, y(bar.high) - 26)}
+                    >
+                      Δ {fmt(bar.delta, 3)}
+                    </text>
+                  </g>
+                )
+              })}
+
+            {mode === 'step-profile' &&
+              visible.map((bar, index) => {
+                const center = x(index)
+                const stepProfileBar = deriveFootprintBar(
+                  {
+                    ...bar,
+                    levels: bar.levels.filter(
+                      (level) => level.price >= low - stepProfileTickSize && level.price <= high
+                    )
+                  },
+                  stepProfileSettings
+                )
+                const levels = stepProfileBar.levels.filter(
+                  (level) =>
+                    level.price + stepProfileTickSize / 2 >= low &&
+                    level.price + stepProfileTickSize / 2 <= high
+                )
+                const maximumSide = Math.max(
+                  ...levels.flatMap((level) => [level.ask, level.bid]),
+                  1
+                )
+                const cellWidth = clamp(step * 0.48, 42, 52)
+                const maximumSideWidth = Math.max(2, Math.min((step - cellWidth) * 0.46, 28))
+                const rowHeight = clamp(
+                  (stepProfileTickSize / range) * (mainBottom - mainTop) * 0.84,
+                  8,
+                  11 * stepZoomScale
+                )
+                const sideHeight = Math.max(4, rowHeight - 2)
+                const valueFontSize = clamp(rowHeight - 1.5, 7, 8.5)
+                return (
+                  <g className="step-profile-bar" key={bar.timestamp}>
+                    <line
+                      className="profile-spine"
+                      x1={center}
+                      x2={center}
+                      y1={y(bar.high)}
+                      y2={y(bar.low)}
+                    />
+                    {levels.map((level) => {
+                      const price = level.price + stepProfileTickSize / 2
+                      const bidWidth = (level.bid / maximumSide) * maximumSideWidth
+                      const askWidth = (level.ask / maximumSide) * maximumSideWidth
+                      const cellX = center - cellWidth / 2
+                      const bidLabel = formatFootprintVolume(level.bid, 'compact')
+                      const askLabel = formatFootprintVolume(level.ask, 'compact')
+                      return (
+                        <g
+                          className={`step-profile-level${level.isPoc ? ' is-poc' : ''}`}
+                          data-ask={level.ask}
+                          data-bid={level.bid}
+                          data-price={level.price}
+                          key={level.price}
+                        >
+                          <title>
+                            {fmt(level.price)}–{fmt(level.price + stepProfileTickSize)} · Bid{' '}
+                            {fmt(level.bid, 3)} × Ask {fmt(level.ask, 3)}
+                          </title>
+                          <rect
+                            className="step-profile-bid"
+                            height={sideHeight}
+                            width={bidWidth}
+                            x={cellX - bidWidth}
+                            y={y(price) - sideHeight / 2}
+                          />
+                          <rect
+                            className="step-profile-ask"
+                            height={sideHeight}
+                            width={askWidth}
+                            x={cellX + cellWidth}
+                            y={y(price) - sideHeight / 2}
+                          />
+                          <rect
+                            className={`step-profile-cell-bg${level.isPoc ? ' is-poc' : ''}`}
+                            height={rowHeight}
+                            width={cellWidth}
+                            x={cellX}
+                            y={y(price) - rowHeight / 2}
+                          />
+                          <text
+                            className="step-profile-value"
+                            dominantBaseline="middle"
+                            dy="0.075em"
+                            style={{ fontSize: valueFontSize }}
+                            textAnchor="middle"
+                            x={center}
+                            y={y(price)}
+                          >
+                            {bidLabel}×{askLabel}
+                          </text>
+                          {level.isPoc && (
+                            <rect
+                              className="step-profile-poc-outline"
+                              height={rowHeight}
+                              width={cellWidth}
+                              x={cellX}
+                              y={y(price) - rowHeight / 2}
+                            />
+                          )}
+                        </g>
+                      )
+                    })}
+                    <text
+                      className={`bar-delta step-delta ${
+                        bar.delta >= 0 ? 'positive-fill' : 'negative-fill'
+                      }`}
+                      style={{ fontSize: stepDeltaFontSize }}
+                      textAnchor="middle"
+                      x={center}
+                      y={Math.max(mainTop + stepDeltaFontSize, y(bar.high) - 26)}
+                    >
+                      Δ {fmt(bar.delta, 2)}
+                    </text>
+                  </g>
+                )
+              })}
+
+            <line
+              className="poc-line"
+              x1={plotLeft}
+              x2={plotRight}
+              y1={y(current.poc)}
+              y2={y(current.poc)}
+            />
+            <line
+              className="value-line"
+              x1={plotLeft}
+              x2={plotRight}
+              y1={y(current.vah)}
+              y2={y(current.vah)}
+            />
+            <line
+              className="value-line"
+              x1={plotLeft}
+              x2={plotRight}
+              y1={y(current.val)}
+              y2={y(current.val)}
+            />
+
+            <line
+              className="current-price-line"
+              x1={plotRight - 18}
+              x2={priceAxisX}
+              y1={y(current.close)}
+              y2={y(current.close)}
+            />
+            <rect
+              className="current-price-tag"
+              height="32"
+              width={chartWidth - priceAxisX - 4}
+              x={priceAxisX + 2}
+              y={y(current.close) - 16}
+            />
+            <text className="current-price-text" x={priceAxisX + 6} y={y(current.close) - 2}>
+              {fmt(current.close)}
+            </text>
+            <text
+              aria-label={`Candle closes in ${candleCloseCountdown}`}
+              className="current-price-countdown"
+              x={priceAxisX + 6}
+              y={y(current.close) + 11}
+            >
+              CLOSE {candleCloseCountdown}
+            </text>
+
+            {timeIndexes.map((index) => (
+              <text
+                className="time-tick"
+                key={`time-${visible[index]?.timestamp}`}
+                textAnchor="middle"
+                x={x(index)}
+                y={timeTickY}
+              >
+                {clock(visible[index]?.timestamp ?? view.timestamp).slice(0, 5)}
+              </text>
+            ))}
+
+            <text
+              aria-label="Visible chart window"
+              className="window-label"
+              x={plotRight}
+              y={priceChartHeight - 8}
+              textAnchor="end"
+            >
+              {windowLabel}
+            </text>
+          </svg>
+        </div>
+        {panelVisibility.volume && (
+          <>
+            <PanelResizer
+              axis="y"
+              className="chart-volume-resizer"
+              label="Resize volume panel"
+              onResize={(delta) =>
+                setPanelSizes((current) => ({
+                  ...current,
+                  volume: clamp(
+                    current.volume - delta,
+                    chartPanelSizeLimits.volume[0],
+                    chartPanelSizeLimits.volume[1]
+                  )
+                }))
+              }
+            />
+            <div className="volume-chart-panel">
+              <svg
+                aria-label="Volume panel"
+                preserveAspectRatio="none"
+                role="img"
+                viewBox={`0 0 ${chartWidth} ${volumeChartHeight}`}
+              >
+                <rect width={chartWidth} height={volumeChartHeight} fill="#0b0f12" />
+                {timeIndexes.map((index) => (
+                  <line
+                    className="gridline faint"
+                    key={`volume-grid-${visible[index]?.timestamp}`}
+                    x1={x(index)}
+                    x2={x(index)}
+                    y1="0"
+                    y2={volumeChartHeight}
+                  />
+                ))}
+                {visible.map((bar, index) => {
+                  const height = Math.max(2, (bar.volume / maxVolume) * (volumeBottom - volumeTop))
+                  return (
+                    <rect
+                      className={`volume-bar ${
+                        bar.close >= bar.open ? 'volume-up' : 'volume-down'
+                      }`}
+                      height={height}
+                      key={`volume-${bar.timestamp}`}
+                      width={volumeWidth}
+                      x={x(index) - volumeWidth / 2}
+                      y={volumeBottom - height}
+                    />
+                  )
+                })}
+              </svg>
+            </div>
+          </>
+        )}
+        {panelVisibility.profile && (
+          <>
+            <PanelResizer
+              className="chart-profile-resizer"
+              label="Resize session volume profile panel"
+              onResize={(delta) =>
+                setPanelSizes((current) => ({
+                  ...current,
+                  profile: clamp(
+                    current.profile - delta,
+                    chartPanelSizeLimits.profile[0],
+                    chartPanelSizeLimits.profile[1]
+                  )
+                }))
+              }
+            />
+            <div className="session-profile-panel">
+              <svg
+                aria-label="Session volume profile panel"
+                preserveAspectRatio="none"
+                role="img"
+                viewBox={`0 0 ${profileChartWidth} ${priceChartHeight}`}
+              >
+                <rect width={profileChartWidth} height={priceChartHeight} fill="#0b0f12" />
+                {priceTicks.map((price) => (
+                  <line
+                    className="gridline"
+                    key={`profile-grid-${price}`}
+                    x1="0"
+                    x2={profileChartWidth}
+                    y1={y(price)}
+                    y2={y(price)}
+                  />
+                ))}
+                <g className="session-profile">
+                  {profile.map((level, index) => {
+                    const total = level.ask + level.bid
+                    const width = (total / maxProfile) * (profileChartWidth - 16)
+                    const right = profileChartWidth - 8
+                    return (
+                      <g key={index}>
+                        <rect
+                          className="session-profile-bar session-profile-bar--bid"
+                          height="8"
+                          width={width * 0.48}
+                          x={right - width}
+                          y={y(level.price) - 4}
+                        />
+                        <rect
+                          className="session-profile-bar session-profile-bar--ask"
+                          height="8"
+                          width={width * 0.52}
+                          x={right - width * 0.52}
+                          y={y(level.price) - 4}
+                        />
+                      </g>
+                    )
+                  })}
+                </g>
+              </svg>
+              {profileMarkers.map(({ label, price, tone }) => (
+                <div
+                  className={`session-profile-marker session-profile-marker--${tone}`}
+                  key={label}
+                  style={{ top: `${(y(price) / priceChartHeight) * 100}%` }}
+                >
+                  <span aria-label={`${label} ${fmt(price)}`} title={`${label} ${fmt(price)}`}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </section>
   )
 }
@@ -1128,9 +1460,48 @@ function TimeSales({ trades }) {
 function Execution({ price, setPrice, trades }) {
   const [side, setSide] = useState('buy')
   const [quantity, setQuantity] = useState('0.10')
-  const [orderType, setOrderType] = useState('Limit')
+  const [orderType, setOrderType] = useState('limit')
+  const [timeInForce, setTimeInForce] = useState('GTC')
+  const [stopPrice, setStopPrice] = useState(() =>
+    Number(price) > 0 ? (Number(price) - 25).toFixed(2) : ''
+  )
+  const [stopLimitPrice, setStopLimitPrice] = useState(() =>
+    Number(price) > 0 ? (Number(price) - 30).toFixed(2) : ''
+  )
+  const [takeProfitPrice, setTakeProfitPrice] = useState(() =>
+    Number(price) > 0 ? (Number(price) + 35).toFixed(2) : ''
+  )
   const [status, setStatus] = useState('')
-  const valid = Number(price) > 0 && Number(quantity) > 0
+  const orderConfig = executionOrderTypes[orderType]
+  const fieldValues = { limitPrice: price, stopPrice, stopLimitPrice, takeProfitPrice }
+  const valid =
+    Number(quantity) > 0 &&
+    orderConfig.priceFields.every((fieldName) => Number(fieldValues[fieldName]) > 0)
+
+  const changeOrderType = (event) => {
+    const nextOrderType = event.target.value
+    setOrderType(nextOrderType)
+    setTimeInForce(executionOrderTypes[nextOrderType].timeInForce[0])
+    setStatus('')
+  }
+
+  const stageOrder = () => {
+    const detailByType = {
+      limit: ` @ ${fmt(price)}`,
+      market: '',
+      'stop-market': ` · trigger ${fmt(stopPrice)}`,
+      'stop-limit': ` · trigger ${fmt(stopPrice)} · limit ${fmt(price)}`,
+      oco: ` · take profit ${fmt(takeProfitPrice)} · stop ${fmt(stopPrice)} · stop limit ${fmt(
+        stopLimitPrice
+      )}`
+    }
+    setStatus(
+      `SIM ${side.toUpperCase()} ${orderConfig.label.toUpperCase()} staged · ${quantity} BTC${
+        detailByType[orderType]
+      } · ${timeInForce} · not transmitted`
+    )
+  }
+
   return (
     <aside className="execution">
       <section className="ticket">
@@ -1155,56 +1526,97 @@ function Execution({ price, setPrice, trades }) {
         </div>
         <label>
           ORDER TYPE
-          <select onChange={(event) => setOrderType(event.target.value)} value={orderType}>
-            <option>Limit</option>
-            <option>Market</option>
-            <option>Stop</option>
+          <select aria-label="Order type" onChange={changeOrderType} value={orderType}>
+            {Object.entries(executionOrderTypes).map(([value, { label }]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </select>
         </label>
+        {orderConfig.priceFields.includes('takeProfitPrice') && (
+          <label>
+            TAKE PROFIT PRICE
+            <div className="field">
+              <input
+                aria-label="Take profit price"
+                inputMode="decimal"
+                onChange={(event) => setTakeProfitPrice(event.target.value)}
+                value={takeProfitPrice}
+              />
+              <span>USDT</span>
+            </div>
+          </label>
+        )}
+        {orderConfig.priceFields.includes('stopPrice') && (
+          <label>
+            STOP PRICE
+            <div className="field">
+              <input
+                aria-label="Stop price"
+                inputMode="decimal"
+                onChange={(event) => setStopPrice(event.target.value)}
+                value={stopPrice}
+              />
+              <span>USDT</span>
+            </div>
+          </label>
+        )}
+        {orderConfig.priceFields.includes('stopLimitPrice') && (
+          <label>
+            STOP LIMIT PRICE
+            <div className="field">
+              <input
+                aria-label="Stop limit price"
+                inputMode="decimal"
+                onChange={(event) => setStopLimitPrice(event.target.value)}
+                value={stopLimitPrice}
+              />
+              <span>USDT</span>
+            </div>
+          </label>
+        )}
+        {orderConfig.priceFields.includes('limitPrice') && (
+          <label>
+            LIMIT PRICE
+            <div className="field">
+              <input
+                aria-label="Limit price"
+                inputMode="decimal"
+                onChange={(event) => setPrice(event.target.value)}
+                value={price}
+              />
+              <span>USDT</span>
+            </div>
+          </label>
+        )}
         <label>
-          LIMIT PRICE
+          QUANTITY
           <div className="field">
             <input
-              aria-label="Limit price"
-              onChange={(event) => setPrice(event.target.value)}
-              value={price}
+              aria-label="Quantity"
+              inputMode="decimal"
+              onChange={(event) => setQuantity(event.target.value)}
+              value={quantity}
             />
-            <span>USDT</span>
+            <span>BTC</span>
           </div>
         </label>
         <label>
           TIME IN FORCE
-          <select>
-            <option>Day</option>
-            <option>GTC</option>
-            <option>IOC</option>
+          <select
+            aria-label="Time in force"
+            disabled={orderConfig.timeInForce.length === 1}
+            onChange={(event) => setTimeInForce(event.target.value)}
+            value={timeInForce}
+          >
+            {orderConfig.timeInForce.map((value) => (
+              <option key={value}>{value}</option>
+            ))}
           </select>
         </label>
-        <label>
-          STOP LOSS
-          <input defaultValue={price ? fmt(Number(price) - 25) : ''} />
-        </label>
-        <label>
-          TAKE PROFIT
-          <input defaultValue={price ? fmt(Number(price) + 35) : ''} />
-        </label>
-        <label>
-          QUANTITY
-          <input onChange={(event) => setQuantity(event.target.value)} value={quantity} />
-        </label>
-        <button
-          className={`submit ${side}`}
-          disabled={!valid}
-          onClick={() =>
-            setStatus(
-              `SIM ${side.toUpperCase()} ${orderType.toUpperCase()} staged · ${quantity} BTCUSDT${
-                orderType === 'Market' ? '' : ` @ ${fmt(price)}`
-              } · not transmitted`
-            )
-          }
-          type="button"
-        >
-          PLACE {side.toUpperCase()} {orderType.toUpperCase()}
+        <button className={`submit ${side}`} disabled={!valid} onClick={stageOrder} type="button">
+          PLACE {side.toUpperCase()} {orderConfig.label.toUpperCase()}
         </button>
         {status && <small aria-live="polite">{status}</small>}
       </section>
@@ -1277,17 +1689,18 @@ function Activity() {
   )
 }
 
-function PanelResizer({ className = '', label, onResize }) {
-  const startX = useRef(null)
+function PanelResizer({ axis = 'x', className = '', label, onResize }) {
+  const startPosition = useRef(null)
   const handlePointerDown = (event) => {
-    startX.current = event.clientX
+    startPosition.current = axis === 'y' ? event.clientY : event.clientX
     const handleMove = (moveEvent) => {
-      const delta = moveEvent.clientX - startX.current
-      startX.current = moveEvent.clientX
+      const nextPosition = axis === 'y' ? moveEvent.clientY : moveEvent.clientX
+      const delta = nextPosition - startPosition.current
+      startPosition.current = nextPosition
       onResize(delta)
     }
     const handleUp = () => {
-      startX.current = null
+      startPosition.current = null
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
     }
@@ -1299,8 +1712,8 @@ function PanelResizer({ className = '', label, onResize }) {
       aria-label={label}
       className={`panel-resizer ${className}`.trim()}
       onKeyDown={(event) => {
-        if (event.key === 'ArrowLeft') onResize(-8)
-        else if (event.key === 'ArrowRight') onResize(8)
+        if (event.key === (axis === 'y' ? 'ArrowUp' : 'ArrowLeft')) onResize(-8)
+        else if (event.key === (axis === 'y' ? 'ArrowDown' : 'ArrowRight')) onResize(8)
         else return
         event.preventDefault()
       }}
@@ -1368,9 +1781,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             <option value="candles">Candles</option>
             <option value="footprint">Footprint</option>
             <option value="step-profile">Step Profile</option>
-          </select>
-          <select aria-label="Tick size">
-            <option>0.01 USD</option>
           </select>
         </nav>
       </header>

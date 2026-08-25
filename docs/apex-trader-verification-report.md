@@ -1,6 +1,6 @@
 # Apex Trader v2 implementation and verification report
 
-Date: 2026-08-23. Scope: the Apex Trader repository and the explicitly authorized DOM-controls correction in the Apex Trader Figma file.
+Initial report: 2026-08-23. Updated: 2026-08-25. Scope: the Apex Trader repository and the explicitly authorized DOM-controls correction in the Apex Trader Figma file.
 
 ## Implemented routes and interactions
 
@@ -32,10 +32,14 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 
 ## Browser artifacts and frequency
 
-- Base session: 7,376,566 bytes (`session-v2.json`).
+- Runtime manifest: 679 bytes (`manifest-v3.json`). It points to the immutable dataset version `v3-d74b9a46afb5d92a`.
+- Base session: 1,297,182 bytes (`session.json.gz`), reduced from 7,376,566 bytes without removing bars, levels or time coverage.
 - Fragment assets: 192 gzip files (96 trade + 96 L2), 15 minutes each, 38,835,019 bytes total.
 - Smallest fragment: 27,430 bytes; largest: 520,869 bytes.
 - L2 event groups retained: 815,980.
+- Dataset filenames live under a content-derived version path and receive `Cache-Control: public, max-age=31536000, immutable`. The runtime manifest receives a five-minute freshness window plus one day of `stale-while-revalidate`.
+- Cache Storage persists the compressed base session and the 16 most recently used 15-minute chunk pairs across reloads. A dataset version change removes stale historical caches and their LRU metadata.
+- The initial historical transfer at the default playback position falls from roughly 8.1 MB to roughly 2.1 MB. Repeated visits can reuse the persistent browser cache without transferring the historical bodies again.
 - Browser render cadence: 20 Hz (50 ms). Every L2 event group up to the historical clock is applied before each render; the persisted source is not sampled.
 - Local Chromium captures at exact 1920×1080 are under the Git-ignored `output/playwright/` directory for candles, footprint and step profile.
 
@@ -47,9 +51,13 @@ All 420,562 trades are retained. Aggressor buys map to ask volume and sells to b
 | Raw hashes/counts/date bounds                     | pass                                                            |
 | Derived fragment gzip integrity                   | pass, 192/192                                                   |
 | Deterministic L2/value-area/clock/timeframe tests | pass                                                            |
-| Complete unit suite                               | pass, 8 files / 23 declared cases                               |
+| Runtime manifest/compression/cache tests          | pass                                                            |
+| Complete unit suite                               | pass, 10 test files                                             |
 | ESLint                                            | pass                                                            |
-| Vite production build                             | pass; JS 179.78 kB (59.08 kB gzip), CSS 40.70 kB (7.94 kB gzip) |
+| Vite production build                             | pass; JS 198.42 kB (64.37 kB gzip), CSS 47.06 kB (8.80 kB gzip) |
+| Local immutable/manifest response headers         | pass                                                            |
+| Chromium persistent-cache reload                  | pass; historical assets stayed in browser caches                |
+| Chromium console after cached reload              | pass, zero errors and warnings                                  |
 | `git diff --check`                                | pass                                                            |
 | Chromium route/console/interaction/keyboard suite | pass, 9/9                                                       |
 | Firefox route/console/interaction/keyboard suite  | pass, 9/9                                                       |
