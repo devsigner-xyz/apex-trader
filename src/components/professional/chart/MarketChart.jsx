@@ -55,6 +55,7 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
   )
   const [settingsOpen, setSettingsOpen] = useState(false)
   const chartRef = useRef(null)
+  const priceChartRef = useRef(null)
   const bars = useMemo(
     () => aggregateProfessionalBars(view.bars, timeframe),
     [timeframe, view.bars]
@@ -96,6 +97,13 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
     plotRatio: plotRight / chartWidth,
     timeframe
   })
+
+  useEffect(() => {
+    const chart = priceChartRef.current
+    if (!chart) return undefined
+    chart.addEventListener('wheel', handleWheel, { passive: false })
+    return () => chart.removeEventListener('wheel', handleWheel)
+  }, [handleWheel])
 
   const { high, low, range } = derivePriceDomain(visible, mode)
   const priceScale = createPriceScale({ high, low, range }, mainTop, mainBottom)
@@ -231,8 +239,8 @@ export default function MarketChart({ mode, sourceTickSize, timeframe, view }) {
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={stopDragging}
-            onWheel={handleWheel}
             preserveAspectRatio="none"
+            ref={priceChartRef}
             role="application"
             tabIndex={0}
             viewBox={`0 0 ${chartWidth} ${priceChartHeight}`}
