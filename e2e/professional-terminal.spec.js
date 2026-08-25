@@ -119,12 +119,15 @@ for (const [route, mode] of views) {
       .getByRole('img', { name: 'Volume panel', exact: true })
       .boundingBox()
     const profilePanelBox = await page
-      .getByRole('img', { name: 'Session volume profile panel', exact: true })
+      .getByRole('img', { name: 'Session volume profile overlay', exact: true })
       .boundingBox()
-    expect(pricePanelBox.x + pricePanelBox.width).toBeLessThanOrEqual(profilePanelBox.x)
+    expect(profilePanelBox.x).toBeGreaterThanOrEqual(pricePanelBox.x)
+    expect(profilePanelBox.x + profilePanelBox.width).toBeLessThanOrEqual(
+      pricePanelBox.x + pricePanelBox.width
+    )
     expect(pricePanelBox.y + pricePanelBox.height).toBeLessThanOrEqual(volumePanelBox.y)
     await expect(page.getByLabel('Resize volume panel')).toBeVisible()
-    await expect(page.getByLabel('Resize session volume profile panel')).toBeVisible()
+    await expect(page.getByLabel('Resize session volume profile panel')).toHaveCount(0)
     if (mode === 'step-profile') {
       const profileCenters = await page
         .locator('.profile-spine')
@@ -435,6 +438,27 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await chart.focus()
   await page.keyboard.press('ArrowLeft')
   await expect(visibleWindow).not.toHaveText(initialWindow)
+  await page.getByRole('button', { name: 'RESET' }).click()
+
+  const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
+  const chartBounds = await chart.boundingBox()
+  await page.mouse.move(
+    chartBounds.x + chartBounds.width * 0.25,
+    chartBounds.y + chartBounds.height * 0.5
+  )
+  await page.mouse.wheel(0, -480)
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-visible-count')))
+    .toBeLessThan(initialVisibleCount)
+  await expect(chart).toHaveAttribute('data-follow-latest', 'false')
+
+  const zoomedWindowStart = await chart.getAttribute('data-window-start')
+  await page.mouse.wheel(-320, 0)
+  await expect.poll(() => chart.getAttribute('data-window-start')).not.toBe(zoomedWindowStart)
+  await chart.focus()
+  await page.keyboard.press('0')
+  await expect(chart).toHaveAttribute('data-visible-count', String(initialVisibleCount))
+  await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 
   const watchlist = page.getByLabel('Markets', { exact: true })
   const initialWatchlist = await watchlist.boundingBox()
@@ -468,16 +492,16 @@ test('historical synchronization, settings and keyboard controls remain coherent
   expect(resizedDom.width).toBeGreaterThan(initialDom.width)
   expect(resizedDomCells.every((width, index) => width > initialDomCells[index])).toBe(true)
 
-  const firstDomRow = page.locator('.dom-row.ask').nth(20)
-  const firstDomPrice = await firstDomRow.getAttribute('data-price')
-  await firstDomRow.evaluate((node) => {
-    window.__firstDomRow = node
+  await page.locator('.dom-row').evaluateAll((nodes) => {
+    window.__domRowsByPrice = new Map(nodes.map((node) => [node.dataset.price, node]))
   })
   await page.waitForTimeout(700)
-  const sameDomRow = await page
-    .locator(`.dom-row[data-price="${firstDomPrice}"]`)
-    .evaluate((node) => node === window.__firstDomRow)
-  expect(sameDomRow).toBe(true)
+  const retainedDomRowIdentity = await page
+    .locator('.dom-row')
+    .evaluateAll((nodes) =>
+      nodes.some((node) => window.__domRowsByPrice.get(node.dataset.price) === node)
+    )
+  expect(retainedDomRowIdentity).toBe(true)
 
   const activityPanel = page.getByRole('tabpanel')
   await expect(activityPanel.locator('.activity-row')).toHaveCount(2)
@@ -531,27 +555,36 @@ test('historical synchronization, settings and keyboard controls remain coherent
   ])
 
   const profilePanel = page.getByRole('img', {
-    name: 'Session volume profile panel',
+    name: 'Session volume profile overlay',
     exact: true
   })
   const volumePanel = page.getByRole('img', { name: 'Volume panel', exact: true })
-  const initialProfileWidth = (await profilePanel.boundingBox()).width
+  const priceChart = page.getByLabel('footprint historical chart')
+  const priceChartBox = await priceChart.boundingBox()
+  const profileBox = await profilePanel.boundingBox()
   const initialVolumeHeight = (await volumePanel.boundingBox()).height
-  await page.getByLabel('Resize session volume profile panel').focus()
-  await page.keyboard.press('ArrowLeft')
+  expect(profileBox.x).toBeGreaterThanOrEqual(priceChartBox.x)
+  expect(profileBox.x + profileBox.width).toBeLessThanOrEqual(priceChartBox.x + priceChartBox.width)
+  await expect(page.getByLabel('Resize session volume profile panel')).toHaveCount(0)
+
+  await page.getByLabel('Chart settings').click()
+  await page.getByLabel('Show session volume profile').uncheck()
+  await expect(profilePanel).toHaveCount(0)
+  await page.getByLabel('Show session volume profile').check()
+  await expect(profilePanel).toBeVisible()
+
   await page.getByLabel('Resize volume panel').focus()
   await page.keyboard.press('ArrowUp')
-  expect((await profilePanel.boundingBox()).width).toBeGreaterThan(initialProfileWidth)
   expect((await volumePanel.boundingBox()).height).toBeGreaterThan(initialVolumeHeight)
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-panel-sizes:v1')))
-  ).toEqual({ profile: 188, volume: 118 })
+  ).toEqual({ profile: 180, volume: 118 })
   await page.reload()
-  expect((await profilePanel.boundingBox()).width).toBeCloseTo(188, 0)
+  await expect(profilePanel).toBeVisible()
   expect((await volumePanel.boundingBox()).height).toBeCloseTo(118, 0)
   await page.screenshot({
     fullPage: false,
-    path: 'output/playwright/footprint-resizable-chart-panels-1920x1080.png'
+    path: 'output/playwright/footprint-profile-overlay-1920x1080.png'
   })
 })
 
