@@ -5,8 +5,7 @@ export const chartTimeframes = [
   { label: '15m', minutes: 15, supported: true },
   { label: '30m', minutes: 30, supported: true },
   { label: '1h', minutes: 60, supported: true },
-  { label: '4h', minutes: 240, supported: true },
-  { label: '1D', minutes: 1440, supported: true }
+  { label: '4h', minutes: 240, supported: true }
 ]
 
 export default function ChartTimeframeSelector({ onChange, value }) {

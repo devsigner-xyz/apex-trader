@@ -532,7 +532,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
 
   const timeframe = page.getByLabel('Timeframe')
-  await expect(timeframe.locator('option')).toHaveCount(6)
+  await expect(timeframe.locator('option')).toHaveCount(5)
   await timeframe.selectOption('15')
   await expect(timeframe).toHaveValue('15')
   await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)
@@ -541,8 +541,6 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(countdown).toHaveText(/CLOSE \d{2}:\d{2}/)
   await timeframe.selectOption('240')
   await expect(timeframe).toHaveValue('240')
-  await timeframe.selectOption('1440')
-  await expect(timeframe).toHaveValue('1440')
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')
@@ -667,12 +665,11 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.getByLabel('Chart mode').selectOption('footprint')
   await expect(page).toHaveURL(/\/footprint$/)
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
-  await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(3)
+  await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(2)
   await expect(page.getByLabel('Timeframe')).toHaveValue('60')
   await expect(page.getByLabel('Timeframe').locator('option')).toHaveText([
     '1 hour',
-    '4 hours',
-    '1 day'
+    '4 hours'
   ])
 
   const profilePanel = page.getByRole('img', {

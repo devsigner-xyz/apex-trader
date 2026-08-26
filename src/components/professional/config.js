@@ -64,8 +64,7 @@ export const chartTimeframes = [
   { label: '15 min', minutes: 15 },
   { label: '30 min', minutes: 30 },
   { label: '1 hour', minutes: 60 },
-  { label: '4 hours', minutes: 240 },
-  { label: '1 day', minutes: 1440 }
+  { label: '4 hours', minutes: 240 }
 ]
 export const footprintTimeframes = chartTimeframes.filter(({ minutes }) => minutes >= 60)
 
