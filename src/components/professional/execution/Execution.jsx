@@ -4,7 +4,7 @@ import TimeSales from './TimeSales.jsx'
 
 export default function Execution({ price, setPrice, trades }) {
   return (
-    <aside className="execution">
+    <aside aria-label="Execution" className="execution">
       <OrderTicket price={price} setPrice={setPrice} />
       <TimeSales trades={trades} />
     </aside>

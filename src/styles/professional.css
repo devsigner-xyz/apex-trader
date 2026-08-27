@@ -156,15 +156,13 @@
 .pro-watchlist {
   position: relative;
   display: grid;
-  grid-template-rows: 44px 42px 30px minmax(0, 1fr);
+  grid-template-rows: 42px 30px minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
   background: var(--pro-panel);
 }
 
-.pro-watchlist header,
 .dom header,
-.ticket header,
 .tape header {
   display: flex;
   align-items: center;
@@ -172,6 +170,15 @@
   height: 44px;
   padding: 0 11px;
   font: 700 12px Inter, sans-serif;
+}
+
+.markets-toolbar {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 6px 8px;
+  gap: 5px;
+  border-bottom: 1px solid var(--pro-subtle);
 }
 
 .watch-head,
@@ -188,13 +195,16 @@
 .markets-search {
   display: grid;
   grid-template-columns: 15px minmax(0, 1fr);
+  min-width: 0;
+  flex: 1;
   align-items: center;
-  height: 42px;
-  padding: 6px 8px;
+  height: 30px;
+  padding-left: 8px;
   gap: 7px;
   color: var(--pro-muted);
-  background: var(--pro-panel);
-  border-top: 1px solid var(--pro-subtle);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
 }
 
 .markets-search:focus-within {
@@ -207,9 +217,8 @@
   height: 28px;
   padding: 0 8px;
   color: var(--pro-text);
-  background: var(--pro-canvas);
-  border: 1px solid var(--pro-border);
-  border-radius: 2px;
+  background: transparent;
+  border: 0;
   outline: none;
   font: 500 10.5px 'Roboto Mono', monospace;
 }
@@ -219,6 +228,10 @@
 }
 
 .markets-search input:focus-visible {
+  box-shadow: none;
+}
+
+.markets-search:focus-within {
   border-color: var(--pro-accent);
   box-shadow: 0 0 0 1px var(--pro-accent);
 }
@@ -305,6 +318,7 @@
 
 .watch-settings-button,
 .dom-settings-button,
+.tape-settings-button,
 .chart-settings-button {
   display: grid;
   width: 28px;
@@ -324,6 +338,9 @@
 .dom-settings-button:hover,
 .dom-settings-button:focus-visible,
 .dom-settings-button[aria-expanded='true'],
+.tape-settings-button:hover,
+.tape-settings-button:focus-visible,
+.tape-settings-button[aria-expanded='true'],
 .chart-settings-button:hover,
 .chart-settings-button:focus-visible,
 .chart-settings-button[aria-expanded='true'] {
@@ -335,6 +352,7 @@
 
 .watch-settings-button svg,
 .dom-settings-button svg,
+.tape-settings-button svg,
 .chart-settings-button svg {
   width: 16px;
   height: 16px;
@@ -880,14 +898,7 @@
   font: 10px 'Roboto Mono', monospace;
 }
 
-.dom-header-meta {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 7px;
-}
-
-.dom-header-meta > span {
+.dom header > span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1090,18 +1101,14 @@
 }
 
 .ticket {
-  padding: 0 14px 14px;
+  padding: 14px;
   border-bottom: 1px solid var(--pro-strong);
-}
-
-.ticket header {
-  padding: 0;
 }
 
 .side-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin: 4px 0 14px;
+  margin: 0 0 14px;
 }
 
 .side-tabs button {
@@ -1177,6 +1184,7 @@
 }
 
 .tape {
+  position: relative;
   display: flex;
   min-height: 0;
   flex-direction: column;
@@ -1195,8 +1203,56 @@
   font: 10px 'Roboto Mono', monospace;
 }
 
+.tape-settings-popover {
+  position: absolute;
+  z-index: 8;
+  top: 38px;
+  right: 6px;
+  width: calc(100% - 12px);
+  padding: 12px;
+  color: var(--pro-text);
+  background: rgb(24 32 39 / 0.98);
+  border: 1px solid var(--pro-strong);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+}
+
+.tape-settings-popover > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--pro-accent);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.tape-filter-options {
+  display: grid;
+  gap: 2px;
+}
+
+.tape-filter-options label {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  min-height: 30px;
+  padding: 0 5px;
+  gap: 7px;
+  color: var(--pro-text);
+  font: 600 10px 'Roboto Mono', monospace;
+}
+
+.tape-filter-options label:hover {
+  background: var(--pro-selected);
+}
+
+.tape-filter-options input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--pro-accent);
+}
+
 .tape-head,
-.tape button {
+.tape-row {
   display: grid;
   grid-template-columns: minmax(82px, 1.2fr) minmax(72px, 1fr) minmax(56px, 0.85fr);
   align-items: center;
@@ -1212,11 +1268,11 @@
 }
 
 .tape-head span:first-child,
-.tape button span:first-child {
+.tape-row span:first-child {
   text-align: left;
 }
 
-.tape button {
+.tape-row {
   min-height: 22px;
   flex: 1 1 26px;
   width: 100%;
@@ -1228,11 +1284,11 @@
   animation: tape-update 0.35s ease-out;
 }
 
-.tape button.buy span:not(:first-child) {
+.tape-row.buy span:not(:first-child) {
   color: var(--pro-buy);
 }
 
-.tape button.sell span:not(:first-child) {
+.tape-row.sell span:not(:first-child) {
   color: var(--pro-sell);
 }
 
@@ -1245,7 +1301,6 @@
 .activity header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: 38px;
   padding: 0 9px;
   background: var(--pro-raised);
@@ -1257,8 +1312,7 @@
   gap: 5px;
 }
 
-.activity header button,
-.activity header span {
+.activity header button {
   display: flex;
   align-items: center;
   height: 28px;
@@ -1275,18 +1329,10 @@
   background: var(--pro-selected);
 }
 
-.activity header span {
-  color: var(--pro-buy);
-}
-
-.activity header .fixture-badge {
-  color: var(--pro-accent);
-}
-
 .activity-head,
 .activity-row {
   display: grid;
-  grid-template-columns: 70px 52px 72px 46px 52px 82px 76px 72px minmax(70px, 1fr) 72px;
+  grid-template-columns: var(--activity-columns);
   align-items: center;
   height: 28px;
   padding: 0 8px;
@@ -1308,13 +1354,139 @@
   background: var(--pro-panel);
 }
 
-.activity-row span:nth-last-child(2) {
-  text-align: right;
+.activity-head span,
+.activity-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .activity-row span:last-child {
   color: var(--pro-text);
-  text-align: center;
+}
+
+.activity-table--positions .activity-row span:nth-child(2),
+.activity-table--orders .activity-row span:nth-child(3),
+.activity-table--fills .activity-row span:nth-child(3) {
+  font-weight: 700;
+}
+
+.activity-table--positions .activity-row span:nth-child(6),
+.activity-table--positions .activity-row span:last-child,
+.activity-table--orders .activity-row span:last-child {
+  color: var(--pro-buy);
+}
+
+.account-risk-view {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(300px, 0.85fr);
+  min-height: 171px;
+  background: var(--pro-canvas);
+}
+
+.account-summary,
+.risk-summary {
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.account-summary {
+  border-right: 1px solid var(--pro-subtle);
+}
+
+.account-summary-heading,
+.risk-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--pro-muted);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.fixture-badge {
+  padding: 3px 6px;
+  color: var(--pro-accent);
+  background: var(--pro-raised);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font-size: 8px;
+}
+
+.account-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--pro-subtle);
+  border: 1px solid var(--pro-subtle);
+}
+
+.account-metric {
+  display: grid;
+  min-width: 0;
+  min-height: 70px;
+  align-content: center;
+  padding: 8px;
+  gap: 6px;
+  background: var(--pro-panel);
+}
+
+.account-metric > span {
+  overflow: hidden;
+  color: var(--pro-muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-metric strong {
+  color: var(--pro-text);
+  font: 700 12px 'Roboto Mono', monospace;
+}
+
+.risk-summary-heading strong {
+  color: var(--pro-buy);
+  font: 700 9px 'Roboto Mono', monospace;
+}
+
+.risk-limits {
+  display: grid;
+  gap: 9px;
+}
+
+.risk-limit {
+  display: grid;
+  gap: 5px;
+}
+
+.risk-limit > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--pro-muted);
+  font-size: 9px;
+}
+
+.risk-limit > div strong {
+  color: var(--pro-text);
+  font-weight: 500;
+}
+
+.risk-meter {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: var(--pro-raised);
+  border-radius: 4px;
+}
+
+.risk-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--pro-buy);
+  border-radius: inherit;
 }
 
 .terminal-footer {
@@ -1370,7 +1542,7 @@
   }
 
   .dom-row,
-  .tape button {
+  .tape-row {
     animation: none !important;
   }
 }

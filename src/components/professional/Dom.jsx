@@ -91,29 +91,25 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
 
   return (
     <section
+      aria-label="Depth of Market"
       className="dom"
       data-groups-applied={orderbook.groupsApplied}
       data-price-grouping={priceGrouping}
       ref={domRef}
     >
       <header>
-        <strong>DOM</strong>
-        <div className="dom-header-meta">
-          <span>
-            BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}
-          </span>
-          <button
-            aria-controls="dom-settings-panel"
-            aria-expanded={settingsOpen}
-            aria-label="DOM settings"
-            className="dom-settings-button"
-            onClick={() => setSettingsOpen((current) => !current)}
-            title="DOM settings"
-            type="button"
-          >
-            <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
-          </button>
-        </div>
+        <span>BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}</span>
+        <button
+          aria-controls="dom-settings-panel"
+          aria-expanded={settingsOpen}
+          aria-label="DOM settings"
+          className="dom-settings-button"
+          onClick={() => setSettingsOpen((current) => !current)}
+          title="DOM settings"
+          type="button"
+        >
+          <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
+        </button>
       </header>
       {settingsOpen && (
         <aside

@@ -49,10 +49,7 @@ export default function OrderTicket({ price, setPrice }) {
   }
 
   return (
-    <section className="ticket">
-      <header>
-        <strong>EXECUTION</strong>
-      </header>
+    <section aria-label="Order ticket" className="ticket">
       <div className="side-tabs">
         <button
           className={side === 'buy' ? 'active buy' : ''}

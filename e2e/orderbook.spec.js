@@ -114,7 +114,7 @@ test.describe('Professional historical order flow', () => {
 
     await grouping.selectOption('0.1')
     await expect(page.locator('.dom')).toHaveAttribute('data-price-grouping', '0.1')
-    await expect(page.locator('.dom-header-meta')).toContainText('BTC · 0.10 · x10')
+    await expect(page.locator('.dom > header')).toContainText('BTC · 0.10 · x10')
 
     const groupedRows = await page
       .locator('.dom-row')
@@ -141,11 +141,11 @@ test.describe('Professional historical order flow', () => {
   test('keeps DOM, Time and Sales and chart on the shared historical clock', async ({ page }) => {
     const countdown = page.locator('.current-price-countdown')
     const countdownBefore = await countdown.textContent()
-    const firstTradeBefore = await page.locator('.tape button').first().textContent()
+    const firstTradeBefore = await page.locator('.tape > button').first().textContent()
     const groupsBefore = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
 
     await expect(countdown).not.toHaveText(countdownBefore)
-    await expect(page.locator('.tape button').first()).not.toHaveText(firstTradeBefore, {
+    await expect(page.locator('.tape > button').first()).not.toHaveText(firstTradeBefore, {
       timeout: 10_000
     })
     await expect
@@ -153,6 +153,26 @@ test.describe('Professional historical order flow', () => {
         timeout: 10_000
       })
       .toBeGreaterThan(groupsBefore)
+  })
+
+  test('filters Time and Sales by aggressor from its settings', async ({ page }) => {
+    const tape = page.locator('.tape')
+    const settingsButton = page.getByRole('button', { name: 'Time and Sales settings' })
+
+    await expect(tape.locator(':scope > header')).toContainText('BTC · Showing all')
+    await settingsButton.click()
+
+    const settings = page.getByRole('dialog', { name: 'Time and Sales settings' })
+    await expect(settings).toBeVisible()
+    await page.getByRole('radio', { name: 'Buys only' }).check()
+    await expect(tape.locator(':scope > header')).toContainText('BTC · Showing buys')
+    await expect(tape.locator(':scope > button.buy')).not.toHaveCount(0)
+    await expect(tape.locator(':scope > button.sell')).toHaveCount(0)
+
+    await page.getByRole('radio', { name: 'Sells only' }).check()
+    await expect(tape.locator(':scope > header')).toContainText('BTC · Showing sells')
+    await expect(tape.locator(':scope > button.sell')).not.toHaveCount(0)
+    await expect(tape.locator(':scope > button.buy')).toHaveCount(0)
   })
 
   test('aggregates the retained five-minute market bars into selectable intervals', async ({

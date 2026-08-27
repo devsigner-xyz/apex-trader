@@ -51,37 +51,63 @@ export const fixtureMarkets = [
   ['IOTAUSDT', '0.2051', '0.2050', '0.2052', '-0.38%', '12M']
 ]
 
+export const activityTables = {
+  POSITIONS: {
+    columns: ['SYMBOL', 'SIDE', 'QTY', 'ENTRY', 'MARK', 'UPL', 'OPENED', 'ACTION'],
+    grid: '1.1fr 0.7fr 0.7fr 1fr 1fr 0.85fr 0.9fr 0.85fr',
+    rows: [
+      ['BTCUSDT', 'BUY', '0.25', '7,366.42', '7,391.62', '+$6.30', '02:17:06', 'CLOSE'],
+      ['BTCUSDT', 'SELL', '0.10', '7,405.00', '7,391.62', '+$1.34', '01:48:03', 'CLOSE']
+    ]
+  },
+  ORDERS: {
+    columns: ['TIME', 'SYMBOL', 'SIDE', 'TYPE', 'QTY', 'LIMIT / TRIGGER', 'TIF', 'STATUS', 'ACTION'],
+    grid: '0.85fr 1fr 0.65fr 0.85fr 0.65fr 1.35fr 0.6fr 0.95fr 0.85fr',
+    rows: [
+      ['04:02:18', 'BTCUSDT', 'BUY', 'LIMIT', '0.25', '7,380.50', 'GTC', 'WORKING', 'CANCEL'],
+      ['03:58:40', 'BTCUSDT', 'SELL', 'STOP', '0.25', '7,350.00', 'GTC', 'WORKING', 'CANCEL'],
+      ['02:17:06', 'BTCUSDT', 'SELL', 'LIMIT', '0.10', '7,412.18', 'GTC', 'FILLED', 'DETAILS'],
+      ['01:48:03', 'BTCUSDT', 'BUY', 'STOP', '0.10', '7,405.00', 'GTC', 'CANCELLED', 'DETAILS']
+    ]
+  },
+  FILLS: {
+    columns: ['TIME', 'SYMBOL', 'SIDE', 'QTY', 'FILL PRICE', 'FEE', 'LIQUIDITY', 'ORDER ID'],
+    grid: '0.9fr 1fr 0.7fr 0.7fr 1fr 0.75fr 0.9fr 1fr',
+    rows: [
+      ['03:42:11', 'BTCUSDT', 'BUY', '0.25', '7,366.42', '$0.31', 'TAKER', 'MKT-1042'],
+      ['02:17:06', 'BTCUSDT', 'SELL', '0.10', '7,412.18', '$0.18', 'MAKER', 'LMT-1038'],
+      ['01:22:14', 'BTCUSDT', 'BUY', '0.15', '7,398.24', '$0.26', 'MAKER', 'LMT-1029']
+    ]
+  },
+  ACTIVITY: {
+    columns: ['TIME', 'EVENT', 'DETAIL', 'STATUS', 'ACCOUNT'],
+    grid: '0.75fr 0.8fr minmax(240px, 3fr) 0.9fr 0.9fr',
+    rows: [
+      ['04:02:18', 'ORDER', 'Limit buy 0.25 BTCUSDT @ 7,380.50', 'ACCEPTED', 'DEMO-001'],
+      ['03:58:40', 'RISK', 'Stop sell checked against session limits', 'VALIDATED', 'DEMO-001'],
+      ['03:42:11', 'FILL', 'Market buy 0.25 BTCUSDT @ 7,366.42', 'COMPLETE', 'DEMO-001']
+    ]
+  }
+}
+
 export const activityTabs = [
-  ['POSITIONS', 'POSITIONS  2'],
-  ['ORDERS', 'ORDERS  4'],
-  ['FILLS', 'FILLS  12'],
+  ['POSITIONS', `POSITIONS  ${activityTables.POSITIONS.rows.length}`],
+  ['ORDERS', `ORDERS  ${activityTables.ORDERS.rows.length}`],
+  ['FILLS', `FILLS  ${activityTables.FILLS.rows.length}`],
   ['ACTIVITY', 'ACTIVITY'],
   ['ACCOUNT & RISK', 'ACCOUNT & RISK']
 ]
 
-export const activityRows = {
-  POSITIONS: [
-    ['02:17:06', 'POSITION', 'BTCUSDT', 'BUY', '0.25', '7,366.42', 'OPEN', '+$6.30', 'DEMO', 'CLOSE'],
-    ['01:48:03', 'POSITION', 'BTCUSDT', 'SELL', '0.10', '7,405.00', 'OPEN', '+$4.58', 'DEMO', 'CLOSE']
-  ],
-  ORDERS: [
-    ['04:02:18', 'LIMIT', 'BTCUSDT', 'BUY', '0.25', '7,380.50', 'WORKING', '—', 'DEMO', 'CANCEL'],
-    ['03:58:40', 'STOP', 'BTCUSDT', 'SELL', '0.25', '7,350.00', 'WORKING', '—', 'DEMO', 'CANCEL'],
-    ['02:17:06', 'LIMIT', 'BTCUSDT', 'SELL', '0.10', '7,412.18', 'FILLED', '+$4.58', 'DEMO', 'DETAILS'],
-    ['01:48:03', 'STOP', 'BTCUSDT', 'BUY', '0.10', '7,405.00', 'CANCELLED', '—', 'DEMO', 'DETAILS']
-  ],
-  FILLS: [
-    ['03:42:11', 'MARKET', 'BTCUSDT', 'BUY', '0.25', '7,366.42', 'FILLED', '+$6.30', 'DEMO', 'DETAILS'],
-    ['02:17:06', 'LIMIT', 'BTCUSDT', 'SELL', '0.10', '7,412.18', 'FILLED', '+$4.58', 'DEMO', 'DETAILS'],
-    ['01:22:14', 'LIMIT', 'BTCUSDT', 'BUY', '0.15', '7,398.24', 'FILLED', '+$7.54', 'DEMO', 'DETAILS']
-  ],
-  ACTIVITY: [
-    ['04:02:18', 'ORDER', 'BTCUSDT', 'BUY', '0.25', '7,380.50', 'ACCEPTED', '—', 'DEMO', 'DETAILS'],
-    ['03:58:40', 'RISK', 'BTCUSDT', 'SELL', '0.25', '7,350.00', 'VALIDATED', '—', 'DEMO', 'DETAILS'],
-    ['03:42:11', 'FILL', 'BTCUSDT', 'BUY', '0.25', '7,366.42', 'COMPLETE', '+$6.30', 'DEMO', 'DETAILS']
-  ],
-  'ACCOUNT & RISK': [
-    ['SESSION', 'RISK', 'BTCUSDT', '—', '0.50', '—', 'WITHIN LIMITS', '+$18.42', 'DEMO', 'DETAILS'],
-    ['SESSION', 'FEES', 'BTCUSDT', '—', '—', '$0.75', 'ESTIMATED', '—', 'DEMO', 'DETAILS']
-  ]
-}
+export const accountSummary = [
+  { label: 'Unrealized P&L', tone: 'positive', value: '+$7.64' },
+  { label: 'Realized P&L', tone: 'positive', value: '+$18.42' },
+  { label: 'Estimated fees', value: '$0.75' },
+  { label: 'Open positions', value: '2' },
+  { label: 'Working orders', value: '2' }
+]
+
+export const riskLimits = [
+  { label: 'Daily loss', detail: '$0.00 / $500', usage: 0 },
+  { label: 'Gross position', detail: '0.35 / 1.00 BTC', usage: 35 },
+  { label: 'Working orders', detail: '2 / 10', usage: 20 }
+]

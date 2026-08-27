@@ -1,22 +1,88 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Settings as SettingsIcon } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { formatClock as clock, formatNumber as fmt } from '../formatters.js'
 
+const tradeFilters = [
+  { id: 'all', label: 'All trades', summary: 'Showing all' },
+  { id: 'buy', label: 'Buys only', summary: 'Showing buys' },
+  { id: 'sell', label: 'Sells only', summary: 'Showing sells' }
+]
+
 export default function TimeSales({ trades }) {
+  const [filter, setFilter] = useState('all')
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const tapeRef = useRef(null)
+  const selectedFilter = tradeFilters.find(({ id }) => id === filter)
+  const visibleTrades = useMemo(
+    () => trades.filter((trade) => filter === 'all' || trade.side === filter).slice(0, 20),
+    [filter, trades]
+  )
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined
+    const close = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return
+      if (event.type === 'pointerdown' && tapeRef.current?.contains(event.target)) return
+      setSettingsOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    window.addEventListener('pointerdown', close)
+    return () => {
+      window.removeEventListener('keydown', close)
+      window.removeEventListener('pointerdown', close)
+    }
+  }, [settingsOpen])
+
   return (
-    <section className="tape">
+    <section aria-label="Time and Sales" className="tape" ref={tapeRef}>
       <header>
-        <strong>TIME &amp; SALES</strong>
-        <span>BTC · HIST</span>
+        <span>BTC · {selectedFilter.summary}</span>
+        <button
+          aria-controls="tape-settings-panel"
+          aria-expanded={settingsOpen}
+          aria-label="Time and Sales settings"
+          className="tape-settings-button"
+          onClick={() => setSettingsOpen((current) => !current)}
+          title="Time and Sales settings"
+          type="button"
+        >
+          <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
+        </button>
       </header>
+      {settingsOpen && (
+        <aside
+          aria-label="Time and Sales settings"
+          className="tape-settings-popover"
+          id="tape-settings-panel"
+          role="dialog"
+        >
+          <strong>SHOW TRADES</strong>
+          <div className="tape-filter-options">
+            {tradeFilters.map(({ id, label }) => (
+              <label key={id}>
+                <input
+                  checked={filter === id}
+                  name="time-sales-filter"
+                  onChange={() => setFilter(id)}
+                  type="radio"
+                  value={id}
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </aside>
+      )}
       <div className="tape-head">
         <span>TIME</span>
         <span>PRICE</span>
         <span>SIZE</span>
       </div>
-      {trades.slice(0, 20).map((trade, index) => (
+      {visibleTrades.map((trade, index) => (
         <button
           aria-label={`${trade.side} trade at ${fmt(trade.price)} for ${fmt(trade.amount, 4)}`}
-          className={trade.side}
+          className={`tape-row ${trade.side}`}
           key={`${trade.timestamp}-${index}`}
           type="button"
         >

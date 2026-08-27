@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { activityRows, activityTabs } from './fixtures.js'
+import { accountSummary, activityTables, activityTabs, riskLimits } from './fixtures.js'
 import { activityTabId } from './formatters.js'
 
 export default function Activity() {
   const [tab, setTab] = useState('POSITIONS')
-  const rows = activityRows[tab]
+  const table = activityTables[tab]
   return (
     <section aria-label="Orders and positions" className="activity">
       <header>
@@ -23,12 +23,6 @@ export default function Activity() {
             </button>
           ))}
         </div>
-        <div>
-          <span className="fixture-badge">DEMO DATA</span>
-          <span>UPL +$6.30</span>
-          <span>RPL +$18.42</span>
-          <span>FEES $0.75</span>
-        </div>
       </header>
       <div
         aria-labelledby={activityTabId(tab)}
@@ -36,31 +30,73 @@ export default function Activity() {
         id="activity-panel"
         role="tabpanel"
       >
-        <div className="activity-head">
-          {[
-            'TIME',
-            'TYPE',
-            'SYMBOL',
-            'SIDE',
-            'QTY',
-            'PRICE',
-            'STATUS',
-            'PNL',
-            'ACCOUNT',
-            'ACTION'
-          ].map((label) => (
-            <span key={label}>{label}</span>
-          ))}
-        </div>
-        {rows.map((row, index) => (
-          <div className="activity-row" key={`${tab}-${index}`}>
-            {row.map((cell, cellIndex) => (
-              <span className={cell.startsWith('+') ? 'positive' : ''} key={cellIndex}>
-                {cell}
-              </span>
+        {tab === 'ACCOUNT & RISK' ? (
+          <div className="account-risk-view">
+            <div className="account-summary">
+              <div className="account-summary-heading">
+                <span>DEMO-001</span>
+                <span className="fixture-badge">SIMULATED ACCOUNT</span>
+              </div>
+              <div className="account-metrics">
+                {accountSummary.map(({ label, tone, value }) => (
+                  <div className="account-metric" key={label}>
+                    <span>{label}</span>
+                    <strong className={tone ?? ''}>{value}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="risk-summary">
+              <div className="risk-summary-heading">
+                <span>SESSION RISK</span>
+                <strong>WITHIN LIMITS</strong>
+              </div>
+              <div className="risk-limits">
+                {riskLimits.map(({ detail, label, usage }) => (
+                  <div className="risk-limit" key={label}>
+                    <div>
+                      <span>{label}</span>
+                      <strong>{detail}</strong>
+                    </div>
+                    <span aria-label={`${label} ${usage}% used`} className="risk-meter">
+                      <span style={{ width: `${usage}%` }} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className={`activity-table activity-table--${tab.toLowerCase()}`}>
+            <div className="activity-head" style={{ '--activity-columns': table.grid }}>
+              {table.columns.map((label) => (
+                <span key={label}>{label}</span>
+              ))}
+            </div>
+            {table.rows.map((row, index) => (
+              <div
+                className="activity-row"
+                key={`${tab}-${index}`}
+                style={{ '--activity-columns': table.grid }}
+              >
+                {row.map((cell, cellIndex) => (
+                  <span
+                    className={
+                      cell.startsWith('+') || cell === 'BUY'
+                        ? 'positive'
+                        : cell === 'SELL'
+                          ? 'negative'
+                          : ''
+                    }
+                    key={cellIndex}
+                  >
+                    {cell}
+                  </span>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
+        )}
       </div>
     </section>
   )

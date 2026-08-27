@@ -40,8 +40,18 @@ export default function Watchlist() {
 
   return (
     <section className="pro-watchlist" aria-label="Markets" ref={watchlistRef}>
-      <header>
-        <strong>MARKETS</strong>
+      <div className="markets-toolbar">
+        <label className="markets-search">
+          <SearchIcon aria-hidden="true" size={15} strokeWidth={2} />
+          <input
+            aria-label="Search markets"
+            onChange={(event) => setMarketQuery(event.target.value)}
+            placeholder="Search symbol"
+            spellCheck="false"
+            type="search"
+            value={marketQuery}
+          />
+        </label>
         <button
           aria-controls="markets-settings-panel"
           aria-expanded={settingsOpen}
@@ -53,18 +63,7 @@ export default function Watchlist() {
         >
           <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
         </button>
-      </header>
-      <label className="markets-search">
-        <SearchIcon aria-hidden="true" size={15} strokeWidth={2} />
-        <input
-          aria-label="Search markets"
-          onChange={(event) => setMarketQuery(event.target.value)}
-          placeholder="Search symbol"
-          spellCheck="false"
-          type="search"
-          value={marketQuery}
-        />
-      </label>
+      </div>
       <div className="watch-head" style={{ gridTemplateColumns }}>
         {visibleColumns.map(({ id, label }) => (
           <span className={`watch-cell watch-cell--${id}`} key={id}>

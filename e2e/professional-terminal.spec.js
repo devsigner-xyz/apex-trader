@@ -19,8 +19,9 @@ for (const [route, mode] of views) {
     await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
     await expect(page.getByLabel(`${mode} historical chart`)).toBeVisible()
     await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
-    await expect(page.getByText('DOM', { exact: true })).toBeVisible()
-    await expect(page.getByText('TIME & SALES')).toBeVisible()
+    await expect(page.getByText('DOM', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('TIME & SALES')).toHaveCount(0)
+    await expect(page.getByText('EXECUTION', { exact: true })).toHaveCount(0)
     await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
     const activity = page.getByLabel('Orders and positions')
     const footer = page.locator('.terminal-footer')
@@ -33,7 +34,6 @@ for (const [route, mode] of views) {
     const execution = page.locator('.execution')
     const tape = execution.locator('.tape')
     const domHeader = dom.locator('header')
-    const executionHeader = execution.locator('.ticket header')
     const tapeHeader = tape.locator(':scope > header')
     await expect(activity).toBeVisible()
     await expect(marketHeader).toContainText('APEX TRADER')
@@ -59,7 +59,6 @@ for (const [route, mode] of views) {
     const domBox = await dom.boundingBox()
     const executionBox = await execution.boundingBox()
     const domHeaderBox = await domHeader.boundingBox()
-    const executionHeaderBox = await executionHeader.boundingBox()
     const tapeHeaderBox = await tapeHeader.boundingBox()
     expect(watchlistBox.y).toBeCloseTo(marketHeaderBox.y + marketHeaderBox.height, 0)
     expect(chartControlsBox.x).toBeGreaterThan(chartHeaderBox.x)
@@ -72,7 +71,10 @@ for (const [route, mode] of views) {
     expect(executionBox.y).toBeCloseTo(chartStackBox.y, 0)
     expect(tapeHeaderBox.height).toBe(44)
     expect(tapeHeaderBox.height).toBe(domHeaderBox.height)
-    expect(tapeHeaderBox.height).toBe(executionHeaderBox.height)
+    await expect(domHeader).toContainText(/BTC · 0\.01 · x1/)
+    await expect(tapeHeader).toContainText('BTC · Showing all')
+    await expect(page.getByRole('button', { name: 'DOM settings' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Time and Sales settings' })).toBeVisible()
     await expect(tape.locator('.tape-head span')).toHaveText(['TIME', 'PRICE', 'SIZE'])
     await expect(tape.getByText('SIDE', { exact: true })).toHaveCount(0)
     await expect(tape.locator(':scope > button').first().locator('span')).toHaveCount(3)
@@ -80,7 +82,6 @@ for (const [route, mode] of views) {
       'aria-label',
       /(?:buy|sell) trade at/
     )
-    await expect(executionHeader).toHaveText('EXECUTION')
     await expect(page.getByText('SIM fixture · no order is transmitted')).toHaveCount(0)
     expect(activityBox.height).toBeGreaterThanOrEqual(200)
     expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(footerBox.y)
@@ -280,7 +281,7 @@ test('Markets columns can be configured while required columns remain visible', 
   const markets = page.getByLabel('Markets', { exact: true })
   const selectedRow = markets.locator('button.selected')
 
-  await expect(markets.getByText('MARKETS', { exact: true })).toBeVisible()
+  await expect(markets.getByText('MARKETS', { exact: true })).toHaveCount(0)
   await expect(page.getByLabel('Watchlist category')).toHaveCount(0)
   await page.getByRole('button', { name: 'Markets settings' }).click()
 
@@ -347,12 +348,14 @@ test('Markets can be filtered and its rows scroll independently', async ({ page 
   await expect(rows).toHaveCount(50)
   await expect(search).toHaveAttribute('placeholder', 'Search symbol')
 
-  const [panelHeaderBox, searchBox, columnHeaderBox] = await Promise.all([
-    markets.locator(':scope > header').boundingBox(),
+  const [toolbarBox, searchBox, settingsBox, columnHeaderBox] = await Promise.all([
+    markets.locator('.markets-toolbar').boundingBox(),
     search.boundingBox(),
+    page.getByRole('button', { name: 'Markets settings' }).boundingBox(),
     columnHeader.boundingBox()
   ])
-  expect(searchBox.y).toBeGreaterThanOrEqual(panelHeaderBox.y + panelHeaderBox.height)
+  expect(searchBox.y).toBeGreaterThanOrEqual(toolbarBox.y)
+  expect(settingsBox.x).toBeGreaterThan(searchBox.x + searchBox.width)
   expect(columnHeaderBox.y).toBeGreaterThanOrEqual(searchBox.y + searchBox.height)
 
   await search.fill('ltc')
@@ -623,15 +626,52 @@ test('historical synchronization, settings and keyboard controls remain coherent
   expect(retainedDomRowIdentity).toBe(true)
 
   const activityPanel = page.getByRole('tabpanel')
+  await expect(activityPanel.locator('.activity-head span')).toHaveText([
+    'SYMBOL',
+    'SIDE',
+    'QTY',
+    'ENTRY',
+    'MARK',
+    'UPL',
+    'OPENED',
+    'ACTION'
+  ])
   await expect(activityPanel.locator('.activity-row')).toHaveCount(2)
   await page.getByRole('tab', { name: /ORDERS/ }).click()
   await expect(activityPanel).toContainText('WORKING')
+  await expect(activityPanel.locator('.activity-head span')).toHaveText([
+    'TIME',
+    'SYMBOL',
+    'SIDE',
+    'TYPE',
+    'QTY',
+    'LIMIT / TRIGGER',
+    'TIF',
+    'STATUS',
+    'ACTION'
+  ])
   await expect(activityPanel.locator('.activity-row')).toHaveCount(4)
   await page.getByRole('tab', { name: /FILLS/ }).click()
-  await expect(activityPanel).toContainText('FILLED')
+  await expect(activityPanel).toContainText('LIQUIDITY')
+  await expect(activityPanel).toContainText('MAKER')
   await expect(activityPanel.locator('.activity-row')).toHaveCount(3)
+  await page.getByRole('tab', { name: 'ACTIVITY' }).click()
+  await expect(activityPanel.locator('.activity-head span')).toHaveText([
+    'TIME',
+    'EVENT',
+    'DETAIL',
+    'STATUS',
+    'ACCOUNT'
+  ])
   await page.getByRole('tab', { name: 'ACCOUNT & RISK' }).click()
   await expect(activityPanel).toContainText('WITHIN LIMITS')
+  await expect(activityPanel).toContainText('SIMULATED ACCOUNT')
+  await expect(activityPanel).toContainText('Unrealized P&L')
+  await expect(activityPanel.locator('.activity-head')).toHaveCount(0)
+  await page.screenshot({
+    fullPage: false,
+    path: 'output/playwright/account-risk-summary-1920x1080.png'
+  })
 
   const orderType = page.getByLabel('Order type')
   await expect(page.getByLabel('Limit price', { exact: true })).toBeVisible()
