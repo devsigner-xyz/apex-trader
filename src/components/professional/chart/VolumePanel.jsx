@@ -10,6 +10,7 @@ const plotWidth = plotRight - plotLeft
 export default function VolumePanel({
   bars,
   centers,
+  crosshairX,
   maximumVolume,
   setPanelSizes,
   timeIndexes,
@@ -76,6 +77,16 @@ export default function VolumePanel({
                 />
               )
             })}
+            {Number.isFinite(crosshairX) && (
+              <line
+                aria-hidden="true"
+                className="chart-crosshair-line chart-crosshair-line--vertical"
+                x1={crosshairX}
+                x2={crosshairX}
+                y1="0"
+                y2={volumeChartHeight}
+              />
+            )}
           </g>
         </svg>
       </div>

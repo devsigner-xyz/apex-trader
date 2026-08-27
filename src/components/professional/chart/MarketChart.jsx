@@ -75,6 +75,7 @@ export default function MarketChart({
   )
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null)
+  const [crosshair, setCrosshair] = useState(null)
   const chartRef = useRef(null)
   const priceChartRef = useRef(null)
   const bars = useMemo(
@@ -123,10 +124,10 @@ export default function MarketChart({
     timeframe
   })
 
-  useEffect(
-    () => setHoveredBarIndex(null),
-    [logicalEnd, logicalStart, mode, timeframe, visibleCount]
-  )
+  useEffect(() => {
+    setHoveredBarIndex(null)
+    setCrosshair(null)
+  }, [logicalEnd, logicalStart, mode, timeframe, visibleCount])
 
   useEffect(() => {
     const chart = priceChartRef.current
@@ -214,6 +215,13 @@ export default function MarketChart({
     handlePointerMove(event)
     const bounds = event.currentTarget.getBoundingClientRect()
     const chartX = ((event.clientX - bounds.left) / bounds.width) * chartWidth
+    const chartY = ((event.clientY - bounds.top) / bounds.height) * priceChartHeight
+    const insidePricePlot =
+      chartX >= plotLeft &&
+      chartX <= plotRight &&
+      chartY >= mainTop &&
+      chartY <= mainBottom
+    setCrosshair(insidePricePlot ? { x: chartX, y: chartY } : null)
     setHoveredBarIndex(
       findTimeScaleBarIndex({
         barCount: bars.length,
@@ -228,6 +236,7 @@ export default function MarketChart({
   }
   const handleChartPointerCancel = (event) => {
     setHoveredBarIndex(null)
+    setCrosshair(null)
     stopDragging(event)
   }
   const summaryBar = bars[hoveredBarIndex] ?? current
@@ -342,7 +351,7 @@ export default function MarketChart({
       >
         <div className="price-chart-panel">
           <svg
-            aria-description="Move the pointer over a bar to inspect its OHLC, delta and volume. Hold the primary pointer button and drag to pan continuously. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
+            aria-description="Move the pointer over the price plot to show a dotted crosshair and inspect the bar OHLC, delta and volume. The vertical guide continues through the volume panel when visible. Hold the primary pointer button and drag to pan continuously. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
             className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}
@@ -357,7 +366,10 @@ export default function MarketChart({
             onKeyDown={handleChartKeyDown}
             onPointerCancel={handleChartPointerCancel}
             onPointerDown={handlePointerDown}
-            onPointerLeave={() => setHoveredBarIndex(null)}
+            onPointerLeave={() => {
+              setHoveredBarIndex(null)
+              setCrosshair(null)
+            }}
             onPointerMove={handleChartPointerMove}
             onPointerUp={stopDragging}
             preserveAspectRatio="none"
@@ -535,6 +547,25 @@ export default function MarketChart({
               </text>
             ))}
 
+            {crosshair && (
+              <g aria-hidden="true" className="chart-crosshair" pointerEvents="none">
+                <line
+                  className="chart-crosshair-line chart-crosshair-line--vertical"
+                  x1={crosshair.x}
+                  x2={crosshair.x}
+                  y1={mainTop}
+                  y2={priceChartHeight}
+                />
+                <line
+                  className="chart-crosshair-line chart-crosshair-line--horizontal"
+                  x1={plotLeft}
+                  x2={plotRight}
+                  y1={crosshair.y}
+                  y2={crosshair.y}
+                />
+              </g>
+            )}
+
             <rect
               aria-hidden="true"
               className="chart-pan-surface"
@@ -576,6 +607,7 @@ export default function MarketChart({
             bars={renderBars}
             centers={chartSlots.positions}
             maximumVolume={maximumVisibleVolume}
+            crosshairX={crosshair?.x ?? null}
             setPanelSizes={setPanelSizes}
             timeIndexes={timeIndexes}
             width={volumeWidth}

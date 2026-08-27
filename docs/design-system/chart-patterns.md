@@ -39,6 +39,7 @@ La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfil
 ## Densidad temporal e interacción
 
 - El cursor en reposo es neutral; la mano cerrada aparece únicamente durante pan con click principal mantenido.
+- El hover dentro del plot muestra un crosshair neutral de 1 px, punteado y con mayor contraste que VAH/POC/VAL. La guía horizontal se limita al área de precio y la vertical continúa por el panel de volumen cuando está visible.
 - El viewport admite offsets temporales fraccionales y recorta barras parciales en los bordes del plot.
 - Una barra participa en cálculos visibles cuando su centro temporal cae dentro del plot. Las barras buffer parcialmente dibujadas cuyo centro queda fuera son solo presentación.
 - Los ticks temporales se reducen dinámicamente según el ancho disponible y nunca se apoyan en un conteo fijo que pueda provocar solapamientos.

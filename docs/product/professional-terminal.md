@@ -29,6 +29,7 @@ El significado visual y de datos de cada modo se define en [Chart patterns](../d
 ### Interacción y viewport temporal
 
 - Mover el puntero sobre una barra actualiza la toolbar con su `O`, `H`, `L`, `C`, `Δ` y `V`; al abandonar el gráfico vuelve a mostrar la barra actual del replay.
+- Dentro del plot de precio, el puntero muestra guías horizontal y vertical punteadas. La horizontal no invade la escala de precio y la vertical conserva la misma coordenada temporal en el panel de volumen cuando este está visible.
 - El puntero en reposo no muestra la mano. El pan se activa solo con el botón principal pulsado y conserva `grabbing` hasta `pointerup` o cancelación.
 - El desplazamiento horizontal usa un offset lógico fraccional y se renderiza de forma continua. Una barra puede quedar parcialmente visible en cualquiera de los bordes sin saltar a intervalos enteros.
 - El cálculo analítico incluye una barra cuando su centro temporal está dentro del plot. Las barras buffer recortadas fuera de ese criterio sirven únicamente para continuidad visual y no alteran profile, POC, VAH o VAL.

@@ -567,6 +567,41 @@ test('candle hover updates OHLC data and leaving restores the latest summary', a
     .toBe(true)
 })
 
+test('chart hover shows a dotted crosshair aligned through the volume panel', async ({ page }) => {
+  await page.setViewportSize({ height: 1080, width: 1920 })
+  await page.goto('/price-chart')
+  const chart = page.getByLabel('candles historical chart')
+  const volumePanel = page.getByRole('img', { name: 'Volume panel', exact: true })
+  const bounds = await chart.boundingBox()
+
+  await expect(chart.locator('.chart-crosshair-line')).toHaveCount(0)
+  await page.mouse.move(bounds.x + bounds.width * 0.45, bounds.y + bounds.height * 0.45)
+
+  const priceVertical = chart.locator('.chart-crosshair-line--vertical')
+  const priceHorizontal = chart.locator('.chart-crosshair-line--horizontal')
+  const volumeVertical = volumePanel.locator('.chart-crosshair-line--vertical')
+  await expect(priceVertical).toHaveCount(1)
+  await expect(priceHorizontal).toHaveCount(1)
+  await expect(volumeVertical).toHaveCount(1)
+  expect(await volumeVertical.getAttribute('x1')).toBe(await priceVertical.getAttribute('x1'))
+
+  const opacities = await chart.evaluate((node) => ({
+    crosshair: Number(getComputedStyle(node.querySelector('.chart-crosshair-line')).opacity),
+    poc: Number(getComputedStyle(node.querySelector('.poc-line')).opacity),
+    valueArea: Number(getComputedStyle(node.querySelector('.value-line')).opacity)
+  }))
+  expect(opacities.crosshair).toBeGreaterThan(opacities.poc)
+  expect(opacities.crosshair).toBeGreaterThan(opacities.valueArea)
+  await page.screenshot({
+    fullPage: false,
+    path: 'output/playwright/chart-crosshair-volume-1920x1080.png'
+  })
+
+  await page.mouse.move(0, 0)
+  await expect(chart.locator('.chart-crosshair-line')).toHaveCount(0)
+  await expect(volumePanel.locator('.chart-crosshair-line')).toHaveCount(0)
+})
+
 test('chart stays still on hover and pans continuously while the pointer is held', async ({
   page
 }) => {
