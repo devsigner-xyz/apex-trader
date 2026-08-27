@@ -119,7 +119,7 @@ for (const [route, mode] of views) {
     await expect(page.locator('.chart-summary > span')).toHaveCount(1)
     await expect(page.locator('.chart-summary')).toContainText(/O .* H .* L .* C .* Δ .* V /)
     await expect(page.getByText(/VOLUME · ALIGNED TO PRICE BARS/i)).toHaveCount(0)
-    await expect(page.getByText('SESSION VOLUME PROFILE', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('VISIBLE RANGE VOLUME PROFILE', { exact: true })).toHaveCount(0)
     await expect(page.locator('.quiet')).toHaveCount(0)
     await expect(
       page.getByRole('button', { name: 'Reserve space for volume profile' })
@@ -132,7 +132,7 @@ for (const [route, mode] of views) {
       .getByRole('img', { name: 'Volume panel', exact: true })
       .boundingBox()
     const profilePanelBox = await page
-      .getByRole('img', { name: 'Session volume profile overlay', exact: true })
+      .getByRole('img', { name: 'Visible range volume profile overlay', exact: true })
       .boundingBox()
     expect(profilePanelBox.x).toBeGreaterThanOrEqual(pricePanelBox.x)
     expect(profilePanelBox.x + profilePanelBox.width).toBeLessThanOrEqual(
@@ -424,6 +424,13 @@ test('time-axis wheel zoom anchors the latest candle and chart drag reveals hist
   const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
   const initialWindowEnd = await chart.getAttribute('data-window-end')
   const chartBounds = await chart.boundingBox()
+  const readVisibleProfile = () =>
+    chart.evaluate((node) => [
+      node.dataset.profilePoc,
+      node.dataset.profileVah,
+      node.dataset.profileVal
+    ])
+  const initialProfile = await readVisibleProfile()
 
   await page.mouse.move(
     chartBounds.x + chartBounds.width * 0.25,
@@ -436,8 +443,10 @@ test('time-axis wheel zoom anchors the latest candle and chart drag reveals hist
   await expect(chart).toHaveAttribute('data-window-end', initialWindowEnd)
   await expect(chart).toHaveAttribute('data-right-offset', '0')
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
+  await expect.poll(readVisibleProfile).not.toEqual(initialProfile)
 
   const zoomedWindowEnd = Number(await chart.getAttribute('data-window-end'))
+  const zoomedProfile = await readVisibleProfile()
   await page.mouse.move(
     chartBounds.x + chartBounds.width * 0.5,
     chartBounds.y + chartBounds.height * 0.5
@@ -453,6 +462,7 @@ test('time-axis wheel zoom anchors the latest candle and chart drag reveals hist
     .poll(async () => Number(await chart.getAttribute('data-window-end')))
     .toBeLessThan(zoomedWindowEnd)
   await expect(chart).toHaveAttribute('data-follow-latest', 'false')
+  await expect.poll(readVisibleProfile).not.toEqual(zoomedProfile)
 
   await page.mouse.move(
     chartBounds.x + chartBounds.width * 0.7,
@@ -707,13 +717,10 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
   await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(2)
   await expect(page.getByLabel('Timeframe')).toHaveValue('60')
-  await expect(page.getByLabel('Timeframe').locator('option')).toHaveText([
-    '1 hour',
-    '4 hours'
-  ])
+  await expect(page.getByLabel('Timeframe').locator('option')).toHaveText(['1 hour', '4 hours'])
 
   const profilePanel = page.getByRole('img', {
-    name: 'Session volume profile overlay',
+    name: 'Visible range volume profile overlay',
     exact: true
   })
   const volumePanel = page.getByRole('img', { name: 'Volume panel', exact: true })
@@ -726,9 +733,9 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByLabel('Resize session volume profile panel')).toHaveCount(0)
 
   await page.getByLabel('Chart settings').click()
-  await page.getByLabel('Show session volume profile').uncheck()
+  await page.getByLabel('Show visible range volume profile').uncheck()
   await expect(profilePanel).toHaveCount(0)
-  await page.getByLabel('Show session volume profile').check()
+  await page.getByLabel('Show visible range volume profile').check()
   await expect(profilePanel).toBeVisible()
 
   await page.getByLabel('Resize volume panel').focus()

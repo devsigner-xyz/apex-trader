@@ -4,6 +4,7 @@ import { gzipSync } from 'node:zlib'
 import {
   aggregateProfessionalBars,
   deriveProfessionalView,
+  deriveVolumeProfile,
   formatCandleCloseCountdown,
   loadPlaybackChunk,
   loadProfessionalSession,
@@ -184,6 +185,50 @@ test('higher timeframes aggregate real OHLC, volume, delta and footprint levels'
   assert.equal(bar.poc, 101)
   assert.equal(bar.val, 101)
   assert.equal(bar.vah, 102)
+  assert.deepEqual(deriveVolumeProfile([bar]), deriveVolumeProfile(bars))
+})
+
+test('volume profile derives POC and 70% value area only from the supplied visible bars', () => {
+  const bars = [
+    {
+      levels: [
+        { ask: 1, bid: 1, price: 100 },
+        { ask: 4, bid: 4, price: 101 }
+      ]
+    },
+    {
+      levels: [
+        { ask: 2, bid: 1, price: 101 },
+        { ask: 4, bid: 3, price: 102 },
+        { ask: 0.5, bid: 0.5, price: 103 }
+      ]
+    }
+  ]
+
+  assert.deepEqual(deriveVolumeProfile(bars), {
+    levels: [
+      { ask: 1, bid: 1, price: 100 },
+      { ask: 6, bid: 5, price: 101 },
+      { ask: 4, bid: 3, price: 102 },
+      { ask: 0.5, bid: 0.5, price: 103 }
+    ],
+    poc: 101,
+    vah: 102,
+    val: 101
+  })
+  assert.deepEqual(deriveVolumeProfile(bars.slice(0, 1)), {
+    levels: bars[0].levels,
+    poc: 101,
+    vah: 101,
+    val: 101
+  })
+  assert.deepEqual(deriveVolumeProfile(bars.slice(1)), {
+    levels: bars[1].levels,
+    poc: 102,
+    vah: 102,
+    val: 101
+  })
+  assert.deepEqual(deriveVolumeProfile([]), { levels: [], poc: null, vah: null, val: null })
 })
 
 test('unsupported timeframes fail instead of silently approximating market data', () => {

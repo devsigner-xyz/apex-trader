@@ -165,16 +165,30 @@ export function tradesThrough(chunk, timestamp, limit = 80) {
 }
 
 export function profileThrough(bars, endIndex) {
+  return deriveVolumeProfile(bars.slice(0, endIndex + 1)).levels
+}
+
+export function deriveVolumeProfile(bars) {
+  if (!Array.isArray(bars)) throw new TypeError('Volume profile bars must be an array.')
   const levels = new Map()
-  for (let index = 0; index <= endIndex; index += 1) {
-    for (const level of bars[index].levels) {
+  for (const bar of bars) {
+    for (const level of bar.levels ?? []) {
       const current = levels.get(level.price) ?? { ask: 0, bid: 0, price: level.price }
       current.ask += level.ask
       current.bid += level.bid
       levels.set(level.price, current)
     }
   }
-  return [...levels.values()].sort((a, b) => a.price - b.price)
+  const sortedLevels = [...levels.values()].sort((a, b) => a.price - b.price)
+  if (sortedLevels.length === 0) return { levels: sortedLevels, poc: null, vah: null, val: null }
+
+  const pocIndex = sortedLevels.reduce(
+    (best, level, index) =>
+      level.ask + level.bid > sortedLevels[best].ask + sortedLevels[best].bid ? index : best,
+    0
+  )
+  const { vah, val } = valueArea(sortedLevels, pocIndex)
+  return { levels: sortedLevels, poc: sortedLevels[pocIndex].price, vah, val }
 }
 
 function valueArea(levels, pocIndex) {
@@ -201,22 +215,7 @@ function valueArea(levels, pocIndex) {
 }
 
 function mergeBars(group, timestamp) {
-  const levelsByPrice = new Map()
-  for (const bar of group) {
-    for (const level of bar.levels) {
-      const current = levelsByPrice.get(level.price) ?? { ask: 0, bid: 0, price: level.price }
-      current.ask += level.ask
-      current.bid += level.bid
-      levelsByPrice.set(level.price, current)
-    }
-  }
-  const levels = [...levelsByPrice.values()].sort((a, b) => a.price - b.price)
-  const pocIndex = levels.reduce(
-    (best, level, index) =>
-      level.ask + level.bid > levels[best].ask + levels[best].bid ? index : best,
-    0
-  )
-  const { vah, val } = valueArea(levels, pocIndex)
+  const profile = deriveVolumeProfile(group)
   const latest = group.at(-1)
 
   return {
@@ -225,13 +224,13 @@ function mergeBars(group, timestamp) {
     cvd: latest.cvd,
     delta: group.reduce((sum, bar) => sum + bar.delta, 0),
     high: Math.max(...group.map((bar) => bar.high)),
-    levels,
+    levels: profile.levels,
     low: Math.min(...group.map((bar) => bar.low)),
     open: group[0].open,
-    poc: levels[pocIndex].price,
+    poc: profile.poc ?? latest.close,
     timestamp,
-    vah,
-    val,
+    vah: profile.vah ?? latest.close,
+    val: profile.val ?? latest.close,
     volume: group.reduce((sum, bar) => sum + bar.volume, 0),
     vwap: latest.vwap
   }
@@ -308,10 +307,12 @@ function partialBar(base, previous, rawTrades, timestamp, tickSize, priorVolume)
     numerator += price * amount
   }
   const sortedLevels = [...levels.values()].sort((a, b) => a.price - b.price)
-  const poc = sortedLevels.reduce(
-    (best, level) => (!best || level.ask + level.bid > best.ask + best.bid ? level : best),
-    null
-  )?.price
+  const pocIndex = sortedLevels.reduce(
+    (best, level, index) =>
+      level.ask + level.bid > sortedLevels[best].ask + sortedLevels[best].bid ? index : best,
+    0
+  )
+  const { vah, val } = valueArea(sortedLevels, pocIndex)
   const priorNumerator = previous ? previous.vwap * priorVolume : 0
   return {
     ...base,
@@ -322,9 +323,9 @@ function partialBar(base, previous, rawTrades, timestamp, tickSize, priorVolume)
     levels: sortedLevels,
     low,
     open: executions[0][2],
-    poc,
-    vah: high,
-    val: low,
+    poc: sortedLevels[pocIndex].price,
+    vah,
+    val,
     volume,
     vwap: (priorNumerator + numerator) / (priorVolume + volume)
   }

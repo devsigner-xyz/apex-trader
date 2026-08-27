@@ -20,6 +20,7 @@ import {
 } from '../../../services/professionalTerminalPersistence.js'
 import {
   aggregateProfessionalBars,
+  deriveVolumeProfile,
   formatCandleCloseCountdown
 } from '../../../services/proPlayback.js'
 import {
@@ -139,13 +140,16 @@ export default function MarketChart({
   const chartSlots = createTimeScale(visible.length, visibleCount, plotLeft, plotWidth)
   const step = chartSlots.step
   const x = (index) => chartSlots.positions[index]
-  const profile = buildSessionProfile(view.profile, low, high)
+  const visibleProfile = deriveVolumeProfile(visible)
+  const profile = buildSessionProfile(visibleProfile.levels, low, high)
   const maxProfile = Math.max(...profile.map((level) => level.ask + level.bid), 1)
-  const profileMarkers = [
-    { label: 'VAH', price: current.vah, tone: 'value-area' },
-    { label: 'NPOC', price: current.poc, tone: 'npoc' },
-    { label: 'VAL', price: current.val, tone: 'value-area' }
-  ]
+  const profileMarkers = Number.isFinite(visibleProfile.poc)
+    ? [
+        { label: 'VAH', price: visibleProfile.vah, tone: 'value-area' },
+        { label: 'POC', price: visibleProfile.poc, tone: 'poc' },
+        { label: 'VAL', price: visibleProfile.val, tone: 'value-area' }
+      ]
+    : []
   const priceTicks = createPriceTicks({ high, low, range }, 9)
   const timeIndexes = selectEvenIndexes(visible.length, Math.min(6, visible.length))
   const candleWidth = clamp(step * 0.58, 4, 16)
@@ -245,7 +249,7 @@ export default function MarketChart({
           <div className="chart-panel-options">
             <label>
               <input
-                aria-label="Show session volume profile"
+                aria-label="Show visible range volume profile"
                 checked={panelVisibility.profile}
                 onChange={(event) =>
                   setPanelVisibility((current) => ({
@@ -255,7 +259,7 @@ export default function MarketChart({
                 }
                 type="checkbox"
               />
-              <span>SESSION VOLUME PROFILE</span>
+              <span>VISIBLE RANGE VOLUME PROFILE</span>
             </label>
             <label>
               <input
@@ -287,6 +291,9 @@ export default function MarketChart({
             className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}
             data-price-scale-factor={priceScaleFactor.toFixed(4)}
+            data-profile-poc={visibleProfile.poc ?? ''}
+            data-profile-vah={visibleProfile.vah ?? ''}
+            data-profile-val={visibleProfile.val ?? ''}
             data-right-offset={safeOffset}
             data-visible-count={visibleCount}
             data-window-end={visible.at(-1)?.timestamp ?? ''}
@@ -392,27 +399,31 @@ export default function MarketChart({
               />
             )}
 
-            <line
-              className="poc-line"
-              x1={plotLeft}
-              x2={plotRight}
-              y1={y(current.poc)}
-              y2={y(current.poc)}
-            />
-            <line
-              className="value-line"
-              x1={plotLeft}
-              x2={plotRight}
-              y1={y(current.vah)}
-              y2={y(current.vah)}
-            />
-            <line
-              className="value-line"
-              x1={plotLeft}
-              x2={plotRight}
-              y1={y(current.val)}
-              y2={y(current.val)}
-            />
+            {profileMarkers.length > 0 && (
+              <g aria-label="Visible range value area">
+                <line
+                  className="poc-line"
+                  x1={plotLeft}
+                  x2={plotRight}
+                  y1={y(visibleProfile.poc)}
+                  y2={y(visibleProfile.poc)}
+                />
+                <line
+                  className="value-line"
+                  x1={plotLeft}
+                  x2={plotRight}
+                  y1={y(visibleProfile.vah)}
+                  y2={y(visibleProfile.vah)}
+                />
+                <line
+                  className="value-line"
+                  x1={plotLeft}
+                  x2={plotRight}
+                  y1={y(visibleProfile.val)}
+                  y2={y(visibleProfile.val)}
+                />
+              </g>
+            )}
 
             <line
               className="current-price-line"

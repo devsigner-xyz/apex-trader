@@ -11,12 +11,12 @@ export default function SessionProfileOverlay({ markers, maximumVolume, priceSca
 
   return (
     <g
-      aria-label="Session volume profile overlay"
+      aria-label="Visible range volume profile overlay"
       className="session-profile-overlay"
       role="img"
       transform={`translate(${originX} 0)`}
     >
-      <title>Session volume profile overlaid on the price chart</title>
+      <title>Visible range volume profile overlaid on the price chart</title>
       <g className="session-profile-bars">
         {profile.map((level, index) => {
           const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, profileChartWidth)
