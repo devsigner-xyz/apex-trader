@@ -11,8 +11,9 @@ import {
   createPriceTicks,
   createTimeScale,
   derivePriceDomain,
+  findTimeScaleBarIndex,
   niceDisplayStep,
-  selectEvenIndexes
+  selectTimeTickIndexes
 } from '../../../services/professionalChartGeometry.js'
 import {
   normalizeChartPanelSizes,
@@ -70,6 +71,7 @@ export default function MarketChart({
     normalizeChartPanelVisibility
   )
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [hoveredBarIndex, setHoveredBarIndex] = useState(null)
   const chartRef = useRef(null)
   const priceChartRef = useRef(null)
   const bars = useMemo(
@@ -101,9 +103,13 @@ export default function MarketChart({
     handlePointerDown,
     handlePointerMove,
     handleWheel,
+    logicalEnd,
+    logicalStart,
+    phase,
+    renderBars,
     safeOffset,
+    startIndex,
     stopDragging,
-    visible,
     visibleCount
   } = useChartViewport({
     bars,
@@ -114,6 +120,11 @@ export default function MarketChart({
     timeframe
   })
 
+  useEffect(
+    () => setHoveredBarIndex(null),
+    [logicalEnd, logicalStart, mode, timeframe, visibleCount]
+  )
+
   useEffect(() => {
     const chart = priceChartRef.current
     if (!chart) return undefined
@@ -121,6 +132,10 @@ export default function MarketChart({
     return () => chart.removeEventListener('wheel', handleWheel)
   }, [handleWheel])
 
+  const visible = renderBars.filter((_, index) => {
+    const center = startIndex + index + 0.5
+    return center >= logicalStart && center < logicalEnd
+  })
   const automaticPriceDomain = derivePriceDomain(visible, mode)
   const {
     domain: priceDomain,
@@ -134,10 +149,11 @@ export default function MarketChart({
     stopResizing: stopPriceScaleResize
   } = usePriceAxisScale({ automaticDomain: automaticPriceDomain, mode, timeframe })
   const { high, low, range } = priceDomain
-  const priceScale = createPriceScale({ high, low, range }, mainTop, mainBottom)
+  const pricePlotTop = mode === 'footprint' ? mainTop + 12 : mainTop
+  const priceScale = createPriceScale({ high, low, range }, pricePlotTop, mainBottom)
   const y = priceScale.toY
   const plotWidth = plotRight - plotLeft
-  const chartSlots = createTimeScale(visible.length, visibleCount, plotLeft, plotWidth)
+  const chartSlots = createTimeScale(renderBars.length, visibleCount, plotLeft, plotWidth, phase)
   const step = chartSlots.step
   const x = (index) => chartSlots.positions[index]
   const visibleProfile = deriveVolumeProfile(visible)
@@ -151,13 +167,17 @@ export default function MarketChart({
       ]
     : []
   const priceTicks = createPriceTicks({ high, low, range }, 9)
-  const timeIndexes = selectEvenIndexes(visible.length, Math.min(6, visible.length))
+  const timeIndexes = selectTimeTickIndexes(chartSlots.positions).filter((index) => {
+    const position = chartSlots.positions[index]
+    return position >= plotLeft + 24 && position <= plotRight - 24
+  })
   const candleWidth = clamp(step * 0.58, 4, 16)
   const volumeWidth = clamp(step * 0.48, 5, 18)
-  const footprintZoomScale = clamp(chartDefaults.footprint / visible.length, 1, 1.6)
+  const maximumVisibleVolume = Math.max(...visible.map((bar) => bar.volume), 1)
+  const footprintZoomScale = clamp(chartDefaults.footprint / visibleCount, 1, 1.6)
   const footprintFontSize = clamp(10 + (footprintZoomScale - 1) * 7, 10, 14)
   const footprintDeltaFontSize = clamp(11 + (footprintZoomScale - 1) * 5, 11, 14)
-  const stepZoomScale = clamp(chartDefaults['step-profile'] / visible.length, 1, 9)
+  const stepZoomScale = clamp(chartDefaults['step-profile'] / visibleCount, 1, 9)
   const stepDeltaFontSize = clamp(13 + (stepZoomScale - 1) * 1.25, 13, 19)
   const footprintTickSize = niceDisplayStep((range / 28) * footprintZoomScale, sourceTickSize)
   const stepProfileTickSize = niceDisplayStep(
@@ -178,9 +198,6 @@ export default function MarketChart({
     tickSize: stepProfileTickSize
   }
 
-  const windowLabel = `${clock(visible[0]?.timestamp ?? view.timestamp)} – ${clock(
-    visible.at(-1)?.timestamp ?? view.timestamp
-  )}`
   const candleCloseCountdown = formatCandleCloseCountdown(view.timestamp, timeframe)
   const chartPanelStyle = {
     '--volume-panel-height': panelVisibility.volume ? `${panelSizes.volume}px` : '0px',
@@ -190,14 +207,35 @@ export default function MarketChart({
     if (event.key === '0') resetPriceScale()
     handleKeyDown(event)
   }
+  const handleChartPointerMove = (event) => {
+    handlePointerMove(event)
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const chartX = ((event.clientX - bounds.left) / bounds.width) * chartWidth
+    setHoveredBarIndex(
+      findTimeScaleBarIndex({
+        barCount: bars.length,
+        chartX,
+        logicalEnd,
+        logicalStart,
+        plotLeft,
+        plotWidth,
+        visibleCount
+      })
+    )
+  }
+  const handleChartPointerCancel = (event) => {
+    setHoveredBarIndex(null)
+    stopDragging(event)
+  }
+  const summaryBar = bars[hoveredBarIndex] ?? current
 
   return (
     <section className="market-chart" ref={chartRef}>
       <header>
         <div className="chart-summary">
           <span>
-            O {fmt(current.open)} · H {fmt(current.high)} · L {fmt(current.low)} · C{' '}
-            {fmt(current.close)} · Δ {fmt(current.delta)} · V {fmt(current.volume)}
+            O {fmt(summaryBar.open)} · H {fmt(summaryBar.high)} · L {fmt(summaryBar.low)} · C{' '}
+            {fmt(summaryBar.close)} · Δ {fmt(summaryBar.delta)} · V {fmt(summaryBar.volume)}
           </span>
         </div>
         <div aria-label="Chart controls" className="chart-controls" role="toolbar">
@@ -301,7 +339,7 @@ export default function MarketChart({
       >
         <div className="price-chart-panel">
           <svg
-            aria-description="Use the wheel to resize the time axis around the last visible candle. Drag the chart right to reveal older candles and left to return toward the latest data. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
+            aria-description="Move the pointer over a bar to inspect its OHLC, delta and volume. Hold the primary pointer button and drag to pan continuously. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
             className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}
@@ -314,9 +352,10 @@ export default function MarketChart({
             data-window-end={visible.at(-1)?.timestamp ?? ''}
             data-window-start={visible[0]?.timestamp ?? ''}
             onKeyDown={handleChartKeyDown}
-            onPointerCancel={stopDragging}
+            onPointerCancel={handleChartPointerCancel}
             onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
+            onPointerLeave={() => setHoveredBarIndex(null)}
+            onPointerMove={handleChartPointerMove}
             onPointerUp={stopDragging}
             preserveAspectRatio="none"
             ref={priceChartRef}
@@ -325,6 +364,11 @@ export default function MarketChart({
             viewBox={`0 0 ${chartWidth} ${priceChartHeight}`}
           >
             <rect width={chartWidth} height={priceChartHeight} fill="#0b0f12" />
+            <defs>
+              <clipPath id="market-chart-price-plot-clip">
+                <rect height={priceChartHeight} width={plotWidth} x={plotLeft} y="0" />
+              </clipPath>
+            </defs>
             <rect
               className="price-axis-bg"
               x={priceAxisX}
@@ -357,7 +401,7 @@ export default function MarketChart({
             {timeIndexes.map((index) => (
               <line
                 className="gridline faint"
-                key={visible[index]?.timestamp}
+                key={renderBars[index]?.timestamp}
                 x1={x(index)}
                 x2={x(index)}
                 y1={mainTop}
@@ -365,45 +409,47 @@ export default function MarketChart({
               />
             ))}
 
-            {mode === 'candles' && (
-              <CandlesLayer
-                bars={visible}
-                centers={chartSlots.positions}
-                priceScale={priceScale}
-                width={candleWidth}
-              />
-            )}
+            <g className="chart-data-layer" clipPath="url(#market-chart-price-plot-clip)">
+              {mode === 'candles' && (
+                <CandlesLayer
+                  bars={renderBars}
+                  centers={chartSlots.positions}
+                  priceScale={priceScale}
+                  width={candleWidth}
+                />
+              )}
 
-            {mode === 'footprint' && (
-              <FootprintLayer
-                bars={visible}
-                centers={chartSlots.positions}
-                deltaFontSize={footprintDeltaFontSize}
-                domain={{ high, low, range }}
-                fontSize={footprintFontSize}
-                plotBounds={{ bottom: mainBottom, top: mainTop }}
-                priceScale={priceScale}
-                settings={footprintSettings}
-                step={step}
-                tickSize={footprintTickSize}
-                zoomScale={footprintZoomScale}
-              />
-            )}
+              {mode === 'footprint' && (
+                <FootprintLayer
+                  bars={renderBars}
+                  centers={chartSlots.positions}
+                  deltaFontSize={footprintDeltaFontSize}
+                  domain={{ high, low, range }}
+                  fontSize={footprintFontSize}
+                  plotBounds={{ bottom: mainBottom, top: mainTop }}
+                  priceScale={priceScale}
+                  settings={footprintSettings}
+                  step={step}
+                  tickSize={footprintTickSize}
+                  zoomScale={footprintZoomScale}
+                />
+              )}
 
-            {mode === 'step-profile' && (
-              <StepProfileLayer
-                bars={visible}
-                centers={chartSlots.positions}
-                deltaFontSize={stepDeltaFontSize}
-                domain={{ high, low, range }}
-                plotBounds={{ bottom: mainBottom, top: mainTop }}
-                priceScale={priceScale}
-                settings={stepProfileSettings}
-                step={step}
-                tickSize={stepProfileTickSize}
-                zoomScale={stepZoomScale}
-              />
-            )}
+              {mode === 'step-profile' && (
+                <StepProfileLayer
+                  bars={renderBars}
+                  centers={chartSlots.positions}
+                  deltaFontSize={stepDeltaFontSize}
+                  domain={{ high, low, range }}
+                  plotBounds={{ bottom: mainBottom, top: mainTop }}
+                  priceScale={priceScale}
+                  settings={stepProfileSettings}
+                  step={step}
+                  tickSize={stepProfileTickSize}
+                  zoomScale={stepZoomScale}
+                />
+              )}
+            </g>
 
             {(panelVisibility.profile || panelVisibility.valueArea) && (
               <SessionProfileOverlay
@@ -469,24 +515,14 @@ export default function MarketChart({
             {timeIndexes.map((index) => (
               <text
                 className="time-tick"
-                key={`time-${visible[index]?.timestamp}`}
+                key={`time-${renderBars[index]?.timestamp}`}
                 textAnchor="middle"
                 x={x(index)}
                 y={timeTickY}
               >
-                {clock(visible[index]?.timestamp ?? view.timestamp).slice(0, 5)}
+                {clock(renderBars[index]?.timestamp ?? view.timestamp).slice(0, 5)}
               </text>
             ))}
-
-            <text
-              aria-label="Visible chart window"
-              className="window-label"
-              x={plotRight}
-              y={priceChartHeight - 8}
-              textAnchor="end"
-            >
-              {windowLabel}
-            </text>
 
             <rect
               aria-hidden="true"
@@ -526,8 +562,9 @@ export default function MarketChart({
         </div>
         {panelVisibility.volume && (
           <VolumePanel
-            bars={visible}
+            bars={renderBars}
             centers={chartSlots.positions}
+            maximumVolume={maximumVisibleVolume}
             setPanelSizes={setPanelSizes}
             timeIndexes={timeIndexes}
             width={volumeWidth}

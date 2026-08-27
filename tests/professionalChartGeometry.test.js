@@ -16,9 +16,12 @@ import {
   deriveStepProfileCellGeometry,
   deriveVolumeBarGeometry,
   deriveZoomedViewport,
+  findTimeScaleBarIndex,
+  isChartOffsetAtLatest,
   niceDisplayStep,
   normalizeWheelDelta,
   selectEvenIndexes,
+  selectTimeTickIndexes,
   selectVisibleWindow
 } from '../src/services/professionalChartGeometry.js'
 
@@ -30,9 +33,14 @@ const bars = [
 ]
 
 test('selects and clamps visible windows for full, short and empty histories', () => {
-  assert.deepEqual(selectVisibleWindow(bars, 2, 1), {
+  const integerWindow = selectVisibleWindow(bars, 2, 1)
+  assert.deepEqual(integerWindow, {
     endIndex: 3,
+    logicalEnd: 3,
+    logicalStart: 1,
     maximumOffset: 2,
+    phase: 0,
+    renderBars: bars.slice(1, 3),
     safeOffset: 1,
     startIndex: 1,
     visible: bars.slice(1, 3)
@@ -40,6 +48,18 @@ test('selects and clamps visible windows for full, short and empty histories', (
   assert.deepEqual(selectVisibleWindow(bars.slice(0, 1), 5, 10).visible, bars.slice(0, 1))
   assert.deepEqual(selectVisibleWindow([], 5, 0).visible, [])
   assert.equal(clamp(12, 0, 10), 10)
+})
+
+test('selects partial edge bars and exposes their logical rendering phase', () => {
+  const window = selectVisibleWindow(bars, 2, 0.5)
+
+  assert.equal(window.logicalStart, 1.5)
+  assert.equal(window.logicalEnd, 3.5)
+  assert.equal(window.startIndex, 1)
+  assert.equal(window.endIndex, 4)
+  assert.equal(window.phase, 0.5)
+  assert.deepEqual(window.renderBars, bars.slice(1, 4))
+  assert.equal(window.visible, window.renderBars)
 })
 
 test('normalizes wheel units and derives deterministic horizontal panning', () => {
@@ -75,6 +95,16 @@ test('normalizes wheel units and derives deterministic horizontal panning', () =
     }),
     15
   )
+  assert.equal(
+    derivePannedOffset({
+      maximumOffset: 100,
+      pixelDelta: 5,
+      plotWidth: 1000,
+      rightOffset: 20,
+      visibleCount: 50
+    }),
+    19.75
+  )
 })
 
 test('zooms the temporal viewport around the cursor anchor', () => {
@@ -95,8 +125,8 @@ test('zooms the temporal viewport around the cursor anchor', () => {
   const nextAnchor =
     current.barCount - next.rightOffset - next.visibleCount + anchorRatio * (next.visibleCount - 1)
 
-  assert.deepEqual(next, { rightOffset: 36, visibleCount: 19 })
-  assert.ok(Math.abs(currentAnchor - nextAnchor) <= 0.5)
+  assert.deepEqual(next, { rightOffset: 35.75, visibleCount: 19 })
+  assert.ok(Math.abs(currentAnchor - nextAnchor) <= Number.EPSILON)
   assert.deepEqual(
     deriveZoomedViewport({
       ...current,
@@ -110,7 +140,7 @@ test('zooms the temporal viewport around the cursor anchor', () => {
 })
 
 test('keeps the last visible candle fixed while resizing the time axis', () => {
-  const current = { barCount: 200, rightOffset: 20, visibleCount: 40 }
+  const current = { barCount: 200, rightOffset: 20.25, visibleCount: 40 }
   const next = deriveZoomedViewport({
     ...current,
     anchorRatio: 1,
@@ -119,8 +149,57 @@ test('keeps the last visible candle fixed while resizing the time axis', () => {
     minimumVisibleCount: 12
   })
 
-  assert.deepEqual(next, { rightOffset: 20, visibleCount: 19 })
+  assert.deepEqual(next, { rightOffset: 20.25, visibleCount: 19 })
   assert.equal(current.barCount - current.rightOffset - 1, current.barCount - next.rightOffset - 1)
+})
+
+test('hit-tests chart X positions against logical bars and partial boundaries', () => {
+  const viewport = selectVisibleWindow(bars, 2, 0.5)
+  const hit = (chartX) =>
+    findTimeScaleBarIndex({
+      barCount: bars.length,
+      chartX,
+      logicalEnd: viewport.logicalEnd,
+      logicalStart: viewport.logicalStart,
+      plotLeft: 10,
+      plotWidth: 200,
+      visibleCount: 2
+    })
+
+  assert.equal(hit(10), 1)
+  assert.equal(hit(60), 2)
+  assert.equal(hit(160), 3)
+  assert.equal(hit(210), 3)
+  assert.equal(hit(9), null)
+  assert.equal(hit(211), null)
+
+  const shortViewport = selectVisibleWindow(bars.slice(0, 1), 5, 0)
+  assert.equal(
+    findTimeScaleBarIndex({
+      barCount: 1,
+      chartX: 20,
+      logicalEnd: shortViewport.logicalEnd,
+      logicalStart: shortViewport.logicalStart,
+      plotLeft: 0,
+      plotWidth: 100,
+      visibleCount: 5
+    }),
+    0
+  )
+  assert.equal(
+    findTimeScaleBarIndex({
+      barCount: 1,
+      chartX: 21,
+      logicalEnd: shortViewport.logicalEnd,
+      logicalStart: shortViewport.logicalStart,
+      plotLeft: 0,
+      plotWidth: 100,
+      visibleCount: 5
+    }),
+    null
+  )
+  assert.equal(isChartOffsetAtLatest(0.0000001), true)
+  assert.equal(isChartOffsetAtLatest(0.001), false)
 })
 
 test('derives the existing padded price domains and a deterministic price scale', () => {
@@ -155,8 +234,28 @@ test('uses one temporal slot model for every chart rendering mode', () => {
   assert.deepEqual(candles, footprint)
   assert.deepEqual(footprint, stepProfile)
   assert.deepEqual(candles.positions, [5, 15, 25])
+  assert.deepEqual(createTimeScale(3, 2, 0, 20, 0.5).positions, [0, 10, 20])
   assert.deepEqual(selectEvenIndexes(10, 4), [0, 3, 6, 9])
   assert.deepEqual(selectEvenIndexes(0, 4), [])
+})
+
+test('selects time ticks from real positions without exceeding count or spacing limits', () => {
+  assert.deepEqual(selectTimeTickIndexes([], 6, 64), [])
+  assert.deepEqual(selectTimeTickIndexes([0, 100, 200, 300, 400, 500]), [0, 1, 2, 3, 4, 5])
+  assert.deepEqual(selectTimeTickIndexes([0, 20, 40, 60, 80, 100], 6, 64), [0, 5])
+  assert.deepEqual(selectTimeTickIndexes([0, 20, 40], 1, 64), [1])
+
+  const densePositions = Array.from({ length: 160 }, (_, index) => index * 6.5 - 3.25)
+  const indexes = selectTimeTickIndexes(densePositions)
+  assert.ok(indexes.length <= 6)
+  assert.equal(indexes[0], 0)
+  assert.equal(indexes.at(-1), densePositions.length - 1)
+  assert.ok(
+    indexes.every(
+      (index, position) =>
+        position === 0 || densePositions[index] - densePositions[indexes[position - 1]] >= 64
+    )
+  )
 })
 
 test('bins session profile levels without losing bid or ask volume', () => {
@@ -201,7 +300,17 @@ test('derives mode-specific primitive geometry without rendering dependencies', 
       tickSize: 1,
       zoomScale: 1
     }),
-    { barWidth: 62.400000000000006, halfWidth: 31.200000000000003, rowHeight: 22 }
+    { barWidth: 68, halfWidth: 34, rowHeight: 22 }
+  )
+  assert.equal(
+    deriveFootprintCellGeometry({
+      plotHeight: 500,
+      range: 20,
+      step: 140,
+      tickSize: 1,
+      zoomScale: 1
+    }).barWidth,
+    84
   )
   assert.deepEqual(
     deriveStepProfileCellGeometry({
@@ -212,8 +321,8 @@ test('derives mode-specific primitive geometry without rendering dependencies', 
       zoomScale: 1
     }),
     {
-      cellWidth: 42,
-      maximumSideWidth: 26.68,
+      cellWidth: 60,
+      maximumSideWidth: 15,
       rowHeight: 10.5,
       sideHeight: 8.5,
       valueFontSize: 8.5
@@ -228,13 +337,23 @@ test('derives mode-specific primitive geometry without rendering dependencies', 
       zoomScale: 4.5
     }),
     {
-      cellWidth: 130,
-      maximumSideWidth: 181.24,
+      cellWidth: 180,
+      maximumSideWidth: 167,
       rowHeight: 19.9,
       sideHeight: 17.9,
       valueFontSize: 16
     }
   )
+  const boundedStepProfile = deriveStepProfileCellGeometry({
+    plotHeight: 500,
+    range: 20,
+    step: 90,
+    tickSize: 0.5,
+    zoomScale: 1
+  })
+  assert.equal(boundedStepProfile.cellWidth, 60)
+  assert.equal(boundedStepProfile.maximumSideWidth, 10)
+  assert.ok(boundedStepProfile.cellWidth + boundedStepProfile.maximumSideWidth * 2 <= 90 - 10)
   assert.deepEqual(
     deriveVolumeBarGeometry({ close: 2, open: 1, volume: 50 }, 25, 10, 100, 10, 90),
     {

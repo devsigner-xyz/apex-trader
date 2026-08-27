@@ -22,7 +22,19 @@ El ancho interno requiere aproximadamente 1920 px para acceso simultáneo a todo
 
 ## Chart
 
-Modos actuales: Candles, Footprint y Step Profile. Timeframes soportados: 1 hour y 4 hours. Pan, zoom y timeframe actualizan el rango visible.
+Modos actuales: Candles, Footprint y Step Profile. Candles y Step Profile soportan 5 min, 15 min, 30 min, 1 hour y 4 hours; Footprint soporta 1 hour y 4 hours. Pan, zoom y timeframe actualizan el rango visible.
+
+El significado visual y de datos de cada modo se define en [Chart patterns](../design-system/chart-patterns.md). Candles usa el acrónimo canónico OHLC; Footprint representa ejecuciones por precio y lado agresor; Step Profile repite un perfil por intervalo.
+
+### Interacción y viewport temporal
+
+- Mover el puntero sobre una barra actualiza la toolbar con su `O`, `H`, `L`, `C`, `Δ` y `V`; al abandonar el gráfico vuelve a mostrar la barra actual del replay.
+- El puntero en reposo no muestra la mano. El pan se activa solo con el botón principal pulsado y conserva `grabbing` hasta `pointerup` o cancelación.
+- El desplazamiento horizontal usa un offset lógico fraccional y se renderiza de forma continua. Una barra puede quedar parcialmente visible en cualquiera de los bordes sin saltar a intervalos enteros.
+- El cálculo analítico incluye una barra cuando su centro temporal está dentro del plot. Las barras buffer recortadas fuera de ese criterio sirven únicamente para continuidad visual y no alteran profile, POC, VAH o VAL.
+- Los límites de barras visibles son 28–160 para Candles, 4–13 para Footprint y 1–12 para Step Profile. Estos límites protegen respectivamente la separación máxima de velas y la legibilidad mínima de celdas densas.
+- Los labels temporales se seleccionan según el ancho renderizado y conservan una separación mínima; el zoom-out reduce su cantidad antes de permitir solapamientos.
+- El rango textual naranja situado antes en el extremo inferior derecho no forma parte del gráfico. El rango accesible y los controles de teclado se derivan del viewport, no de ese label visual.
 
 `apex-trader:chart-panel-visibility:v1` persiste tres booleanos independientes: `profile` (barras), `valueArea` (líneas y etiquetas) y `volume` (panel inferior). Un estado legado sin `valueArea` se normaliza a `true`. Ocultar las barras no oculta los niveles activos.
 
@@ -39,6 +51,10 @@ El cálculo usa las velas agregadas actualmente visibles y se recalcula con pan,
 El profile ocupa 180 unidades SVG y se alinea a la derecha. Cada marcador es un chip sólido de 38 × 16 px, radio 2 px y texto centrado, anclado al borde derecho/base de las barras. La línea queda cubierta por el chip, no atraviesa el texto.
 
 Deuda: el tamaño persistido del profile es legado aunque la anchura renderizada sea fija.
+
+## Footer
+
+`devsigner.xyz` es el único fragmento enlazado de `ApexTrader by devsigner.xyz`. Abre `https://devsigner.xyz` en una pestaña nueva con aislamiento `noopener noreferrer`; el texto anterior permanece informativo.
 
 ## DOM
 

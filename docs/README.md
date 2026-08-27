@@ -13,6 +13,7 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Professional terminal specification](product/professional-terminal.md): comportamiento, datos, persistencia y limitaciones.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
 - [Panel patterns](design-system/panel-patterns.md): headers, settings, tablas, overlays y accesibilidad.
+- [Chart patterns](design-system/chart-patterns.md): significado de Candles/OHLC, Footprint, Step Profile y Volume Profile.
 - [Figma contract](figma/README.md): archivo maestro, masters, variantes, anotaciones y trazabilidad.
 - [Decisions](decisions/README.md): decisiones duraderas y consecuencias.
 - [Verification](verification/2026-08-27-figma-product-alignment.md): última auditoría Figma ↔ web ↔ código.

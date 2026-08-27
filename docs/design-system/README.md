@@ -29,4 +29,4 @@ Figma organiza 28 primitivos, 37 roles semánticos y 24 dimensiones bajo `Apex P
 
 Los nuevos componentes enlazan propiedades a variables existentes cuando exista un rol aplicable. Los colores hard-coded de grid/profile son deuda a promover antes de ampliar temas.
 
-Consulta [Panel patterns](panel-patterns.md) y [Figma contract](../figma/README.md).
+Consulta [Panel patterns](panel-patterns.md), [Chart patterns](chart-patterns.md) y [Figma contract](../figma/README.md).

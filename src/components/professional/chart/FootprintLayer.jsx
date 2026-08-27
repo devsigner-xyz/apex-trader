@@ -1,5 +1,8 @@
 /* eslint-disable react/prop-types */
-import { deriveFootprintBar, formatFootprintVolume } from '../../../services/footprintPresentation.js'
+import {
+  deriveFootprintBar,
+  formatFootprintVolume
+} from '../../../services/footprintPresentation.js'
 import { deriveFootprintCellGeometry } from '../../../services/professionalChartGeometry.js'
 import { formatNumber as fmt } from '../formatters.js'
 
@@ -25,9 +28,7 @@ export default function FootprintLayer({
     const footprintBar = deriveFootprintBar(
       {
         ...bar,
-        levels: bar.levels.filter(
-          (level) => level.price >= low - tickSize && level.price <= high
-        )
+        levels: bar.levels.filter((level) => level.price >= low - tickSize && level.price <= high)
       },
       settings
     )
@@ -42,6 +43,11 @@ export default function FootprintLayer({
       tickSize,
       zoomScale
     })
+    const firstCellTop = Math.min(
+      ...levels.map((level) => y(level.price + tickSize / 2) - rowHeight / 2),
+      bottom
+    )
+    const deltaY = Math.max(top + deltaFontSize, Math.min(y(bar.high) - 26, firstCellTop - 8))
 
     return (
       <g className="footprint-bar" key={bar.timestamp}>
@@ -123,7 +129,7 @@ export default function FootprintLayer({
           style={{ fontSize: deltaFontSize }}
           textAnchor="middle"
           x={center}
-          y={Math.max(top + deltaFontSize, y(bar.high) - 26)}
+          y={deltaY}
         >
           Δ {fmt(bar.delta, 3)}
         </text>

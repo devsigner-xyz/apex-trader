@@ -3,6 +3,7 @@ import {
   clamp,
   derivePannedOffset,
   deriveZoomedViewport,
+  isChartOffsetAtLatest,
   normalizeWheelDelta,
   selectVisibleWindow
 } from '../services/professionalChartGeometry.js'
@@ -22,11 +23,8 @@ export function useChartViewport({
   const dragState = useRef(null)
   const previousBarCount = useRef(bars.length)
   const wheelState = useRef({ delta: 0, frame: null, kind: 'zoom' })
-  const { maximumOffset, safeOffset, visible } = selectVisibleWindow(
-    bars,
-    visibleCount,
-    rightOffset
-  )
+  const viewportWindow = selectVisibleWindow(bars, visibleCount, rightOffset)
+  const { maximumOffset, safeOffset } = viewportWindow
   const viewportState = useRef(null)
   viewportState.current = {
     barCount: bars.length,
@@ -46,8 +44,11 @@ export function useChartViewport({
   }, [mode, resetViewport, timeframe])
 
   useEffect(() => {
-    if (rightOffset !== safeOffset) setRightOffset(safeOffset)
-  }, [rightOffset, safeOffset])
+    const normalizedOffset = isChartOffsetAtLatest(safeOffset) ? 0 : safeOffset
+    if (rightOffset !== normalizedOffset) setRightOffset(normalizedOffset)
+    const nextFollowLatest = isChartOffsetAtLatest(normalizedOffset)
+    if (followLatest !== nextFollowLatest) setFollowLatest(nextFollowLatest)
+  }, [followLatest, rightOffset, safeOffset])
 
   useEffect(() => {
     const addedBars = bars.length - previousBarCount.current
@@ -61,36 +62,75 @@ export function useChartViewport({
   useEffect(
     () => () => {
       if (wheelState.current.frame !== null) cancelAnimationFrame(wheelState.current.frame)
+      const drag = dragState.current
+      if (drag && drag.frame !== null) cancelAnimationFrame(drag.frame)
     },
     []
   )
+
+  const applyOffset = (nextOffset) => {
+    const normalizedOffset = isChartOffsetAtLatest(nextOffset) ? 0 : nextOffset
+    setRightOffset(normalizedOffset)
+    setFollowLatest(isChartOffsetAtLatest(normalizedOffset))
+  }
+
+  const applyDragPosition = (drag) => {
+    const current = viewportState.current
+    const nextOffset = derivePannedOffset({
+      maximumOffset: current.maximumOffset,
+      pixelDelta: drag.startX - drag.latestX,
+      plotWidth: drag.plotWidth,
+      rightOffset: drag.offset,
+      visibleCount: current.visibleCount
+    })
+    if (nextOffset !== drag.appliedOffset) {
+      drag.appliedOffset = nextOffset
+      applyOffset(nextOffset)
+    }
+  }
 
   const handlePointerDown = (event) => {
     if (event.button !== 0) return
     event.currentTarget.focus({ preventScroll: true })
     event.currentTarget.setPointerCapture(event.pointerId)
-    dragState.current = { offset: safeOffset, startX: event.clientX }
+    const bounds = event.currentTarget.getBoundingClientRect()
+    dragState.current = {
+      frame: null,
+      appliedOffset: safeOffset,
+      latestX: event.clientX,
+      offset: safeOffset,
+      plotWidth: bounds.width * plotRatio,
+      startX: event.clientX
+    }
     setDragging(true)
   }
 
   const handlePointerMove = (event) => {
-    if (!dragState.current) return
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const plotWidth = bounds.width * plotRatio
-    const nextOffset = derivePannedOffset({
-      maximumOffset,
-      pixelDelta: dragState.current.startX - event.clientX,
-      plotWidth,
-      rightOffset: dragState.current.offset,
-      visibleCount
-    })
-    if (nextOffset !== safeOffset) {
-      setFollowLatest(nextOffset === 0)
-      setRightOffset(nextOffset)
+    const drag = dragState.current
+    if (!drag) return
+    if ((event.buttons & 1) === 0) {
+      stopDragging(event)
+      return
     }
+    drag.latestX = event.clientX
+    const bounds = event.currentTarget.getBoundingClientRect()
+    drag.plotWidth = bounds.width * plotRatio
+    if (drag.frame !== null) return
+    drag.frame = requestAnimationFrame(() => {
+      const pendingDrag = dragState.current
+      if (!pendingDrag) return
+      pendingDrag.frame = null
+      applyDragPosition(pendingDrag)
+    })
   }
 
   const stopDragging = (event) => {
+    const drag = dragState.current
+    if (drag && drag.frame !== null) {
+      cancelAnimationFrame(drag.frame)
+      drag.frame = null
+      applyDragPosition(drag)
+    }
     if (event.currentTarget.hasPointerCapture?.(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId)
     dragState.current = null
@@ -125,8 +165,7 @@ export function useChartViewport({
           visibleCount: current.visibleCount
         })
         if (nextOffset !== current.rightOffset) {
-          setRightOffset(nextOffset)
-          setFollowLatest(nextOffset === 0)
+          applyOffset(nextOffset)
         }
         return
       }
@@ -142,8 +181,7 @@ export function useChartViewport({
       })
       if (next.visibleCount === current.visibleCount) return
       setVisibleCount(next.visibleCount)
-      setRightOffset(next.rightOffset)
-      setFollowLatest(next.rightOffset === 0)
+      applyOffset(next.rightOffset)
     })
   }
 
@@ -155,8 +193,7 @@ export function useChartViewport({
     else return
 
     if (nextOffset !== undefined && nextOffset !== safeOffset) {
-      setRightOffset(nextOffset)
-      setFollowLatest(nextOffset === 0)
+      applyOffset(nextOffset)
     }
     event.preventDefault()
   }
@@ -168,12 +205,18 @@ export function useChartViewport({
     handlePointerDown,
     handlePointerMove,
     handleWheel,
-    isAtLatest: safeOffset === 0,
+    endIndex: viewportWindow.endIndex,
+    isAtLatest: isChartOffsetAtLatest(safeOffset),
+    logicalEnd: viewportWindow.logicalEnd,
+    logicalStart: viewportWindow.logicalStart,
     maximumOffset,
+    phase: viewportWindow.phase,
+    renderBars: viewportWindow.renderBars,
     resetViewport,
     safeOffset,
+    startIndex: viewportWindow.startIndex,
     stopDragging,
-    visible,
+    visible: viewportWindow.visible,
     visibleCount
   }
 }

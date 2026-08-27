@@ -4,19 +4,23 @@ function toChartTime(timestamp) {
   return Math.floor(timestamp / 1000)
 }
 
-export function createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth) {
+export function createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth, phase = 0) {
   if (!Number.isInteger(itemCount) || itemCount < 0)
     throw new TypeError('Chart item count must be a non-negative integer.')
-  if (!Number.isInteger(slotCount) || slotCount < 1 || itemCount > slotCount)
-    throw new TypeError(
-      'Chart slot count must be a positive integer at least as large as item count.'
-    )
+  if (!Number.isInteger(slotCount) || slotCount < 1 || itemCount > slotCount + 1)
+    throw new TypeError('Chart item count cannot exceed slot count by more than one.')
   if (!Number.isFinite(plotLeft) || !Number.isFinite(plotWidth) || plotWidth <= 0)
     throw new TypeError('Chart plot geometry must be finite and have positive width.')
+  if (!Number.isFinite(phase) || phase < 0 || phase >= 1)
+    throw new TypeError('Chart slot phase must be a finite number from zero up to one.')
 
   const step = plotWidth / slotCount
   return {
-    positions: Array.from({ length: itemCount }, (_, index) => plotLeft + (index + 0.5) * step),
+    phase,
+    positions: Array.from(
+      { length: itemCount },
+      (_, index) => plotLeft + (index + 0.5 - phase) * step
+    ),
     step
   }
 }
@@ -58,7 +62,8 @@ export function createHeikinAshiData(candlesticks) {
 }
 
 export function createSmaData(candlesticks, period = 20) {
-  if (!Number.isInteger(period) || period < 1) throw new TypeError('SMA period must be a positive integer.')
+  if (!Number.isInteger(period) || period < 1)
+    throw new TypeError('SMA period must be a positive integer.')
 
   let sum = 0
   return candlesticks.flatMap((candle, index) => {

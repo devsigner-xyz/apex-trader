@@ -6,7 +6,14 @@ test.describe('Professional historical order flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/price-chart')
     await expect(page.locator('.replay-status')).toHaveCount(0)
-    await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
+    const footer = page.locator('.terminal-footer')
+    const link = footer.getByRole('link', { name: 'devsigner.xyz', exact: true })
+    await expect(footer).toHaveText('ApexTrader by devsigner.xyz')
+    await expect(link).toHaveAttribute('href', /^https:\/\/devsigner\.xyz\/?$/)
+    await expect(link).toHaveAttribute('target', '_blank')
+    const rel = (await link.getAttribute('rel'))?.split(/\s+/) ?? []
+    expect(rel).toEqual(expect.arrayContaining(['noopener', 'noreferrer']))
+    await expect(page.locator('.window-label')).toHaveCount(0)
   })
 
   test('renders the reconstructed DOM with a balanced visible ladder', async ({ page }) => {
@@ -86,13 +93,24 @@ test.describe('Professional historical order flow', () => {
   })
 
   test('sends a selected real DOM price to the execution ticket', async ({ page }) => {
-    const row = page.locator('.dom-row.bid').first()
-    const price = await row.evaluate((node) => {
-      const selectedPrice = node.dataset.price
-      node.click()
-      return selectedPrice
-    })
-    await expect(page.getByLabel('Limit price')).toHaveValue(Number(price).toFixed(2))
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            new Promise((resolve) => {
+              const row = document.querySelector('.dom-row.bid')
+              const input = document.querySelector('[aria-label="Limit price"]')
+              if (!row?.dataset.price || !input) {
+                resolve(false)
+                return
+              }
+              const expected = Number(row.dataset.price).toFixed(2)
+              row.click()
+              requestAnimationFrame(() => resolve(input.value === expected))
+            })
+        )
+      )
+      .toBe(true)
   })
 
   test('groups real DOM levels into configurable price increments', async ({ page }) => {
@@ -179,7 +197,9 @@ test.describe('Professional historical order flow', () => {
     page
   }) => {
     const timeframe = page.getByLabel('Timeframe')
-    const visibleBars = page.locator('.market-chart svg > g.up, .market-chart svg > g.down')
+    const visibleBars = page.locator(
+      '.market-chart .chart-data-layer > g.up, .market-chart .chart-data-layer > g.down'
+    )
 
     await timeframe.selectOption('5')
     await expect(visibleBars).toHaveCount(34)

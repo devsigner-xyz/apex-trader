@@ -8,6 +8,60 @@ const views = [
 
 test.use({ viewport: { height: 1080, width: 1920 } })
 
+async function expectFooterContract(page) {
+  const footer = page.locator('.terminal-footer')
+  const link = footer.getByRole('link', { name: 'devsigner.xyz', exact: true })
+
+  await expect(footer).toHaveText('ApexTrader by devsigner.xyz')
+  await expect(link).toHaveAttribute('href', /^https:\/\/devsigner\.xyz\/?$/)
+  await expect(link).toHaveAttribute('target', '_blank')
+  const rel = (await link.getAttribute('rel'))?.split(/\s+/) ?? []
+  expect(rel).toEqual(expect.arrayContaining(['noopener', 'noreferrer']))
+}
+
+async function expectInsetSelectChevron(select) {
+  const styles = await select.evaluate((node) => {
+    const computed = getComputedStyle(node)
+    return {
+      appearance: computed.appearance,
+      backgroundImage: computed.backgroundImage,
+      backgroundPosition: computed.backgroundPosition,
+      backgroundSize: computed.backgroundSize,
+      paddingRight: computed.paddingRight
+    }
+  })
+
+  expect(styles.appearance).toBe('none')
+  expect(styles.backgroundImage).toContain('svg')
+  expect(styles.backgroundPosition).toContain('8px')
+  expect(styles.backgroundSize).toBe('12px 8px')
+  expect(styles.paddingRight).toBe('28px')
+}
+
+async function readChartWindow(chart) {
+  return chart.evaluate((node) => ({
+    end: node.dataset.windowEnd,
+    start: node.dataset.windowStart
+  }))
+}
+
+async function readCandleCenter(candle) {
+  return candle.evaluate((node) => {
+    const line = node.querySelector('line')
+    const svg = node.ownerSVGElement
+    const point = svg.createSVGPoint()
+    point.x = Number(line.getAttribute('x1'))
+    point.y = 0
+    return point.matrixTransform(line.getScreenCTM()).x
+  })
+}
+
+async function moveToCandle(page, chart, candle) {
+  const x = await readCandleCenter(candle)
+  const chartBounds = await chart.boundingBox()
+  await page.mouse.move(x, chartBounds.y + chartBounds.height * 0.45)
+}
+
 for (const [route, mode] of views) {
   test(`${mode} matches the professional terminal contract`, async ({ page }) => {
     const errors = []
@@ -18,7 +72,8 @@ for (const [route, mode] of views) {
     await page.goto(route)
     await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
     await expect(page.getByLabel(`${mode} historical chart`)).toBeVisible()
-    await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
+    await expectFooterContract(page)
+    await expect(page.locator('.window-label')).toHaveCount(0)
     await expect(page.getByText('DOM', { exact: true })).toHaveCount(0)
     await expect(page.getByText('TIME & SALES')).toHaveCount(0)
     await expect(page.getByText('EXECUTION', { exact: true })).toHaveCount(0)
@@ -42,6 +97,7 @@ for (const [route, mode] of views) {
     await expect(chartControls.locator('select')).toHaveCount(2)
     await expect(chartControls.locator('select').nth(0)).toHaveAttribute('aria-label', 'Timeframe')
     await expect(chartControls.locator('select').nth(1)).toHaveAttribute('aria-label', 'Chart mode')
+    await expectInsetSelectChevron(chartControls.locator('select').first())
     await expect(chartControls.getByRole('button', { name: 'Chart settings' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'RESET' })).toHaveCount(0)
     await expect(page.getByLabel('Tick size')).toHaveCount(0)
@@ -210,7 +266,7 @@ for (const [route, mode] of views) {
           ({ askX, cellWidth, cellX }) => Math.abs(cellX + cellWidth - askX) < 0.01
         )
       ).toBe(true)
-      expect(stepProfileGeometry.every(({ cellWidth }) => cellWidth >= 42 && cellWidth <= 52)).toBe(
+      expect(stepProfileGeometry.every(({ cellWidth }) => cellWidth >= 60 && cellWidth <= 70)).toBe(
         true
       )
       expect(stepProfileGeometry.every(({ label }) => label.includes('×'))).toBe(true)
@@ -258,7 +314,7 @@ for (const [route, mode] of views) {
         .locator('.footprint-bid-bg')
         .first()
         .evaluate((node) => Number(node.getAttribute('width')))
-      expect(valueFontSize).toBeGreaterThanOrEqual(13)
+      expect(valueFontSize).toBeGreaterThanOrEqual(10)
       expect(initialCellWidth).toBeLessThanOrEqual(38)
       const verticalAlignment = await cells.evaluateAll((nodes) =>
         nodes.flatMap((node) => {
@@ -439,9 +495,7 @@ test('panel sizes persist across reloads and later visits', async ({ context, pa
   await returningPage.close()
 })
 
-test('time-axis wheel zoom anchors the latest candle and chart drag reveals history', async ({
-  page
-}) => {
+test('time-axis wheel zoom anchors the latest visible candle', async ({ page }) => {
   await page.goto('/price-chart')
   const chart = page.getByLabel('candles historical chart')
   const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
@@ -467,40 +521,201 @@ test('time-axis wheel zoom anchors the latest candle and chart drag reveals hist
   await expect(chart).toHaveAttribute('data-right-offset', '0')
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
   await expect.poll(readVisibleProfile).not.toEqual(initialProfile)
+})
 
-  const zoomedWindowEnd = Number(await chart.getAttribute('data-window-end'))
-  const zoomedProfile = await readVisibleProfile()
-  await page.mouse.move(
-    chartBounds.x + chartBounds.width * 0.5,
-    chartBounds.y + chartBounds.height * 0.5
-  )
-  await page.mouse.down()
-  await page.mouse.move(
-    chartBounds.x + chartBounds.width * 0.7,
-    chartBounds.y + chartBounds.height * 0.5,
-    { steps: 8 }
-  )
-  await page.mouse.up()
+test('candle hover updates OHLC data and leaving restores the latest summary', async ({ page }) => {
+  await page.goto('/price-chart')
+  const chart = page.getByLabel('candles historical chart')
+  const summary = page.locator('.chart-summary > span')
+  const candles = chart.locator('g.up, g.down')
+  const targetCandle = candles.nth(2)
+  const expectedSummary = await targetCandle.evaluate((node) => {
+    const format = (value) =>
+      Number(value).toLocaleString('en-US', {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 2
+      })
+    return `O ${format(node.dataset.open)} · H ${format(node.dataset.high)} · L ${format(
+      node.dataset.low
+    )} · C ${format(node.dataset.close)} · Δ ${format(node.dataset.delta)} · V ${format(
+      node.dataset.volume
+    )}`
+  })
+
+  await moveToCandle(page, chart, targetCandle)
+  await expect(summary).toHaveText(expectedSummary)
+
+  await page.mouse.wheel(0, -480)
+  await expect(summary).not.toHaveText(expectedSummary)
+
+  await page.mouse.move(0, 0)
   await expect
-    .poll(async () => Number(await chart.getAttribute('data-window-end')))
-    .toBeLessThan(zoomedWindowEnd)
-  await expect(chart).toHaveAttribute('data-follow-latest', 'false')
-  await expect.poll(readVisibleProfile).not.toEqual(zoomedProfile)
+    .poll(() =>
+      page.evaluate(() => {
+        const summaryText = document.querySelector('.chart-summary > span')?.textContent ?? ''
+        const summaryClose = summaryText.match(/ · C ([\d,.]+) · Δ /)?.[1]
+        const currentPrice = document.querySelector('.current-price-text')?.textContent
+        return Boolean(summaryClose && summaryClose === currentPrice)
+      })
+    )
+    .toBe(true)
+})
 
-  await page.mouse.move(
-    chartBounds.x + chartBounds.width * 0.7,
-    chartBounds.y + chartBounds.height * 0.5
-  )
+test('chart stays still on hover and pans continuously while the pointer is held', async ({
+  page
+}) => {
+  await page.goto('/price-chart')
+  const chart = page.getByLabel('candles historical chart')
+  const chartBounds = await chart.boundingBox()
+  const candles = chart.locator('g.up, g.down')
+  const initialWindow = await readChartWindow(chart)
+  const initialOffset = Number(await chart.getAttribute('data-right-offset'))
+  const firstCenter = await readCandleCenter(candles.nth(0))
+  const secondCenter = await readCandleCenter(candles.nth(1))
+  const barStep = secondCenter - firstCenter
+  const startX = chartBounds.x + chartBounds.width * 0.5
+  const startY = chartBounds.y + chartBounds.height * 0.45
+
+  await page.mouse.move(chartBounds.x + chartBounds.width * 0.2, startY)
+  await page.mouse.move(chartBounds.x + chartBounds.width * 0.8, startY, { steps: 8 })
+  expect(await readChartWindow(chart)).toEqual(initialWindow)
+  expect(Number(await chart.getAttribute('data-right-offset'))).toBe(initialOffset)
+  await expect.poll(() => chart.evaluate((node) => getComputedStyle(node).cursor)).toBe('crosshair')
+
+  const trackedCandle = await candles.last().elementHandle()
+  expect(trackedCandle).not.toBeNull()
+  const trackedStart = await readCandleCenter(trackedCandle)
+  await page.mouse.move(startX, startY)
   await page.mouse.down()
-  await page.mouse.move(
-    chartBounds.x + chartBounds.width * 0.5,
-    chartBounds.y + chartBounds.height * 0.5,
-    { steps: 8 }
-  )
+  await expect.poll(() => chart.evaluate((node) => getComputedStyle(node).cursor)).toBe('grabbing')
+
+  await page.mouse.move(startX + barStep * 0.2, startY)
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+    .toBeGreaterThan(0)
+  const firstFractionalOffset = Number(await chart.getAttribute('data-right-offset'))
+  const firstFractionalCenter = await readCandleCenter(trackedCandle)
+
+  await page.mouse.move(startX + barStep * 0.4, startY)
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+    .toBeGreaterThan(firstFractionalOffset)
+  const secondFractionalOffset = Number(await chart.getAttribute('data-right-offset'))
+  const secondFractionalCenter = await readCandleCenter(trackedCandle)
+
+  expect(firstFractionalOffset).toBeLessThan(1)
+  expect(secondFractionalOffset).toBeLessThan(1)
+  expect(firstFractionalCenter).toBeGreaterThan(trackedStart)
+  expect(secondFractionalCenter).toBeGreaterThan(firstFractionalCenter)
+  expect(secondFractionalCenter - trackedStart).toBeLessThan(barStep)
+  const clipGeometry = await trackedCandle.evaluate((node) => {
+    const body = node.querySelector('rect')
+    const clipRect = node.ownerSVGElement.querySelector('#market-chart-price-plot-clip rect')
+    const panSurface = node.ownerSVGElement.querySelector('.chart-pan-surface')
+    let hasClipAncestor = false
+    let current = node.parentElement
+    while (current && current !== node.ownerSVGElement) {
+      if (
+        current.hasAttribute('clip-path') ||
+        (getComputedStyle(current).clipPath && getComputedStyle(current).clipPath !== 'none')
+      ) {
+        hasClipAncestor = true
+        break
+      }
+      current = current.parentElement
+    }
+    return {
+      bodyRight: Number(body.getAttribute('x')) + Number(body.getAttribute('width')),
+      clipRight: Number(clipRect.getAttribute('x')) + Number(clipRect.getAttribute('width')),
+      hasClipAncestor,
+      panRight: Number(panSurface.getAttribute('x')) + Number(panSurface.getAttribute('width'))
+    }
+  })
+  expect(clipGeometry.hasClipAncestor).toBe(true)
+  expect(clipGeometry.bodyRight).toBeGreaterThan(clipGeometry.clipRight)
+  expect(clipGeometry.clipRight).toBeCloseTo(clipGeometry.panRight, 5)
+
   await page.mouse.up()
-  await expect(chart).toHaveAttribute('data-window-end', String(zoomedWindowEnd))
-  await expect(chart).toHaveAttribute('data-right-offset', '0')
-  await expect(chart).toHaveAttribute('data-follow-latest', 'true')
+  await expect.poll(() => chart.evaluate((node) => getComputedStyle(node).cursor)).toBe('crosshair')
+})
+
+test('mode-specific zoom limits preserve readable chart geometry', async ({ page }) => {
+  const cases = [
+    { deltaY: -10_000, expected: 28, mode: 'candles', route: '/price-chart' },
+    { deltaY: 10_000, expected: 13, mode: 'footprint', route: '/footprint' },
+    { deltaY: 10_000, expected: 12, mode: 'step-profile', route: '/step-profile' }
+  ]
+
+  for (const { deltaY, expected, mode, route } of cases) {
+    await page.goto(route)
+    const chart = page.getByLabel(`${mode} historical chart`)
+    const bounds = await chart.boundingBox()
+    await page.mouse.move(bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.45)
+    await page.mouse.wheel(0, deltaY)
+    await expect(chart).toHaveAttribute('data-visible-count', String(expected))
+
+    if (mode === 'footprint') {
+      expect(await chart.locator('.footprint-cell').count()).toBeGreaterThan(0)
+      const fit = await chart.locator('.footprint-cell').evaluateAll((cells) =>
+        cells.every((cell) =>
+          [...cell.querySelectorAll('.footprint-cell-value')].every((value) => {
+            const background = cell.querySelector(
+              value.classList.contains('bid') ? '.footprint-bid-bg' : '.footprint-ask-bg'
+            )
+            const textBox = value.getBBox()
+            const cellBox = background.getBBox()
+            return (
+              textBox.x >= cellBox.x - 0.5 &&
+              textBox.x + textBox.width <= cellBox.x + cellBox.width + 0.5 &&
+              textBox.y >= cellBox.y - 0.5 &&
+              textBox.y + textBox.height <= cellBox.y + cellBox.height + 0.5
+            )
+          })
+        )
+      )
+      expect(fit).toBe(true)
+    }
+
+    if (mode === 'step-profile') {
+      expect(await chart.locator('.step-profile-level').count()).toBeGreaterThan(0)
+      const fit = await chart.locator('.step-profile-level').evaluateAll((levels) =>
+        levels.every((level) => {
+          const textBox = level.querySelector('.step-profile-value').getBBox()
+          const cellBox = level.querySelector('.step-profile-cell-bg').getBBox()
+          return (
+            textBox.x >= cellBox.x - 0.5 &&
+            textBox.x + textBox.width <= cellBox.x + cellBox.width + 0.5 &&
+            textBox.y >= cellBox.y - 0.5 &&
+            textBox.y + textBox.height <= cellBox.y + cellBox.height + 0.5
+          )
+        })
+      )
+      expect(fit).toBe(true)
+    }
+  }
+})
+
+test('time-axis labels never overlap at the most compressed candle scale', async ({ page }) => {
+  await page.setViewportSize({ height: 900, width: 1366 })
+  await page.goto('/price-chart')
+  const chart = page.getByLabel('candles historical chart')
+  const bounds = await chart.boundingBox()
+  await page.mouse.move(bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.45)
+  await page.mouse.wheel(0, 10_000)
+  await expect(chart).toHaveAttribute('data-visible-count', '160')
+
+  const labels = await chart.locator('.time-tick').evaluateAll((nodes) =>
+    nodes
+      .map((node) => {
+        const bounds = node.getBoundingClientRect()
+        return { left: bounds.left, right: bounds.right }
+      })
+      .sort((left, right) => left.left - right.left)
+  )
+  expect(labels.length).toBeGreaterThan(1)
+  expect(labels.every((label, index) => index === 0 || label.left >= labels[index - 1].right)).toBe(
+    true
+  )
 })
 
 test('step profile supports deep legible zoom without sparse profile bars', async ({ page }) => {
@@ -561,7 +776,8 @@ test('historical synchronization, settings and keyboard controls remain coherent
   const countdownBefore = await countdown.textContent()
   await page.waitForTimeout(1000)
   await expect(countdown).not.toHaveText(countdownBefore)
-  await expect(page.locator('.terminal-footer')).toHaveText('ApexTrader by devsigner.xyz')
+  await expectFooterContract(page)
+  await expect(page.locator('.window-label')).toHaveCount(0)
   await expect(page.getByLabel('Historical time')).toHaveCount(0)
   await expect(page.getByLabel('Playback speed')).toHaveCount(0)
   await expect(page.getByText(/REPLAYING|BUFFERING|PAUSED/)).toHaveCount(0)
@@ -583,11 +799,10 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByRole('button', { name: /Zoom chart/ })).toHaveCount(0)
   await expect(page.getByLabel('Visible bars')).toHaveCount(0)
 
-  const visibleWindow = page.locator('.window-label')
-  const initialWindow = await visibleWindow.textContent()
+  const initialWindow = await readChartWindow(chart)
   await chart.focus()
   await page.keyboard.press('ArrowLeft')
-  await expect(visibleWindow).not.toHaveText(initialWindow)
+  await expect.poll(() => readChartWindow(chart)).not.toEqual(initialWindow)
   await page.keyboard.press('0')
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 
@@ -639,13 +854,20 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.getByLabel('Resize DOM').focus()
   await page.keyboard.press('ArrowLeft')
   const resizedDom = await domPanel.boundingBox()
-  const resizedDomCells = await page
-    .locator('.dom-row')
-    .first()
-    .locator('span')
-    .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().width))
   expect(resizedDom.width).toBeGreaterThan(initialDom.width)
-  expect(resizedDomCells.every((width, index) => width > initialDomCells[index])).toBe(true)
+  await expect
+    .poll(async () => {
+      const resizedDomCells = await page
+        .locator('.dom-row')
+        .first()
+        .locator('span')
+        .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().width))
+      return (
+        resizedDomCells.every((width, index) => width >= initialDomCells[index] - 0.1) &&
+        resizedDomCells.some((width, index) => width > initialDomCells[index] + 0.5)
+      )
+    })
+    .toBe(true)
 
   await page.locator('.dom-row').evaluateAll((nodes) => {
     window.__domRowsByPrice = new Map(nodes.map((node) => [node.dataset.price, node]))

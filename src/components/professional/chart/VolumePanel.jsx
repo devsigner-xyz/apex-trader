@@ -1,16 +1,20 @@
 /* eslint-disable react/prop-types */
-import {
-  clamp,
-  deriveVolumeBarGeometry
-} from '../../../services/professionalChartGeometry.js'
+import { clamp, deriveVolumeBarGeometry } from '../../../services/professionalChartGeometry.js'
 import { chartDimensions, chartPanelSizeLimits } from '../config.js'
 import PanelResizer from '../PanelResizer.jsx'
 
-const { chartWidth, volumeBottom, volumeChartHeight, volumeTop } = chartDimensions
+const { chartWidth, plotLeft, plotRight, volumeBottom, volumeChartHeight, volumeTop } =
+  chartDimensions
+const plotWidth = plotRight - plotLeft
 
-export default function VolumePanel({ bars, centers, setPanelSizes, timeIndexes, width }) {
-  const maximumVolume = Math.max(...bars.map((bar) => bar.volume), 1)
-
+export default function VolumePanel({
+  bars,
+  centers,
+  maximumVolume,
+  setPanelSizes,
+  timeIndexes,
+  width
+}) {
   return (
     <>
       <PanelResizer
@@ -36,36 +40,43 @@ export default function VolumePanel({ bars, centers, setPanelSizes, timeIndexes,
           viewBox={`0 0 ${chartWidth} ${volumeChartHeight}`}
         >
           <rect width={chartWidth} height={volumeChartHeight} fill="#0b0f12" />
-          {timeIndexes.map((index) => (
-            <line
-              className="gridline faint"
-              key={`volume-grid-${bars[index]?.timestamp}`}
-              x1={centers[index]}
-              x2={centers[index]}
-              y1="0"
-              y2={volumeChartHeight}
-            />
-          ))}
-          {bars.map((bar, index) => {
-            const geometry = deriveVolumeBarGeometry(
-              bar,
-              centers[index],
-              width,
-              maximumVolume,
-              volumeTop,
-              volumeBottom
-            )
-            return (
-              <rect
-                className={`volume-bar ${geometry.rising ? 'volume-up' : 'volume-down'}`}
-                height={geometry.height}
-                key={`volume-${bar.timestamp}`}
-                width={geometry.width}
-                x={geometry.x}
-                y={geometry.y}
+          <defs>
+            <clipPath id="market-chart-volume-plot-clip">
+              <rect height={volumeChartHeight} width={plotWidth} x={plotLeft} y="0" />
+            </clipPath>
+          </defs>
+          <g clipPath="url(#market-chart-volume-plot-clip)">
+            {timeIndexes.map((index) => (
+              <line
+                className="gridline faint"
+                key={`volume-grid-${bars[index]?.timestamp}`}
+                x1={centers[index]}
+                x2={centers[index]}
+                y1="0"
+                y2={volumeChartHeight}
               />
-            )
-          })}
+            ))}
+            {bars.map((bar, index) => {
+              const geometry = deriveVolumeBarGeometry(
+                bar,
+                centers[index],
+                width,
+                maximumVolume,
+                volumeTop,
+                volumeBottom
+              )
+              return (
+                <rect
+                  className={`volume-bar ${geometry.rising ? 'volume-up' : 'volume-down'}`}
+                  height={geometry.height}
+                  key={`volume-${bar.timestamp}`}
+                  width={geometry.width}
+                  x={geometry.x}
+                  y={geometry.y}
+                />
+              )
+            })}
+          </g>
         </svg>
       </div>
     </>

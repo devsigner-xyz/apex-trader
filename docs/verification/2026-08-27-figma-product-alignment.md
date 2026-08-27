@@ -20,6 +20,17 @@ owners: product-design-engineering
 - Panel Settings con Chart, Time Sales y RadioOption.
 - Anotaciones nativas de desarrollo, interacción, accesibilidad y contenido.
 
+## Limpieza de la librería Figma
+
+- 25 páginas activas con canvas negro; los dos separadores vacíos fueron retirados.
+- Getting Started se convirtió en un mapa anotado de las siete regiones de la terminal.
+- Components y Utilities contienen índices y resúmenes visibles.
+- `_Documentation/Page intro` (`530:7371`) unifica título y descripción a 14 px con altura Hug; 20 instancias permanecen enlazadas al master.
+- Production UI contiene Price Chart, Footprint y Step Profile en una sola columna con 120 px de separación.
+- `Trading/MarketChart` (`101:3457`) conserva sus ocho variantes y sus anotaciones, ahora en una sola columna y sin overflow.
+- El contenido de Market Chart Behavior se migró a la página del componente y `465:9587` se retiró después de verificar los textos y metadatos.
+- Archive permanece antes de `99.99 · Graveyard · Legacy UI`, que es la última página.
+
 ## Correcciones de producto
 
 - Los labels del value area permanecen sin las barras.

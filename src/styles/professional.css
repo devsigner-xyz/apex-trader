@@ -618,7 +618,7 @@
 }
 
 .price-chart-panel > svg {
-  cursor: grab;
+  cursor: crosshair;
   outline: none;
   touch-action: none;
   user-select: none;
@@ -629,7 +629,7 @@
 }
 
 .chart-pan-surface {
-  cursor: grab;
+  cursor: crosshair;
 }
 
 .price-chart-panel > svg.dragging .chart-pan-surface {
@@ -669,8 +669,7 @@
   opacity: 0.42;
 }
 
-.time-tick,
-.window-label {
+.time-tick {
   fill: var(--pro-muted);
   font: 10px 'Roboto Mono', monospace;
 }
@@ -878,10 +877,6 @@
   font: 700 8px 'Roboto Mono', monospace;
   letter-spacing: 0.02em;
   opacity: 0.82;
-}
-
-.window-label {
-  fill: var(--pro-accent);
 }
 
 .dom {
@@ -1511,6 +1506,30 @@
   background: var(--pro-top);
   border-top: 1px solid var(--pro-border);
   font-weight: 500;
+}
+
+.terminal-footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.terminal-footer a:hover {
+  color: var(--pro-text);
+}
+
+.terminal-footer a:focus-visible {
+  color: var(--pro-text);
+  outline: 2px solid var(--pro-accent);
+  outline-offset: 3px;
+}
+
+.pro-terminal select:not([multiple]) {
+  appearance: none;
+  padding-inline-end: calc(12px + var(--space-2) + var(--space-2));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='m2 2 4 4 4-4' stroke='%2389959F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-2) center;
+  background-size: 12px 8px;
 }
 
 @keyframes quote-update {

@@ -1,5 +1,7 @@
 import { createFixedChartSlots } from './chartTransforms.js'
 
+export const chartOffsetEpsilon = 1e-6
+
 export function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum)
 }
@@ -11,16 +13,61 @@ export function selectVisibleWindow(bars, visibleCount, rightOffset) {
 
   const maximumOffset = Math.max(0, bars.length - Math.min(visibleCount, bars.length))
   const safeOffset = clamp(Number.isFinite(rightOffset) ? rightOffset : 0, 0, maximumOffset)
-  const endIndex = bars.length - safeOffset
-  const startIndex = Math.max(0, endIndex - visibleCount)
+  const logicalEnd = bars.length - safeOffset
+  const logicalStart = Math.max(0, logicalEnd - visibleCount)
+  const startIndex = clamp(Math.floor(logicalStart), 0, bars.length)
+  const endIndex = clamp(Math.ceil(logicalEnd), startIndex, bars.length)
+  const phase = logicalStart - startIndex
+  const renderBars = bars.slice(startIndex, endIndex)
 
   return {
     endIndex,
+    logicalEnd,
+    logicalStart,
     maximumOffset,
+    phase,
+    renderBars,
     safeOffset,
     startIndex,
-    visible: bars.slice(startIndex, endIndex)
+    visible: renderBars
   }
+}
+
+export function isChartOffsetAtLatest(offset, epsilon = chartOffsetEpsilon) {
+  if (!Number.isFinite(offset)) return false
+  if (!Number.isFinite(epsilon) || epsilon < 0)
+    throw new TypeError('Chart offset epsilon must be a finite non-negative number.')
+  return Math.abs(offset) <= epsilon
+}
+
+export function findTimeScaleBarIndex({
+  barCount,
+  chartX,
+  logicalEnd,
+  logicalStart,
+  plotLeft,
+  plotWidth,
+  visibleCount
+}) {
+  if (!Number.isInteger(barCount) || barCount < 0)
+    throw new TypeError('Chart bar count must be a non-negative integer.')
+  if (!Number.isFinite(chartX)) throw new TypeError('Chart X must be finite.')
+  if (!Number.isFinite(logicalStart) || !Number.isFinite(logicalEnd))
+    throw new TypeError('Logical chart bounds must be finite.')
+  if (!Number.isFinite(plotLeft) || !Number.isFinite(plotWidth) || plotWidth <= 0)
+    throw new TypeError('Chart plot geometry must be finite and have positive width.')
+  if (!Number.isInteger(visibleCount) || visibleCount < 1)
+    throw new TypeError('Visible chart bar count must be a positive integer.')
+
+  const plotRight = plotLeft + plotWidth
+  if (barCount === 0 || chartX < plotLeft || chartX > plotRight) return null
+
+  const logicalPosition = logicalStart + ((chartX - plotLeft) / plotWidth) * visibleCount
+  if (logicalPosition < logicalStart || logicalPosition > logicalEnd) return null
+
+  const lastRenderedIndex = Math.ceil(logicalEnd) - 1
+  const index = Math.min(Math.floor(logicalPosition), lastRenderedIndex)
+  return index >= 0 && index < barCount ? index : null
 }
 
 export function normalizeWheelDelta({ deltaMode = 0, deltaX = 0, deltaY = 0 }, pageSize = 800) {
@@ -48,7 +95,7 @@ export function deriveZoomedViewport({
 
   if (nextVisibleCount === safeVisibleCount) {
     return {
-      rightOffset: clamp(Math.round(rightOffset), 0, maximumOffset),
+      rightOffset: clamp(rightOffset, 0, maximumOffset),
       visibleCount: safeVisibleCount
     }
   }
@@ -59,7 +106,7 @@ export function deriveZoomedViewport({
   const nextRightOffset = barCount - (nextStart + nextVisibleCount)
 
   return {
-    rightOffset: clamp(Math.round(nextRightOffset), 0, maximumOffset),
+    rightOffset: clamp(nextRightOffset, 0, maximumOffset),
     visibleCount: nextVisibleCount
   }
 }
@@ -72,7 +119,7 @@ export function derivePannedOffset({
   visibleCount
 }) {
   const pixelsPerBar = plotWidth / Math.max(visibleCount, 1)
-  const barDelta = Math.round(pixelDelta / Math.max(pixelsPerBar, 4))
+  const barDelta = pixelDelta / Math.max(pixelsPerBar, Number.EPSILON)
   return clamp(rightOffset - barDelta, 0, maximumOffset)
 }
 
@@ -137,8 +184,8 @@ export function createPriceScale(domain, top, bottom) {
   }
 }
 
-export function createTimeScale(itemCount, slotCount, plotLeft, plotWidth) {
-  return createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth)
+export function createTimeScale(itemCount, slotCount, plotLeft, plotWidth, phase = 0) {
+  return createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth, phase)
 }
 
 export function createPriceTicks(domain, count) {
@@ -162,6 +209,30 @@ export function selectEvenIndexes(length, count) {
       Array.from({ length: count }, (_, index) => Math.round((index * (length - 1)) / (count - 1)))
     )
   ]
+}
+
+export function selectTimeTickIndexes(positions, maximumCount = 6, minimumSpacing = 64) {
+  if (!Array.isArray(positions) || positions.some((position) => !Number.isFinite(position)))
+    throw new TypeError('Chart tick positions must be an array of finite numbers.')
+  if (!Number.isInteger(maximumCount) || maximumCount < 1)
+    throw new TypeError('Maximum chart tick count must be a positive integer.')
+  if (!Number.isFinite(minimumSpacing) || minimumSpacing < 0)
+    throw new TypeError('Minimum chart tick spacing must be a finite non-negative number.')
+  if (positions.some((position, index) => index > 0 && position < positions[index - 1]))
+    throw new TypeError('Chart tick positions must be ordered from left to right.')
+  if (positions.length === 0) return []
+
+  const candidateCount = Math.min(maximumCount, positions.length)
+  for (let count = candidateCount; count >= 2; count -= 1) {
+    const indexes = selectEvenIndexes(positions.length, count)
+    const hasRequiredSpacing = indexes.every(
+      (index, position) =>
+        position === 0 || positions[index] - positions[indexes[position - 1]] >= minimumSpacing
+    )
+    if (hasRequiredSpacing) return indexes
+  }
+
+  return [Math.floor((positions.length - 1) / 2)]
 }
 
 export function buildSessionProfile(profile, minimum, maximum, binCount = 25) {
@@ -216,7 +287,7 @@ export function deriveCandleGeometry(bar, center, width, priceScale) {
 }
 
 export function deriveFootprintCellGeometry({ plotHeight, range, step, tickSize, zoomScale }) {
-  const barWidth = Math.min(step * 0.78, 76)
+  const barWidth = clamp(step - 12, 68, 84)
   return {
     barWidth,
     halfWidth: barWidth / 2,
@@ -225,11 +296,12 @@ export function deriveFootprintCellGeometry({ plotHeight, range, step, tickSize,
 }
 
 export function deriveStepProfileCellGeometry({ plotHeight, range, step, tickSize, zoomScale }) {
-  const cellWidth = clamp(step * 0.42, 42, 40 + 20 * zoomScale)
+  const cellWidth = clamp(step * 0.56, 60, 180)
+  const maximumSideWidth = Math.max(0, Math.min((step - cellWidth - 10) / 2, 80 * zoomScale))
   const rowHeight = clamp((tickSize / range) * plotHeight * 0.84, 8, 10 + 2.2 * zoomScale)
   return {
     cellWidth,
-    maximumSideWidth: Math.max(2, Math.min((step - cellWidth) * 0.46, 80 * zoomScale)),
+    maximumSideWidth,
     rowHeight,
     sideHeight: Math.max(4, rowHeight - 2),
     valueFontSize: clamp(rowHeight - 2, 7, 16)

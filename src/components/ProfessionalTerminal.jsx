@@ -86,7 +86,12 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
         />
         <Execution price={price} setPrice={setPrice} trades={view.trades} />
       </div>
-      <footer className="terminal-footer">ApexTrader by devsigner.xyz</footer>
+      <footer className="terminal-footer">
+        ApexTrader by{' '}
+        <a href="https://devsigner.xyz" rel="noopener noreferrer" target="_blank">
+          devsigner.xyz
+        </a>
+      </footer>
     </div>
   )
 }
