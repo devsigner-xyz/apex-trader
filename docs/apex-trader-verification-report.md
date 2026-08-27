@@ -1,5 +1,7 @@
 # Apex Trader v2 implementation and verification report
 
+> Historical snapshot. Use [Professional terminal specification](product/professional-terminal.md) and the [latest alignment verification](verification/2026-08-27-figma-product-alignment.md) for the current contract.
+
 Initial report: 2026-08-23. Updated: 2026-08-25. Scope: the Apex Trader repository and the explicitly authorized DOM-controls correction in the Apex Trader Figma file.
 
 ## Implemented routes and interactions

@@ -1198,8 +1198,12 @@
 }
 
 .tape header span {
-  color: var(--pro-buy);
+  min-width: 0;
+  overflow: hidden;
+  color: var(--pro-muted);
   font: 10px 'Roboto Mono', monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tape-settings-popover {
@@ -1372,9 +1376,17 @@
 }
 
 .activity-table--positions .activity-row span:nth-child(6),
-.activity-table--positions .activity-row span:last-child,
-.activity-table--orders .activity-row span:last-child {
+.activity-row .positive {
   color: var(--pro-buy);
+}
+
+.activity-row .negative,
+.activity-row .action-danger {
+  color: var(--pro-sell);
+}
+
+.activity-row .action-neutral {
+  color: var(--pro-text);
 }
 
 .account-risk-view {

@@ -12,15 +12,22 @@ const markerTextX = markerX + markerWidth / 2
 export default function SessionProfileOverlay({ markers, maximumVolume, priceScale, profile }) {
   const y = priceScale.toY
   const originX = plotRight - profileChartWidth
+  const hasBars = profile.length > 0
 
   return (
     <g
-      aria-label="Visible range volume profile overlay"
+      aria-label={
+        hasBars ? 'Visible range volume profile overlay' : 'Visible range value area markers'
+      }
       className="session-profile-overlay"
       role="img"
       transform={`translate(${originX} 0)`}
     >
-      <title>Visible range volume profile overlaid on the price chart</title>
+      <title>
+        {hasBars
+          ? 'Visible range volume profile overlaid on the price chart'
+          : 'Visible range value area markers at the profile edge'}
+      </title>
       <g className="session-profile-bars">
         {profile.map((level, index) => {
           const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, profileChartWidth)

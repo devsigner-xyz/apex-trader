@@ -1,5 +1,7 @@
 # Apex Trader Figma implementation inventory
 
+> Historical inventory. Current master IDs, variants and annotation policy live in [Figma contract](figma/README.md).
+
 Source file: `Ze9eGnPaNDj8u0oB1iUt3C`, page `01 · Proposed UI`.
 
 The original rebuild objective treated Figma as read-only. Later user instructions explicitly authorized synchronizing the current web layout back into the three target frames. Those writes are limited to the Apex Trader file and are recorded below.

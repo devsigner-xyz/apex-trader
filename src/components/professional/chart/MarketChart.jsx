@@ -405,12 +405,12 @@ export default function MarketChart({
               />
             )}
 
-            {panelVisibility.profile && (
+            {(panelVisibility.profile || panelVisibility.valueArea) && (
               <SessionProfileOverlay
                 markers={panelVisibility.valueArea ? profileMarkers : []}
                 maximumVolume={maxProfile}
                 priceScale={priceScale}
-                profile={profile}
+                profile={panelVisibility.profile ? profile : []}
               />
             )}
 

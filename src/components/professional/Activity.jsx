@@ -2,6 +2,14 @@ import { useState } from 'react'
 import { accountSummary, activityTables, activityTabs, riskLimits } from './fixtures.js'
 import { activityTabId } from './formatters.js'
 
+function cellTone(cell) {
+  if (cell.startsWith('+') || cell === 'BUY') return 'positive'
+  if (cell === 'SELL') return 'negative'
+  if (cell === 'CANCEL' || cell === 'CLOSE') return 'action-danger'
+  if (cell === 'DETAILS') return 'action-neutral'
+  return ''
+}
+
 export default function Activity() {
   const [tab, setTab] = useState('POSITIONS')
   const table = activityTables[tab]
@@ -58,7 +66,14 @@ export default function Activity() {
                       <span>{label}</span>
                       <strong>{detail}</strong>
                     </div>
-                    <span aria-label={`${label} ${usage}% used`} className="risk-meter">
+                    <span
+                      aria-label={`${label} ${usage}% used`}
+                      aria-valuemax="100"
+                      aria-valuemin="0"
+                      aria-valuenow={usage}
+                      className="risk-meter"
+                      role="progressbar"
+                    >
                       <span style={{ width: `${usage}%` }} />
                     </span>
                   </div>
@@ -80,16 +95,7 @@ export default function Activity() {
                 style={{ '--activity-columns': table.grid }}
               >
                 {row.map((cell, cellIndex) => (
-                  <span
-                    className={
-                      cell.startsWith('+') || cell === 'BUY'
-                        ? 'positive'
-                        : cell === 'SELL'
-                          ? 'negative'
-                          : ''
-                    }
-                    key={cellIndex}
-                  >
+                  <span className={cellTone(cell)} key={cellIndex}>
                     {cell}
                   </span>
                 ))}

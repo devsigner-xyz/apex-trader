@@ -64,6 +64,38 @@ export default function Watchlist() {
           <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
         </button>
       </div>
+      {settingsOpen && (
+        <aside
+          aria-label="Markets columns"
+          className="watch-settings-popover"
+          id="markets-settings-panel"
+          role="dialog"
+        >
+          <strong>VISIBLE COLUMNS</strong>
+          <div className="watch-column-options">
+            {watchlistColumns.map(({ id, label, required }) => (
+              <label key={id}>
+                <input
+                  aria-label={`Show ${label} column`}
+                  checked={required || optionalColumns.includes(id)}
+                  disabled={required}
+                  onChange={() => {
+                    if (required) return
+                    setOptionalColumns((current) =>
+                      current.includes(id)
+                        ? current.filter((column) => column !== id)
+                        : [...current, id]
+                    )
+                  }}
+                  type="checkbox"
+                />
+                <span>{label}</span>
+                {required && <small>ALWAYS</small>}
+              </label>
+            ))}
+          </div>
+        </aside>
+      )}
       <div className="watch-head" style={{ gridTemplateColumns }}>
         {visibleColumns.map(({ id, label }) => (
           <span className={`watch-cell watch-cell--${id}`} key={id}>
@@ -100,38 +132,6 @@ export default function Watchlist() {
           </p>
         )}
       </div>
-      {settingsOpen && (
-        <aside
-          aria-label="Markets columns"
-          className="watch-settings-popover"
-          id="markets-settings-panel"
-          role="dialog"
-        >
-          <strong>VISIBLE COLUMNS</strong>
-          <div className="watch-column-options">
-            {watchlistColumns.map(({ id, label, required }) => (
-              <label key={id}>
-                <input
-                  aria-label={`Show ${label} column`}
-                  checked={required || optionalColumns.includes(id)}
-                  disabled={required}
-                  onChange={() => {
-                    if (required) return
-                    setOptionalColumns((current) =>
-                      current.includes(id)
-                        ? current.filter((column) => column !== id)
-                        : [...current, id]
-                    )
-                  }}
-                  type="checkbox"
-                />
-                <span>{label}</span>
-                {required && <small>ALWAYS</small>}
-              </label>
-            ))}
-          </div>
-        </aside>
-      )}
     </section>
   )
 }
