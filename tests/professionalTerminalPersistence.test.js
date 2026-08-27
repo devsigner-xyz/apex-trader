@@ -18,14 +18,23 @@ test('normalizes workspace panel sizes with the existing defaults and limits', (
   assert.deepEqual(normalizePanelSizes(null), { dom: 218, execution: 280, watch: 360 })
 })
 
-test('normalizes chart panel sizes and visibility without changing their schemas', () => {
+test('normalizes chart panel sizes and visibility with backward-compatible defaults', () => {
   assert.deepEqual(normalizeChartPanelSizes({ profile: 100, volume: 500 }), {
     profile: 120,
     volume: 200
   })
-  assert.deepEqual(normalizeChartPanelVisibility({ profile: false, volume: 'false' }), {
+  assert.deepEqual(
+    normalizeChartPanelVisibility({ profile: false, valueArea: false, volume: 'false' }),
+    {
+      profile: false,
+      valueArea: false,
+      volume: true
+    }
+  )
+  assert.deepEqual(normalizeChartPanelVisibility({ profile: false, volume: false }), {
     profile: false,
-    volume: true
+    valueArea: true,
+    volume: false
   })
 })
 
@@ -46,8 +55,15 @@ test('reads and writes JSON through an injected storage adapter', () => {
     execution: 300,
     watch: 400
   })
-  assert.equal(writePersistentValue(storage, 'visible', { profile: false, volume: true }), true)
-  assert.equal(values.get('visible'), '{"profile":false,"volume":true}')
+  assert.equal(
+    writePersistentValue(storage, 'visible', {
+      profile: false,
+      valueArea: false,
+      volume: true
+    }),
+    true
+  )
+  assert.equal(values.get('visible'), '{"profile":false,"valueArea":false,"volume":true}')
   assert.deepEqual(readPersistentValue(storage, 'missing', normalizePanelSizes), {
     dom: 218,
     execution: 280,

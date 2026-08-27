@@ -263,6 +263,20 @@ export default function MarketChart({
             </label>
             <label>
               <input
+                aria-label="Show VAH, POC and VAL"
+                checked={panelVisibility.valueArea}
+                onChange={(event) =>
+                  setPanelVisibility((current) => ({
+                    ...current,
+                    valueArea: event.target.checked
+                  }))
+                }
+                type="checkbox"
+              />
+              <span>VAH / POC / VAL</span>
+            </label>
+            <label>
+              <input
                 aria-label="Show volume"
                 checked={panelVisibility.volume}
                 onChange={(event) =>
@@ -281,6 +295,7 @@ export default function MarketChart({
       <div
         className="market-chart-panels"
         data-show-profile={panelVisibility.profile}
+        data-show-value-area={panelVisibility.valueArea}
         data-show-volume={panelVisibility.volume}
         style={chartPanelStyle}
       >
@@ -392,14 +407,14 @@ export default function MarketChart({
 
             {panelVisibility.profile && (
               <SessionProfileOverlay
-                markers={profileMarkers}
+                markers={panelVisibility.valueArea ? profileMarkers : []}
                 maximumVolume={maxProfile}
                 priceScale={priceScale}
                 profile={profile}
               />
             )}
 
-            {profileMarkers.length > 0 && (
+            {panelVisibility.valueArea && profileMarkers.length > 0 && (
               <g aria-label="Visible range value area">
                 <line
                   className="poc-line"
