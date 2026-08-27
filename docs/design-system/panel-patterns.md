@@ -18,6 +18,10 @@ owners: product-design-engineering
 
 No añadas títulos para compensar metadata poco clara. Corrige la metadata o el nombre accesible.
 
+Los separadores de Markets, DOM, Execution y Time & Sales usan una sola línea de 1 px con el
+token `border`, igual que los controles de formulario. El token `strong` se reserva para énfasis
+temporal como popovers, focos o asas; no se apilan dos bordes en una misma unión.
+
 ## Settings popover
 
 - Anclado al trigger superior derecho.
@@ -50,9 +54,10 @@ VAH, POC y VAL son independientes de las barras:
 
 - chip sólido 38 × 16 px, radio 2 px;
 - texto centrado con contraste;
-- borde derecho alineado con la base de las barras;
+- borde izquierdo alineado a 8 px del inicio del plot, opuesto al Volume Profile;
 - POC usa POC/accent; VAH y VAL usan profile value;
-- las líneas quedan cubiertas por el chip;
+- cada nivel conserva una única línea edge-to-edge, punteada y de baja opacidad;
+- el chip cubre su línea y no añade un segundo segmento dentro del Volume Profile;
 - el toggle oculta o muestra líneas y chips conjuntamente.
 
 ## Fixtures y responsive

@@ -194,24 +194,30 @@ for (const [route, mode] of views) {
     expect(profilePanelBox.x + profilePanelBox.width).toBeLessThanOrEqual(
       pricePanelBox.x + pricePanelBox.width
     )
-    const profileMarkerGeometry = await page
-      .locator('.session-profile-overlay')
-      .evaluate((profile) => {
-        const bar = profile.querySelector('.session-profile-bar--ask')
-        const marker = profile.querySelector('.session-profile-marker')
-        const markerRect = marker.querySelector('rect')
-        const markerText = marker.querySelector('text')
-        return {
-          barRight: Number(bar.getAttribute('x')) + Number(bar.getAttribute('width')),
-          color: getComputedStyle(marker).color,
-          fill: getComputedStyle(markerRect).fill,
-          markerRight:
-            Number(markerRect.getAttribute('x')) + Number(markerRect.getAttribute('width')),
-          stroke: getComputedStyle(markerRect).stroke,
-          textFill: getComputedStyle(markerText).fill
-        }
-      })
-    expect(profileMarkerGeometry.markerRight).toBeCloseTo(profileMarkerGeometry.barRight, 5)
+    const profileMarkerGeometry = await page.locator('.market-chart').evaluate((chart) => {
+      const marker = chart.querySelector('.session-profile-marker')
+      const markerRect = marker.querySelector('rect')
+      const markerText = marker.querySelector('text')
+      const levelLine = marker.parentElement.querySelector('.poc-line, .value-line')
+      return {
+        color: getComputedStyle(marker).color,
+        dashPattern: getComputedStyle(levelLine).strokeDasharray,
+        fill: getComputedStyle(markerRect).fill,
+        lineCount: marker.querySelectorAll('line').length,
+        lineOpacity: Number(getComputedStyle(levelLine).opacity),
+        lineX1: Number(levelLine.getAttribute('x1')),
+        lineX2: Number(levelLine.getAttribute('x2')),
+        markerLeft: Number(markerRect.getAttribute('x')),
+        stroke: getComputedStyle(markerRect).stroke,
+        textFill: getComputedStyle(markerText).fill
+      }
+    })
+    expect(profileMarkerGeometry.markerLeft).toBe(8)
+    expect(profileMarkerGeometry.lineX1).toBe(0)
+    expect(profileMarkerGeometry.lineX2).toBe(1048)
+    expect(profileMarkerGeometry.lineCount).toBe(0)
+    expect(profileMarkerGeometry.dashPattern).not.toBe('none')
+    expect(profileMarkerGeometry.lineOpacity).toBeLessThan(0.7)
     expect(profileMarkerGeometry.fill).toBe(profileMarkerGeometry.color)
     expect(profileMarkerGeometry.stroke).toBe('none')
     expect(profileMarkerGeometry.textFill).not.toBe(profileMarkerGeometry.fill)
@@ -981,7 +987,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.getByLabel('Chart settings').click()
   await page.getByLabel('Show visible range volume profile').uncheck()
   await expect(profilePanel).toHaveCount(0)
-  await expect(page.getByRole('img', { name: 'Visible range value area markers' })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'VAH, POC and VAL markers' })).toBeVisible()
   await expect(valueAreaMarkers).toHaveCount(3)
   await page.getByLabel('Show visible range volume profile').check()
   await expect(profilePanel).toBeVisible()

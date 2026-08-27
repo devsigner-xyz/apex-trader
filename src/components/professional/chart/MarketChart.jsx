@@ -49,6 +49,9 @@ const {
   priceChartHeight,
   timeTickY
 } = chartDimensions
+const profileMarkerWidth = 38
+const profileMarkerX = plotLeft + 8
+const profileMarkerTextX = profileMarkerX + profileMarkerWidth / 2
 const {
   chartPanelSizes: chartPanelSizesStorageKey,
   chartPanelVisibility: chartPanelVisibilityStorageKey
@@ -451,38 +454,46 @@ export default function MarketChart({
               )}
             </g>
 
-            {(panelVisibility.profile || panelVisibility.valueArea) && (
+            {panelVisibility.profile && (
               <SessionProfileOverlay
-                markers={panelVisibility.valueArea ? profileMarkers : []}
                 maximumVolume={maxProfile}
                 priceScale={priceScale}
-                profile={panelVisibility.profile ? profile : []}
+                profile={profile}
               />
             )}
 
             {panelVisibility.valueArea && profileMarkers.length > 0 && (
               <g aria-label="Visible range value area">
-                <line
-                  className="poc-line"
-                  x1={plotLeft}
-                  x2={plotRight}
-                  y1={y(visibleProfile.poc)}
-                  y2={y(visibleProfile.poc)}
-                />
-                <line
-                  className="value-line"
-                  x1={plotLeft}
-                  x2={plotRight}
-                  y1={y(visibleProfile.vah)}
-                  y2={y(visibleProfile.vah)}
-                />
-                <line
-                  className="value-line"
-                  x1={plotLeft}
-                  x2={plotRight}
-                  y1={y(visibleProfile.val)}
-                  y2={y(visibleProfile.val)}
-                />
+                <g aria-label="VAH, POC and VAL markers" role="img">
+                  <title>VAH, POC and VAL markers aligned to the left price edge</title>
+                  {profileMarkers.map(({ label, price, tone }) => (
+                    <g key={label}>
+                      <line
+                        className={tone === 'poc' ? 'poc-line' : 'value-line'}
+                        x1={plotLeft}
+                        x2={plotRight}
+                        y1={y(price)}
+                        y2={y(price)}
+                      />
+                      <g
+                        className={`session-profile-marker session-profile-marker--${tone}`}
+                        transform={`translate(0 ${y(price)})`}
+                      >
+                        <title>{`${label} ${fmt(price)}`}</title>
+                        <rect
+                          height="16"
+                          rx="2"
+                          width={profileMarkerWidth}
+                          x={profileMarkerX}
+                          y="-8"
+                        />
+                        <text textAnchor="middle" x={profileMarkerTextX} y="3">
+                          {label}
+                        </text>
+                      </g>
+                    </g>
+                  ))}
+                </g>
               </g>
             )}
 

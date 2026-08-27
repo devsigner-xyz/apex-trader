@@ -98,7 +98,9 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
       ref={domRef}
     >
       <header>
-        <span>BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}</span>
+        <span>
+          BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}
+        </span>
         <button
           aria-controls="dom-settings-panel"
           aria-expanded={settingsOpen}
@@ -186,11 +188,6 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
           {bids.map((row, index) => renderRow(row, 'bid', index))}
         </div>
       </div>
-      <footer>
-        <span>
-          BID {fmt(orderbook.bids[0]?.price)} ASK {fmt(orderbook.asks[0]?.price)}
-        </span>
-      </footer>
     </section>
   )
 }

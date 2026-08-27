@@ -63,6 +63,7 @@ Deuda: el tamaño persistido del profile es legado aunque la anchura renderizada
 - Asks y bids tienen scroll independiente; seleccionar precio lo copia a Execution.
 - Grouping es transitorio.
 - Price y Size son L2 histórico. `Δ` y `LAST` son presentación derivada.
+- El ladder termina directamente en los bids; no repite un resumen BID/ASK en el pie.
 
 ## Execution
 

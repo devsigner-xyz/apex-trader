@@ -26,7 +26,7 @@ test.describe('Professional historical order flow', () => {
     await expect(spreadRow).toContainText('LAST')
     await expect(spreadRow).toContainText('SPREAD')
     await expect(page.getByText(/Exact groups applied/)).toHaveCount(0)
-    await expect(page.locator('.dom footer')).toContainText(/BID .* ASK/)
+    await expect(page.locator('.dom footer')).toHaveCount(0)
     await expect(page.getByText(/LADDER|D42|CUM/)).toHaveCount(0)
 
     const separator = await page.locator('.dom-ladder').evaluate((ladder) => {
@@ -81,15 +81,14 @@ test.describe('Professional historical order flow', () => {
 
     const dimensions = await page.locator('.dom').evaluate((dom) => {
       const ladder = dom.querySelector('.dom-ladder')
-      const footer = dom.querySelector('footer')
       return {
         domBottom: dom.getBoundingClientRect().bottom,
-        footerBottom: footer.getBoundingClientRect().bottom,
+        ladderBottom: ladder.getBoundingClientRect().bottom,
         ladderHeight: ladder.getBoundingClientRect().height
       }
     })
     expect(dimensions.ladderHeight).toBeGreaterThan(700)
-    expect(Math.abs(dimensions.domBottom - dimensions.footerBottom)).toBeLessThanOrEqual(1)
+    expect(Math.abs(dimensions.domBottom - dimensions.ladderBottom)).toBeLessThanOrEqual(1)
   })
 
   test('sends a selected real DOM price to the execution ticket', async ({ page }) => {

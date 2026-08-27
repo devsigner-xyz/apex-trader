@@ -1,33 +1,21 @@
 /* eslint-disable react/prop-types */
 import { deriveSessionProfileBarGeometry } from '../../../services/professionalChartGeometry.js'
 import { chartDimensions } from '../config.js'
-import { formatNumber as fmt } from '../formatters.js'
 
 const { plotRight, profileChartWidth } = chartDimensions
-const markerWidth = 38
-const profileRightInset = 8
-const markerX = profileChartWidth - profileRightInset - markerWidth
-const markerTextX = markerX + markerWidth / 2
 
-export default function SessionProfileOverlay({ markers, maximumVolume, priceScale, profile }) {
+export default function SessionProfileOverlay({ maximumVolume, priceScale, profile }) {
   const y = priceScale.toY
   const originX = plotRight - profileChartWidth
-  const hasBars = profile.length > 0
 
   return (
     <g
-      aria-label={
-        hasBars ? 'Visible range volume profile overlay' : 'Visible range value area markers'
-      }
+      aria-label="Visible range volume profile overlay"
       className="session-profile-overlay"
       role="img"
       transform={`translate(${originX} 0)`}
     >
-      <title>
-        {hasBars
-          ? 'Visible range volume profile overlaid on the price chart'
-          : 'Visible range value area markers at the profile edge'}
-      </title>
+      <title>Visible range volume profile overlaid on the price chart</title>
       <g className="session-profile-bars">
         {profile.map((level, index) => {
           const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, profileChartWidth)
@@ -51,20 +39,6 @@ export default function SessionProfileOverlay({ markers, maximumVolume, priceSca
           )
         })}
       </g>
-      {markers.map(({ label, price, tone }) => (
-        <g
-          className={`session-profile-marker session-profile-marker--${tone}`}
-          key={label}
-          transform={`translate(0 ${y(price)})`}
-        >
-          <title>{`${label} ${fmt(price)}`}</title>
-          <line x1="0" x2={profileChartWidth - profileRightInset} y1="0" y2="0" />
-          <rect height="16" rx="2" width={markerWidth} x={markerX} y="-8" />
-          <text textAnchor="middle" x={markerTextX} y="3">
-            {label}
-          </text>
-        </g>
-      ))}
     </g>
   )
 }
