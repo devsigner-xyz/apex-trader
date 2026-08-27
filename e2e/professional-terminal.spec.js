@@ -138,6 +138,27 @@ for (const [route, mode] of views) {
     expect(profilePanelBox.x + profilePanelBox.width).toBeLessThanOrEqual(
       pricePanelBox.x + pricePanelBox.width
     )
+    const profileMarkerGeometry = await page
+      .locator('.session-profile-overlay')
+      .evaluate((profile) => {
+        const bar = profile.querySelector('.session-profile-bar--ask')
+        const marker = profile.querySelector('.session-profile-marker')
+        const markerRect = marker.querySelector('rect')
+        const markerText = marker.querySelector('text')
+        return {
+          barRight: Number(bar.getAttribute('x')) + Number(bar.getAttribute('width')),
+          color: getComputedStyle(marker).color,
+          fill: getComputedStyle(markerRect).fill,
+          markerRight:
+            Number(markerRect.getAttribute('x')) + Number(markerRect.getAttribute('width')),
+          stroke: getComputedStyle(markerRect).stroke,
+          textFill: getComputedStyle(markerText).fill
+        }
+      })
+    expect(profileMarkerGeometry.markerRight).toBeCloseTo(profileMarkerGeometry.barRight, 5)
+    expect(profileMarkerGeometry.fill).toBe(profileMarkerGeometry.color)
+    expect(profileMarkerGeometry.stroke).toBe('none')
+    expect(profileMarkerGeometry.textFill).not.toBe(profileMarkerGeometry.fill)
     expect(pricePanelBox.y + pricePanelBox.height).toBeLessThanOrEqual(volumePanelBox.y)
     await expect(page.getByLabel('Resize volume panel')).toBeVisible()
     await expect(page.getByLabel('Resize session volume profile panel')).toHaveCount(0)

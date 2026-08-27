@@ -4,6 +4,10 @@ import { chartDimensions } from '../config.js'
 import { formatNumber as fmt } from '../formatters.js'
 
 const { plotRight, profileChartWidth } = chartDimensions
+const markerWidth = 38
+const profileRightInset = 8
+const markerX = profileChartWidth - profileRightInset - markerWidth
+const markerTextX = markerX + markerWidth / 2
 
 export default function SessionProfileOverlay({ markers, maximumVolume, priceScale, profile }) {
   const y = priceScale.toY
@@ -47,9 +51,9 @@ export default function SessionProfileOverlay({ markers, maximumVolume, priceSca
           transform={`translate(0 ${y(price)})`}
         >
           <title>{`${label} ${fmt(price)}`}</title>
-          <line x1="0" x2={profileChartWidth} y1="0" y2="0" />
-          <rect height="16" rx="2" width="38" x="4" y="-8" />
-          <text textAnchor="middle" x="23" y="3">
+          <line x1="0" x2={profileChartWidth - profileRightInset} y1="0" y2="0" />
+          <rect height="16" rx="2" width={markerWidth} x={markerX} y="-8" />
+          <text textAnchor="middle" x={markerTextX} y="3">
             {label}
           </text>
         </g>

@@ -713,13 +713,12 @@
 }
 
 .session-profile-marker rect {
-  fill: var(--pro-canvas);
-  stroke: currentColor;
-  stroke-width: 1;
+  fill: currentColor;
+  stroke: none;
 }
 
 .session-profile-marker text {
-  fill: currentColor;
+  fill: var(--pro-canvas);
   font: 700 9px 'Roboto Mono', monospace;
   letter-spacing: 0.04em;
 }
