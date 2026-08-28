@@ -8,7 +8,7 @@ test('landing renders its product thesis without loading historical data', async
   })
   page.on('pageerror', (error) => errors.push(error.message))
   page.on('request', (request) => {
-    if (request.url().includes('/api/market-data/')) historicalRequests.push(request.url())
+    if (request.url().includes('/data/tardis/')) historicalRequests.push(request.url())
   })
 
   await page.goto('/')
@@ -34,7 +34,7 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     'https://devsigner.xyz'
   )
-  await expect(page.getByText('481,468', { exact: true })).toBeVisible()
+  await expect(page.getByText('420,562', { exact: true })).toBeVisible()
   await page.waitForTimeout(250)
   expect(historicalRequests).toEqual([])
   expect(errors).toEqual([])

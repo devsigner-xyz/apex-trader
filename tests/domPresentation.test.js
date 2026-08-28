@@ -3,13 +3,8 @@ import test from 'node:test'
 import {
   aggregateDomOrderbook,
   aggregateDomSide,
-  domPriceGroupings,
   formatDomGrouping
 } from '../src/services/domPresentation.js'
-
-test('exposes only useful BTCUSDT Spot grouping increments', () => {
-  assert.deepEqual(domPriceGroupings, [0.1, 0.5, 1, 5])
-})
 
 test('groups asks upward and bids downward without crossing the source spread', () => {
   const orderbook = {

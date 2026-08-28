@@ -20,11 +20,6 @@ Cada vela resume `Open`, `High`, `Low` y `Close` de un intervalo seleccionado:
 
 En hover, la toolbar sustituye temporalmente los valores de la barra actual por `O`, `H`, `L`, `C`, `Δ` y `V` de la vela bajo el puntero. La vista permite entre 28 y 160 barras: el límite inferior evita una separación excesiva en el zoom-in y el superior conserva la lectura de cuerpos y mechas.
 
-Candles admite 5 min, 15 min, 30 min, 1 hour, 4 hours y 1 day. `1 day` es exclusivo de
-Candles: Footprint conserva 1 hour/4 hours y Step Profile llega hasta 4 hours. Cada timeframe
-incorpora un pack de velas anterior a la sesión para permitir pan hacia el pasado sin selector de
-fecha ni carga infinita.
-
 ## Footprint
 
 Cada barra precio-tiempo distribuye las ejecuciones por nivel de precio. El lado bid representa ventas agresivas ejecutadas contra bids y el lado ask compras agresivas ejecutadas contra asks.
@@ -69,8 +64,7 @@ La intensidad cromática usa una escala logarítmica global y el control `INTENS
 opacidad del overlay.
 
 La capa no sustituye OHLC, Footprint, Volume Profile ni DOM. Las velas, crosshair, ejes y markers
-permanecen por encima. Solo intersecta el rango L2 explícito de la sesión: el pre-roll anterior no
-solicita ni muestra liquidez. Footprint y Step Profile no muestran el heatmap. La
+permanecen por encima. Footprint y Step Profile no muestran el heatmap en la primera entrega. La
 definición de datos, resolución y límites vive en
 [Historical liquidity heatmap](../product/liquidity-heatmap.md).
 

@@ -1,7 +1,7 @@
-export const HISTORICAL_CACHE_PREFIX = 'apextrader-market-data-'
+export const HISTORICAL_CACHE_PREFIX = 'apextrader-tardis-'
 export const DEFAULT_PERSISTENT_CHUNK_LIMIT = 16
 
-const CHUNK_INDEX_KEY_PREFIX = 'apextrader.market-data.chunk-indices.'
+const CHUNK_INDEX_KEY_PREFIX = 'apextrader.tardis.chunk-indices.'
 
 function browserCacheStorage() {
   return typeof globalThis.caches === 'undefined' ? null : globalThis.caches

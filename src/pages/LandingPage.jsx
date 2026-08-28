@@ -35,8 +35,8 @@ const evidence = [
 const metrics = [
   ['3', 'CHART MODES'],
   ['1', 'SYNCHRONIZED CLOCK'],
-  ['24 HOURS', 'BYBIT SPOT BTCUSDT'],
-  ['481,468', 'REAL TRADES']
+  ['24 HOURS', 'BTCUSDT SESSION'],
+  ['420,562', 'REAL TRADES']
 ]
 
 const callouts = [
@@ -251,10 +251,9 @@ export default function LandingPage() {
           <div className="landing-session-evidence" aria-labelledby="evidence-title">
             <div className="landing-copy">
               <p className="landing-kicker">04 / SESSION EVIDENCE</p>
-              <h3 id="evidence-title">A complete Spot day, kept in context.</h3>
+              <h3 id="evidence-title">A complete day, kept in context.</h3>
               <p className="landing-lede">
-                Explore the July 31, 2026 Bybit Spot BTCUSDT session across every synchronized
-                surface, with preloaded history for navigating back in context.
+                Explore one 24-hour BTCUSDT session across every mode and synchronized surface.
               </p>
             </div>
             <dl className="landing-metrics">

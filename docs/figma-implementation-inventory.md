@@ -1,6 +1,6 @@
 # Apex Trader Figma implementation inventory
 
-> Historical inventory of the original rebuild. Current master IDs, variants and annotation policy live in [Figma contract](figma/README.md); current market-data provenance and runtime behavior live in [Professional terminal specification](product/professional-terminal.md) and supersede this inventory when they differ.
+> Historical inventory. Current master IDs, variants and annotation policy live in [Figma contract](figma/README.md).
 
 Source file: `Ze9eGnPaNDj8u0oB1iUt3C`, page `01 · Proposed UI`.
 
@@ -23,7 +23,7 @@ All frames are 1920 × 1080. At narrower viewports the workspace keeps its tradi
 | Figma node                                                | Geometry at 1920 × 1080 | Implementation responsibility | Visible states and behavior                                                                   |
 | --------------------------------------------------------- | ----------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
 | `61:3` / equivalent · Global Market Header                | `x0 y0 w1920 h44`       | `MarketHeader`                | BTCUSDT identity, real last/change, historical session clock and feed state                   |
-| `61:14` / equivalent · Workspace Toolbar                  | `x365 y44 w1047 h44`    | workspace toolbar             | symbol, timeframe, chart mode, tick and settings                                               |
+| `61:14` / equivalent · Workspace Toolbar                  | `x365 y44 w1047 h44`    | workspace toolbar             | symbol, 5/15/30/60-minute timeframe, chart mode, tick and settings                            |
 | `113:2114` / equivalent · Markets                         | `x0 y44 w360 h982`      | `Watchlist`                   | fixed title/search/columns; independently scrolling rows; non-BTC instruments are demo data   |
 | `113:2745`, `113:5681`, `169:4821` · MarketChart variants | `x365 y88 w1047 h728`   | `MarketChart` renderers       | Candles, Footprint, Step Profile; price scale, volume, CVD, profiles and chart interaction    |
 | `113:4047` / equivalent · ActivityBlotter                 | `x365 y816 w1047 h210`  | `Activity`                    | functional Positions, Orders, Fills, Activity, Account & Risk tabs; explicit `DEMO DATA`      |
@@ -46,7 +46,7 @@ column visibility preferences.
 
 ### Price Chart (`62:1697`)
 
-- Candles and volume are derived from Bybit Spot BTCUSDT trades in the active interval; the price-scale marker shows the replay-clock countdown to that interval's close.
+- Candles and volume are derived from all Binance Spot BTCUSDT trades in the active interval; the price-scale marker shows the replay-clock countdown to that interval's close.
 - VWAP, EMA20, session profile, POC, VAH and VAL share the playback clock.
 - The reference uses a dense canvas with a 56 px price scale and a right-aligned split buy/sell profile.
 
@@ -96,4 +96,4 @@ field: it appears only as one leg of the OCO pair.
 
 - Real market data: BTCUSDT last price, OHLC, volume, footprint, delta, CVD, VWAP, EMA, profiles, DOM and Time & Sales.
 - Fixtures: buying power, positions/orders/fills, PnL, fees, execution narrative and non-BTC watchlist instruments. Fixture surfaces are labelled `SIM`, `DEMO` or `DEMO DATA` and must not be presented as live market feeds.
-- Historical clock: Bybit Spot UTC session 2026-07-31; every real market module resolves from that shared replay clock. Pre-roll candles add chart context without creating a second clock.
+- Historical clock: UTC session 2019-12-01; every market module resolves from that clock for fixed 1× playback, pause and seek.

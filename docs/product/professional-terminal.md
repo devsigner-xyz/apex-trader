@@ -30,33 +30,13 @@ El selector de modo actualiza la URL canónica sin reiniciar el reloj compartido
 
 ## Chart
 
-Modos actuales: Candles, Footprint y Step Profile. Candles soporta 5 min, 15 min, 30 min, 1 hour, 4 hours y 1 day; Step Profile llega hasta 4 hours y Footprint soporta 1 hour y 4 hours. Pan, zoom y timeframe actualizan el rango visible.
+Modos actuales: Candles, Footprint y Step Profile. Candles y Step Profile soportan 5 min, 15 min, 30 min, 1 hour y 4 hours; Footprint soporta 1 hour y 4 hours. Pan, zoom y timeframe actualizan el rango visible.
 
 El significado visual y de datos de cada modo se define en [Chart patterns](../design-system/chart-patterns.md). Candles usa el acrónimo canónico OHLC; Footprint representa ejecuciones por precio y lado agresor; Step Profile repite un perfil por intervalo.
 
 Candles muestra por defecto un [Historical liquidity heatmap](liquidity-heatmap.md) derivado del
 L2 real, con visibilidad e intensidad persistentes en Chart settings. La capa respeta el viewport y
-el reloj del replay y no se monta en Footprint o Step Profile. La profundidad L2 existe solo en la
-sesión detallada; navegar por el pre-roll no solicita ni extiende artificialmente el heatmap.
-
-### Histórico precargado
-
-Cada timeframe carga un pack inmutable anterior al replay y lo combina con las barras que va
-revelando el reloj. No existe selector de fechas, carga infinita ni petición de barras al alcanzar
-el límite izquierdo: el pan se detiene en la primera vela precargada.
-
-| Timeframe | Velas de pre-roll | Contexto aproximado |
-| --------- | -----------------: | ------------------: |
-| 5 min     |                288 |               1 día |
-| 15 min    |                288 |              3 días |
-| 30 min    |                336 |              7 días |
-| 1 hour    |                336 |             14 días |
-| 4 hours   |                180 |             30 días |
-| 1 day     |                180 |            6 meses |
-
-Cambiar timeframe selecciona otro pack, pero no cambia fecha ni crea un segundo reloj. DOM, Time
-& Sales, countdown y barra parcial continúan siguiendo únicamente el replay detallado. Un fallo
-del pack histórico deja operativo ese replay y se expone como estado aislado del chart.
+el reloj del replay y no se monta en Footprint o Step Profile.
 
 ### Interacción y viewport temporal
 
@@ -92,7 +72,7 @@ Deuda: el tamaño persistido del profile es legado aunque la anchura renderizada
 ## DOM
 
 - Sin título; context header de 44 px con `BTC · <grouping> · x<multiple>` y settings.
-- Grouping: 0.10, 0.50, 1 y 5 USDT; cambiarlo recentra el spread.
+- Grouping: 0.01, 0.05, 0.10, 0.50, 1 y 5 USDT; cambiarlo recentra el spread.
 - Asks y bids tienen scroll independiente; seleccionar precio lo copia a Execution.
 - Grouping es transitorio.
 - Price y Size son L2 histórico. `Δ` y `LAST` son presentación derivada.
@@ -128,18 +108,9 @@ La tab bar mide 38 px, no muestra métricas globales y empieza en Positions sin 
 
 ## Datos y accesibilidad
 
-- Chart, DOM y Time & Sales usan el replay compartido de Bybit Spot BTCUSDT del 31 de julio de
-  2026 UTC. El día conserva 481.468 trades reales y L2 top-200; no mezcla derivados ni genera
-  profundidad sintética.
-- El manifest `apextrader.market-dataset-manifest/v4` declara 296 assets inmutables y
-  63.541.117 bytes: sesión, procedencia, seis packs de histórico y 96 chunks de book, trades y
-  liquidez respectivamente.
-- El navegador solo conoce IDs allowlisted y rutas same-origin bajo `/api/market-data/`. En
-  producción, el servicio obtiene el manifest privado del Railway Storage Bucket y redirige cada
-  asset a una URL GET firmada temporal; credenciales y claves internas nunca forman parte del
-  manifest público.
-- El manifest público se revalida; los assets content-addressed usan caché immutable. Un fallo de
-  histórico o heatmap degrada esa capa sin detener chart, DOM o Time & Sales ya disponibles.
+- Chart, DOM y Time & Sales usan replay histórico compartido.
+- El manifest mutable se revalida en cada visita. Durante una release, un manifest anterior sin
+  tiles de liquidez sigue cargando el replay base; la capa de heatmap degrada de forma aislada.
 - Cache Storage es una optimización. Fallos al abrir, escribir o desalojar su caché no bloquean una
   respuesta histórica válida obtenida por red.
 - Markets, Activity, cuenta y submit de Execution son demostración o simulación.

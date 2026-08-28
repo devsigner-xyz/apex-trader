@@ -3,18 +3,18 @@ import PropTypes from 'prop-types'
 import { chunkIndexFor, loadLiquidityChunk } from '../../../services/proPlayback.js'
 import { createLiquidityColorLut } from '../../../services/liquidityHeatmap.js'
 import { chartDimensions } from '../config.js'
-import {
-  requestedLiquidityChunkIndexes,
-  resolveLiquidityWindow
-} from './liquidityViewport.js'
 
 const { mainBottom, mainTop, priceChartHeight } = chartDimensions
+
+function requestedChunkIndexes(start, end, sessionStart) {
+  const first = chunkIndexFor(Math.max(start, sessionStart), sessionStart)
+  const last = chunkIndexFor(Math.max(start, end - 1), sessionStart)
+  return Array.from({ length: last - first + 1 }, (_, offset) => first + offset)
+}
 
 export default function LiquidityHeatmapLayer({
   enabled,
   intensity,
-  liquidityEnd,
-  liquidityStart,
   priceDomain,
   replayTimestamp,
   sessionStart,
@@ -26,22 +26,12 @@ export default function LiquidityHeatmapLayer({
   const [canvasSize, setCanvasSize] = useState({ height: 0, width: 0 })
   const [status, setStatus] = useState('idle')
   const [tiles, setTiles] = useState(new Map())
-  const liquidityWindow = useMemo(
-    () =>
-      enabled
-        ? resolveLiquidityWindow({
-            liquidityEnd,
-            liquidityStart,
-            replayTimestamp,
-            viewportEnd,
-            viewportStart
-          })
-        : null,
-    [enabled, liquidityEnd, liquidityStart, replayTimestamp, viewportEnd, viewportStart]
-  )
   const indexes = useMemo(
-    () => requestedLiquidityChunkIndexes(liquidityWindow, sessionStart),
-    [liquidityWindow, sessionStart]
+    () =>
+      enabled && viewportEnd > viewportStart
+        ? requestedChunkIndexes(viewportStart, Math.min(viewportEnd, replayTimestamp), sessionStart)
+        : [],
+    [enabled, replayTimestamp, sessionStart, viewportEnd, viewportStart]
   )
   const indexKey = indexes.join(',')
 
@@ -96,21 +86,9 @@ export default function LiquidityHeatmapLayer({
       return
     }
 
-    if (!liquidityWindow) {
-      context.clearRect(0, 0, width, height)
-      renderKeyRef.current = ''
-      return
-    }
-
-    const startPixel = Math.max(
-      0,
-      Math.floor(
-        ((liquidityWindow.start - viewportStart) / (viewportEnd - viewportStart)) * width
-      )
-    )
-    const endPixel = Math.min(
-      width,
-      Math.ceil(((liquidityWindow.end - viewportStart) / (viewportEnd - viewportStart)) * width)
+    const cutoff = Math.min(Math.max(replayTimestamp, viewportStart), viewportEnd)
+    const cutoffPixel = Math.round(
+      ((cutoff - viewportStart) / (viewportEnd - viewportStart)) * width
     )
     const renderKey = [
       width,
@@ -120,8 +98,7 @@ export default function LiquidityHeatmapLayer({
       priceDomain.low,
       priceDomain.high,
       intensity,
-      startPixel,
-      endPixel,
+      cutoffPixel,
       indexKey
     ].join(':')
     if (renderKeyRef.current === renderKey) return
@@ -144,7 +121,7 @@ export default function LiquidityHeatmapLayer({
       priceIndexes[y - top] = Math.floor((price - firstTile.priceMin) / firstTile.priceStep)
     }
 
-    for (let x = startPixel; x < endPixel; x += 1) {
+    for (let x = 0; x < Math.min(width, cutoffPixel); x += 1) {
       const timestamp = viewportStart + ((x + 0.5) / width) * (viewportEnd - viewportStart)
       const tile = tiles.get(chunkIndexFor(timestamp, sessionStart))
       if (!tile) continue
@@ -170,7 +147,6 @@ export default function LiquidityHeatmapLayer({
     enabled,
     indexKey,
     intensity,
-    liquidityWindow,
     priceDomain,
     replayTimestamp,
     sessionStart,
@@ -195,8 +171,6 @@ export default function LiquidityHeatmapLayer({
 LiquidityHeatmapLayer.propTypes = {
   enabled: PropTypes.bool.isRequired,
   intensity: PropTypes.number.isRequired,
-  liquidityEnd: PropTypes.number.isRequired,
-  liquidityStart: PropTypes.number.isRequired,
   priceDomain: PropTypes.shape({
     high: PropTypes.number.isRequired,
     low: PropTypes.number.isRequired,

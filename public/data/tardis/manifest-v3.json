@@ -1,0 +1,36 @@
+{
+  "assets": {
+    "bookChunkTemplate": "datasets/v3-d74b9a46afb5d92a/chunks/book-{index}.json.gz",
+    "provenance": "datasets/v3-d74b9a46afb5d92a/provenance.json",
+    "session": "datasets/v3-d74b9a46afb5d92a/session.json.gz",
+    "tradeChunkTemplate": "datasets/v3-d74b9a46afb5d92a/chunks/trades-{index}.json.gz",
+    "liquidityChunkTemplate": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-{index}.json.gz"
+  },
+  "cache": {
+    "chunkLimit": 16,
+    "immutableMaxAgeSeconds": 31536000
+  },
+  "datasetVersion": "v3-d74b9a46afb5d92a",
+  "schema": "apextrader.tardis-runtime-manifest/v3",
+  "session": {
+    "date": "2019-12-01",
+    "exchange": "binance",
+    "symbol": "BTCUSDT"
+  },
+  "statistics": {
+    "bars": 288,
+    "bookChunks": 96,
+    "tradeChunks": 96,
+    "liquidityChunks": 96
+  },
+  "liquidity": {
+    "amountScale": 100,
+    "normalization": "log1p using the 99.5th percentile of non-zero sampled bins",
+    "normalizationMaxAmount": 70.16,
+    "priceCount": 832,
+    "priceMin": 6960,
+    "priceStep": 1,
+    "sampleDurationMs": 5000,
+    "version": "v1-4b173c519fe639bd"
+  }
+}

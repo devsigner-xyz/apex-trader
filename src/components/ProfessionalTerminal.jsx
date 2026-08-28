@@ -6,20 +6,13 @@ import { clamp } from '../services/professionalChartGeometry.js'
 import { normalizePanelSizes } from '../services/professionalTerminalPersistence.js'
 import Activity from './professional/Activity.jsx'
 import MarketChart from './professional/chart/MarketChart.jsx'
-import { storageKeys, timeframesForMode } from './professional/config.js'
+import { storageKeys } from './professional/config.js'
 import Dom from './professional/Dom.jsx'
 import Execution from './professional/execution/Execution.jsx'
 import PanelResizer from './professional/PanelResizer.jsx'
 import Watchlist from './professional/Watchlist.jsx'
 
 const { panelSizes: panelSizesStorageKey } = storageKeys
-
-function normalizeTimeframeForMode(current, mode) {
-  const supported = timeframesForMode(mode).map(({ minutes }) => minutes)
-  if (supported.includes(current)) return current
-  if (current < supported[0]) return supported[0]
-  return supported.at(-1)
-}
 
 export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const { session, view } = playback
@@ -28,11 +21,11 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const [columns, setColumns] = usePersistentState(panelSizesStorageKey, normalizePanelSizes)
 
   useEffect(() => {
-    setTimeframe((current) => normalizeTimeframeForMode(current, mode))
-  }, [mode])
+    if (mode === 'footprint' && timeframe < 60) setTimeframe(60)
+  }, [mode, timeframe])
 
   const routeMode = (next) => {
-    setTimeframe((current) => normalizeTimeframeForMode(current, next))
+    if (next === 'footprint') setTimeframe((current) => Math.max(current, 60))
     onMode(next)
   }
   const workspaceStyle = {
@@ -60,7 +53,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
             mode={mode}
             onMode={routeMode}
             onTimeframe={setTimeframe}
-            session={session}
             sourceTickSize={session.tickSize}
             timeframe={timeframe}
             view={view}

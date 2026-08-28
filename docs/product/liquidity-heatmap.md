@@ -12,33 +12,29 @@ Candles puede mostrar una capa de liquidez histórica detrás de OHLC. Cada píx
 tamaño agregado de órdenes limit resting —bids y asks— en un intervalo de tiempo y precio. No
 representa órdenes individuales, identidad de participantes, intención ni garantía de ejecución.
 
-La capa usa el mismo order book top-200 real de Bybit Spot BTCUSDT del 31 de julio de 2026 que
-alimenta el DOM. No usa datos de derivados, profundidad sintética ni liquidez derivada de trades.
+La capa usa el mismo `incremental_book_L2` real de Binance BTCUSDT del 1 de diciembre de 2019 que
+alimenta el DOM. No usa profundidad sintética ni deriva liquidez a partir de trades.
 
 ## Contrato de datos
 
-- La ingesta `scripts/bybit-ingest.mjs` reconstruye snapshots y deltas `orderbook.200` y genera 96
-  tiles de 15 min. Tamaño cero elimina el nivel y cada chunk contiene un checkpoint exacto.
+- El artefacto fuente conserva 6.486.542 filas L2 agrupadas en 815.980 timestamps exactos.
+- La ingesta `scripts/tardis-liquidity-tiles.mjs` reconstruye el libro y genera 96 tiles de 15 min.
 - El muestreo visual es de 5 segundos y el bin de precio de 1 USDT. Son resoluciones de
-  presentación; la fuente descargada conserva mensajes top-200 verificables.
+  presentación; el L2 exacto permanece inalterado como fuente verificable.
 - Cada celda conserva el tamaño total bid + ask en centésimas de BTC dentro de `uint16`, con clip
   documentado en 655,35 BTC.
 - La escala cromática usa `log1p` y el percentil 99,5 de celdas no vacías de toda la sesión,
-  actualmente 14,24 BTC. La comparación es consistente entre tiles y no se renormaliza al hacer
+  actualmente 70,16 BTC. La comparación es consistente entre tiles y no se renormaliza al hacer
   pan o zoom.
-- El renderer intersecta explícitamente viewport, `liquidityStart`, `liquidityEnd` y reloj del
-  replay. Nunca solicita ni pinta tiles anteriores a la sesión L2, posteriores al reloj o dentro
-  del pre-roll.
-- Los tiles cubren el intervalo de precio `[62.196, 65.673)` USDT en bins de 1 USDT. Fuera de ese
-  dominio la capa queda vacía.
+- El renderer nunca pinta timestamps posteriores al reloj compartido del replay.
+- Los tiles cubren 6960–7792 USDT, incluyendo 250 USDT de padding sobre los extremos OHLC de la
+  sesión. Fuera de ese dominio la capa queda vacía.
 
-El runtime carga únicamente los tiles que intersectan el viewport visible. Los 96 assets de
-liquidez suman 2.667.216 bytes comprimidos y comparten la caché versionada del replay. Se resuelven
-mediante IDs allowlisted en `/api/market-data/assets/<assetId>`; en producción, el servicio emite
-una redirección temporal al Railway Storage Bucket privado.
-
-La sesión, los seis packs de pre-roll, la procedencia y los tres grupos de 96 chunks forman un
-dataset v4 de 296 assets y 63.541.117 bytes. El manifest público no expone claves del bucket.
+El runtime carga únicamente los tiles que intersectan el viewport visible. Los assets suman
+3.080.573 bytes comprimidos y comparten la caché versionada del replay.
+El manifest se revalida en cada visita. Si durante una release el navegador conserva el manifest
+anterior sin `liquidityChunkTemplate`, el replay base continúa y solo la capa de liquidez queda no
+disponible hasta recibir el manifest actual.
 
 ## Controles
 
@@ -49,8 +45,8 @@ Chart settings contiene:
   normalización.
 
 La persistencia usa `apex-trader:chart-liquidity:v1`. Al desactivar la capa se limpia el canvas y
-el slider queda deshabilitado sin perder su valor. La capa está limitada a Candles; Footprint y
-Step Profile no montan el canvas.
+el slider queda deshabilitado sin perder su valor. La primera entrega está limitada a Candles;
+Footprint y Step Profile no montan el canvas.
 
 ## Renderizado y accesibilidad
 

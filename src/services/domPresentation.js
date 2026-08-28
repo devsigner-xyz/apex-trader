@@ -1,4 +1,4 @@
-export const domPriceGroupings = [0.1, 0.5, 1, 5]
+export const domPriceGroupings = [0.01, 0.05, 0.1, 0.5, 1, 5]
 
 function decimalPlaces(value) {
   const [, decimals = ''] = String(value).split('.')
