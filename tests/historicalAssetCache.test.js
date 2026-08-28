@@ -147,12 +147,12 @@ test('dataset version changes remove stale caches and their LRU metadata', async
   const stale = historicalCacheName('v3-stale')
   await cacheStorage.open(active)
   await cacheStorage.open(stale)
-  storage.setItem(`apextrader.tardis.chunk-indices.${active}`, '[1]')
-  storage.setItem(`apextrader.tardis.chunk-indices.${stale}`, '[2]')
+  storage.setItem(`apextrader.market-data.chunk-indices.${active}`, '[1]')
+  storage.setItem(`apextrader.market-data.chunk-indices.${stale}`, '[2]')
 
   await removeStaleHistoricalCaches(active, cacheStorage, storage)
 
   assert.deepEqual(await cacheStorage.keys(), [active])
   assert.equal(storage.length, 1)
-  assert.equal(storage.getItem(`apextrader.tardis.chunk-indices.${active}`), '[1]')
+  assert.equal(storage.getItem(`apextrader.market-data.chunk-indices.${active}`), '[1]')
 })

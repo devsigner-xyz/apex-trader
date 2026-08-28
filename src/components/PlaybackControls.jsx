@@ -11,7 +11,7 @@ export default function PlaybackControls({ timestamp }) {
       className="playback-controls"
       data-testid="playback-controls"
     >
-      <span>Binance Spot BTCUSDT · 2019-12-01 UTC</span>
+      <span>Bybit Spot BTCUSDT · 2026-07-31 UTC</span>
       <output aria-live="polite" data-testid="playback-clock">
         {formatPlaybackTime(timestamp)}
       </output>

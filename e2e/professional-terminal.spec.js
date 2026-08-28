@@ -127,7 +127,7 @@ for (const [route, mode] of views) {
     expect(executionBox.y).toBeCloseTo(chartStackBox.y, 0)
     expect(tapeHeaderBox.height).toBe(44)
     expect(tapeHeaderBox.height).toBe(domHeaderBox.height)
-    await expect(domHeader).toContainText(/BTC · 0\.01 · x1/)
+    await expect(domHeader).toContainText(/BTC · 0\.10 · x1/)
     await expect(tapeHeader).toContainText('BTC · Showing all')
     await expect(page.getByRole('button', { name: 'DOM settings' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Time and Sales settings' })).toBeVisible()
@@ -825,7 +825,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
 
   const timeframe = page.getByLabel('Timeframe')
-  await expect(timeframe.locator('option')).toHaveCount(5)
+  await expect(timeframe.locator('option')).toHaveCount(6)
   await timeframe.selectOption('15')
   await expect(timeframe).toHaveValue('15')
   await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)
@@ -834,6 +834,8 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(countdown).toHaveText(/CLOSE \d{2}:\d{2}/)
   await timeframe.selectOption('240')
   await expect(timeframe).toHaveValue('240')
+  await timeframe.selectOption('1440')
+  await expect(timeframe).toHaveValue('1440')
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')
@@ -1061,6 +1063,31 @@ test('historical synchronization, settings and keyboard controls remain coherent
     fullPage: false,
     path: 'output/playwright/footprint-profile-overlay-1920x1080.png'
   })
+})
+
+test('daily bars remain exclusive to Candles while order-flow modes retain their ranges', async ({
+  page
+}) => {
+  await page.goto('/demo')
+  const mode = page.getByLabel('Chart mode')
+  const timeframe = page.getByLabel('Timeframe')
+
+  await timeframe.selectOption('1440')
+  await expect(timeframe).toHaveValue('1440')
+
+  await mode.selectOption('step-profile')
+  await expect(page).toHaveURL(/\/demo\/step-profile$/)
+  await expect(timeframe).toHaveValue('240')
+  await expect(timeframe.locator('option')).toHaveCount(5)
+
+  await mode.selectOption('footprint')
+  await expect(page).toHaveURL(/\/demo\/footprint$/)
+  await expect(timeframe).toHaveValue('240')
+  await expect(timeframe.locator('option')).toHaveCount(2)
+
+  await mode.selectOption('candles')
+  await expect(page).toHaveURL(/\/demo$/)
+  await expect(timeframe.locator('option')).toHaveCount(6)
 })
 
 test('orders and positions remain visible at a smaller desktop viewport', async ({ page }) => {

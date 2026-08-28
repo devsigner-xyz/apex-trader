@@ -60,14 +60,22 @@ export const chartViewportLimits = {
   footprint: { maximum: 13, minimum: 4 },
   'step-profile': { maximum: 12, minimum: 1 }
 }
-export const chartTimeframes = [
+export const candleTimeframes = [
   { label: '5 min', minutes: 5 },
   { label: '15 min', minutes: 15 },
   { label: '30 min', minutes: 30 },
   { label: '1 hour', minutes: 60 },
-  { label: '4 hours', minutes: 240 }
+  { label: '4 hours', minutes: 240 },
+  { label: '1 day', minutes: 1440 }
 ]
-export const footprintTimeframes = chartTimeframes.filter(({ minutes }) => minutes >= 60)
+export const stepProfileTimeframes = candleTimeframes.filter(({ minutes }) => minutes <= 240)
+export const footprintTimeframes = stepProfileTimeframes.filter(({ minutes }) => minutes >= 60)
+
+export function timeframesForMode(mode) {
+  if (mode === 'footprint') return footprintTimeframes
+  if (mode === 'step-profile') return stepProfileTimeframes
+  return candleTimeframes
+}
 
 export const chartDimensions = {
   chartWidth: 1128,

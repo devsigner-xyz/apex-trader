@@ -33,7 +33,10 @@ export default function StepProfileLayer({
     const levels = stepProfileBar.levels.filter(
       (level) => level.price + tickSize / 2 >= low && level.price + tickSize / 2 <= high
     )
-    const maximumSide = Math.max(...levels.flatMap((level) => [level.ask, level.bid]), 1)
+    const maximumSide = Math.max(
+      ...levels.flatMap((level) => [level.ask, level.bid]),
+      Number.EPSILON
+    )
     const { cellWidth, maximumSideWidth, rowHeight, sideHeight, valueFontSize } =
       deriveStepProfileCellGeometry({
         plotHeight: bottom - top,

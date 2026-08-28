@@ -5,33 +5,27 @@ import {
   removeStaleHistoricalCaches
 } from './historicalAssetCache.js'
 import { normalizeLiquidityTile } from './liquidityHeatmap.js'
+import {
+  loadMarketDataManifest,
+  marketDataAssetUrl,
+  marketDataChunkAssetId
+} from './marketDataAssets.js'
 
-const RUNTIME_MANIFEST_URL = 'data/tardis/manifest-v3.json'
-const EXPECTED_MANIFEST_SCHEMA = 'apextrader.tardis-runtime-manifest/v3'
 const CHUNK_MS = 15 * 60 * 1000
 const playbackChunkCache = new Map()
 const liquidityChunkCache = new Map()
+const historyCache = new Map()
 let runtimeManifestPromise = null
-
-function assetUrl(path) {
-  const base = import.meta.env?.BASE_URL ?? '/'
-  return `${base.replace(/\/$/, '')}/${path}`
-}
 
 export function chunkIndexFor(timestamp, sessionStart) {
   return Math.max(0, Math.min(95, Math.floor((timestamp - sessionStart) / CHUNK_MS)))
 }
 
-async function fetchJson(url, fetchImpl = fetch, init) {
-  const response = await fetchImpl(assetUrl(url), init)
-  if (!response.ok) throw new Error(`Unable to load historical asset (${response.status})`)
-  return response.json()
-}
-
-async function fetchGzipJson(url, fetchImpl = fetch, cacheName) {
-  const response = await fetchPersistentAsset(assetUrl(url), { cacheName, fetchImpl })
+async function fetchGzipJson(manifest, assetId, fetchImpl = fetch, cacheName) {
+  const url = marketDataAssetUrl(manifest, assetId)
+  const response = await fetchPersistentAsset(url, { cacheName, fetchImpl })
   if (!response.ok) throw new Error(`Unable to load historical chunk (${response.status})`)
-  // Vite and correctly configured CDNs transparently decode Content-Encoding.
+  // Browsers and fetch transparently decode a correctly declared Content-Encoding.
   if (response.headers.get('content-encoding') === 'gzip') return response.json()
   if (typeof globalThis.DecompressionStream === 'undefined')
     throw new Error('This browser does not support gzip streaming.')
@@ -39,20 +33,8 @@ async function fetchGzipJson(url, fetchImpl = fetch, cacheName) {
   return JSON.parse(await new Response(stream).text())
 }
 
-function validateRuntimeManifest(manifest) {
-  if (
-    manifest?.schema !== EXPECTED_MANIFEST_SCHEMA ||
-    !manifest.datasetVersion ||
-    !manifest.assets?.session ||
-    !manifest.assets?.bookChunkTemplate ||
-    !manifest.assets?.tradeChunkTemplate
-  )
-    throw new Error('Unexpected historical runtime manifest.')
-  return manifest
-}
-
 async function fetchRuntimeManifest(fetchImpl) {
-  const manifest = validateRuntimeManifest(await fetchJson(RUNTIME_MANIFEST_URL, fetchImpl))
+  const manifest = await loadMarketDataManifest(fetchImpl)
   if (fetchImpl === globalThis.fetch)
     await removeStaleHistoricalCaches(historicalCacheName(manifest.datasetVersion))
   return manifest
@@ -68,49 +50,101 @@ export function loadRuntimeManifest(fetchImpl = fetch) {
   return runtimeManifestPromise
 }
 
-function runtimeAssetPath(filename) {
-  return `data/tardis/${filename}`
-}
-
-function chunkAssetPaths(manifest, index) {
-  const suffix = String(index).padStart(3, '0')
-  const paths = {
-    book: runtimeAssetPath(manifest.assets.bookChunkTemplate.replace('{index}', suffix)),
-    trades: runtimeAssetPath(manifest.assets.tradeChunkTemplate.replace('{index}', suffix))
-  }
-  if (manifest.assets.liquidityChunkTemplate)
-    paths.liquidity = runtimeAssetPath(
-      manifest.assets.liquidityChunkTemplate.replace('{index}', suffix)
-    )
-  return paths
+function chunkAssetUrls(manifest, index) {
+  return ['book', 'trades', 'liquidity']
+    .map((kind) => marketDataChunkAssetId(kind, index))
+    .filter((assetId) => manifest.assets?.[assetId])
+    .map((assetId) => marketDataAssetUrl(manifest, assetId))
 }
 
 export async function loadProfessionalSession(fetchImpl = fetch) {
   const manifest = await loadRuntimeManifest(fetchImpl)
   const session = await fetchGzipJson(
-    runtimeAssetPath(manifest.assets.session),
+    manifest,
+    manifest.runtime?.sessionAssetId ?? 'session',
     fetchImpl,
     historicalCacheName(manifest.datasetVersion)
   )
-  if (session.schema !== 'apextrader.tardis-session/v2')
-    throw new Error('Unexpected session schema.')
-  return session
+  if (
+    session.schema !== 'apextrader.market-session/v4' ||
+    session.market?.exchange !== 'bybit' ||
+    session.market?.marketType !== 'spot' ||
+    session.market?.symbol !== 'BTCUSDT' ||
+    session.sessionStart !== manifest.sessionStart ||
+    session.sessionEndExclusive !== manifest.sessionEndExclusive
+  ) {
+    throw new Error('Unexpected Bybit Spot session schema.')
+  }
+  return {
+    ...session,
+    liquidityEnd: manifest.liquidityEnd,
+    liquidityStart: manifest.liquidityStart,
+    playbackStart: manifest.playbackStart
+  }
+}
+
+async function fetchHistoricalBars(timeframe, fetchImpl) {
+  const manifest = await loadRuntimeManifest(fetchImpl)
+  const assetId = manifest.runtime?.historyAssetIds?.[timeframe]
+  if (!assetId) throw new Error(`Unsupported historical timeframe: ${timeframe}`)
+  const history = await fetchGzipJson(
+    manifest,
+    assetId,
+    fetchImpl,
+    historicalCacheName(manifest.datasetVersion)
+  )
+  if (
+    history.schema !== 'apextrader.market-history/v4' ||
+    history.timeframeMinutes !== timeframe ||
+    history.market?.exchange !== 'bybit' ||
+    history.market?.marketType !== 'spot' ||
+    history.market?.symbol !== 'BTCUSDT' ||
+    !Array.isArray(history.bars) ||
+    history.bars.length === 0 ||
+    history.bars.some(
+      (bar, index) =>
+        !Number.isFinite(bar?.timestamp) ||
+        (index > 0 && bar.timestamp <= history.bars[index - 1].timestamp)
+    )
+  ) {
+    throw new Error('Unexpected Bybit Spot history schema.')
+  }
+  return history.bars
+}
+
+export function loadHistoricalBars(timeframe, fetchImpl = fetch) {
+  if (fetchImpl !== globalThis.fetch) return fetchHistoricalBars(timeframe, fetchImpl)
+  if (!historyCache.has(timeframe)) {
+    const request = fetchHistoricalBars(timeframe, fetchImpl).catch((error) => {
+      historyCache.delete(timeframe)
+      throw error
+    })
+    historyCache.set(timeframe, request)
+  }
+  return historyCache.get(timeframe)
 }
 
 async function fetchPlaybackChunk(index, fetchImpl) {
   const manifest = await loadRuntimeManifest(fetchImpl)
-  const paths = chunkAssetPaths(manifest, index)
   const cacheName = historicalCacheName(manifest.datasetVersion)
+  const bookId = marketDataChunkAssetId('book', index)
+  const tradesId = marketDataChunkAssetId('trades', index)
   const [book, trades] = await Promise.all([
-    fetchGzipJson(paths.book, fetchImpl, cacheName),
-    fetchGzipJson(paths.trades, fetchImpl, cacheName)
+    fetchGzipJson(manifest, bookId, fetchImpl, cacheName),
+    fetchGzipJson(manifest, tradesId, fetchImpl, cacheName)
   ])
+  if (
+    book.schema !== 'apextrader.book-chunk/v4' ||
+    trades.schema !== 'apextrader.trades-chunk/v4'
+  ) {
+    throw new Error('Unexpected Bybit Spot playback chunk.')
+  }
   if (fetchImpl === globalThis.fetch)
     await recordPersistentChunk(
       {
         cacheName,
         index,
-        urls: (nextIndex) => Object.values(chunkAssetPaths(manifest, nextIndex)).map(assetUrl)
+        urls: (nextIndex) => chunkAssetUrls(manifest, nextIndex)
       },
       { limit: manifest.cache?.chunkLimit }
     )
@@ -131,17 +165,17 @@ export function loadPlaybackChunk(index, fetchImpl = fetch) {
 
 async function fetchLiquidityChunk(index, fetchImpl) {
   const manifest = await loadRuntimeManifest(fetchImpl)
-  if (!manifest.assets?.liquidityChunkTemplate)
+  const assetId = marketDataChunkAssetId('liquidity', index)
+  if (!manifest.assets?.[assetId])
     throw new Error('The historical dataset does not include liquidity tiles.')
-  const paths = chunkAssetPaths(manifest, index)
   const cacheName = historicalCacheName(manifest.datasetVersion)
-  const raw = await fetchGzipJson(paths.liquidity, fetchImpl, cacheName)
+  const raw = await fetchGzipJson(manifest, assetId, fetchImpl, cacheName)
   if (fetchImpl === globalThis.fetch)
     await recordPersistentChunk(
       {
         cacheName,
         index,
-        urls: (nextIndex) => Object.values(chunkAssetPaths(manifest, nextIndex)).map(assetUrl)
+        urls: (nextIndex) => chunkAssetUrls(manifest, nextIndex)
       },
       { limit: manifest.cache?.chunkLimit }
     )

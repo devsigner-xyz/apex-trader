@@ -19,7 +19,7 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Chart patterns](design-system/chart-patterns.md): significado de Candles/OHLC, Footprint, Step Profile y Volume Profile.
 - [Figma contract](figma/README.md): archivo maestro, masters, variantes, anotaciones y trazabilidad.
 - [Decisions](decisions/README.md): decisiones duraderas y consecuencias.
-- [Verification](verification/2026-08-28-landing-direction-b-local.md): última verificación local de la landing y el routing de demo.
+- [Verification](verification/2026-08-28-bybit-spot-v4-local.md): última verificación local del dataset Bybit Spot v4 y su frontera de runtime.
 
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
 

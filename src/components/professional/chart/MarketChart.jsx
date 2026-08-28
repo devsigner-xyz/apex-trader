@@ -23,15 +23,15 @@ import {
 import {
   aggregateProfessionalBars,
   deriveVolumeProfile,
-  formatCandleCloseCountdown
+  formatCandleCloseCountdown,
+  loadHistoricalBars
 } from '../../../services/proPlayback.js'
 import {
   chartDefaults,
   chartDimensions,
-  chartTimeframes,
   chartViewportLimits,
-  footprintTimeframes,
-  storageKeys
+  storageKeys,
+  timeframesForMode
 } from '../config.js'
 import { formatClock as clock, formatNumber as fmt } from '../formatters.js'
 import CandlesLayer from './CandlesLayer.jsx'
@@ -64,6 +64,7 @@ export default function MarketChart({
   mode,
   onMode,
   onTimeframe,
+  session,
   sourceTickSize,
   timeframe,
   view
@@ -83,13 +84,38 @@ export default function MarketChart({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null)
   const [crosshair, setCrosshair] = useState(null)
+  const [history, setHistory] = useState({ bars: [], status: 'loading', timeframe })
   const chartRef = useRef(null)
   const priceChartRef = useRef(null)
-  const bars = useMemo(
+  useEffect(() => {
+    let current = true
+    setHistory({ bars: [], status: 'loading', timeframe })
+    loadHistoricalBars(timeframe)
+      .then((nextBars) => {
+        if (current) setHistory({ bars: nextBars, status: 'ready', timeframe })
+      })
+      .catch(() => {
+        if (current) setHistory({ bars: [], status: 'error', timeframe })
+      })
+    return () => {
+      current = false
+    }
+  }, [timeframe])
+
+  const replayBars = useMemo(
     () => aggregateProfessionalBars(view.bars, timeframe),
     [timeframe, view.bars]
   )
-  const current = bars.at(-1)
+  const bars = useMemo(() => {
+    const historical = history.timeframe === timeframe ? history.bars : []
+    const merged = new Map(historical.map((bar) => [bar.timestamp, bar]))
+    replayBars.forEach((bar) => merged.set(bar.timestamp, bar))
+    return [...merged.values()].sort((left, right) => left.timestamp - right.timestamp)
+  }, [history.bars, history.timeframe, replayBars, timeframe])
+  const current = replayBars.at(-1) ?? bars.at(-1)
+  const liquidityStart = session.liquidityStart ?? session.sessionStart
+  const liquidityEnd =
+    session.liquidityEnd ?? session.sessionEnd ?? session.sessionEndExclusive
 
   useEffect(() => {
     if (!settingsOpen) return undefined
@@ -248,7 +274,11 @@ export default function MarketChart({
   const summaryBar = bars[hoveredBarIndex] ?? current
 
   return (
-    <section className="market-chart" ref={chartRef}>
+    <section
+      className="market-chart"
+      data-history-status={history.timeframe === timeframe ? history.status : 'loading'}
+      ref={chartRef}
+    >
       <header>
         <div className="chart-summary">
           <span>
@@ -263,13 +293,11 @@ export default function MarketChart({
             onChange={(event) => onTimeframe(Number(event.target.value))}
             value={timeframe}
           >
-            {(mode === 'footprint' ? footprintTimeframes : chartTimeframes).map(
-              ({ label, minutes }) => (
-                <option key={minutes} value={minutes}>
-                  {label}
-                </option>
-              )
-            )}
+            {timeframesForMode(mode).map(({ label, minutes }) => (
+              <option key={minutes} value={minutes}>
+                {label}
+              </option>
+            ))}
           </select>
           <select
             aria-label="Chart mode"
@@ -390,9 +418,11 @@ export default function MarketChart({
             <LiquidityHeatmapLayer
               enabled={liquidity.enabled}
               intensity={liquidity.intensity}
+              liquidityEnd={liquidityEnd}
+              liquidityStart={liquidityStart}
               priceDomain={priceDomain}
               replayTimestamp={view.timestamp}
-              sessionStart={view.bars[0].timestamp}
+              sessionStart={session.sessionStart}
               viewportEnd={viewportEnd}
               viewportStart={viewportStart}
             />

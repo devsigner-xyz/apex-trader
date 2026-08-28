@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { gzipSync } from 'node:zlib'
 import {
   aggregateProfessionalBars,
   deriveProfessionalView,
   deriveVolumeProfile,
   formatCandleCloseCountdown,
+  loadHistoricalBars,
   loadLiquidityChunk,
   loadPlaybackChunk,
   loadProfessionalSession,
@@ -14,20 +14,31 @@ import {
 
 const runtimeManifest = {
   assets: {
-    bookChunkTemplate: 'datasets/v3-test/chunks/book-{index}.json.gz',
-    liquidityChunkTemplate: 'datasets/v3-test/liquidity/liquidity-{index}.json.gz',
-    session: 'datasets/v3-test/session.json.gz',
-    tradeChunkTemplate: 'datasets/v3-test/chunks/trades-{index}.json.gz'
+    'book-095': { href: '/api/market-data/assets/book-095' },
+    'history-60': { href: '/api/market-data/assets/history-60' },
+    'liquidity-095': { href: '/api/market-data/assets/liquidity-095' },
+    session: { href: '/api/market-data/assets/session' },
+    'trades-095': { href: '/api/market-data/assets/trades-095' }
   },
   cache: { chunkLimit: 16 },
-  datasetVersion: 'v3-test',
+  datasetVersion: 'v4-test',
+  liquidityEnd: 86_400_000,
+  liquidityStart: 2_317,
   liquidity: { normalizationMaxAmount: 25 },
-  schema: 'apextrader.tardis-runtime-manifest/v3'
+  market: { exchange: 'bybit', marketType: 'spot', symbol: 'BTCUSDT' },
+  playbackStart: 2_317,
+  runtime: {
+    historyAssetIds: { 60: 'history-60' },
+    sessionAssetId: 'session'
+  },
+  schema: 'apextrader.market-dataset-manifest/v4',
+  sessionEndExclusive: 86_400_000,
+  sessionStart: 0
 }
 
 function gzipResponse(value) {
-  return new Response(gzipSync(`${JSON.stringify(value)}\n`), {
-    headers: { 'content-type': 'application/gzip' }
+  return new Response(`${JSON.stringify(value)}\n`, {
+    headers: { 'content-encoding': 'gzip', 'content-type': 'application/json' }
   })
 }
 
@@ -35,16 +46,29 @@ test('runtime manifest resolves the compressed session and versioned chunk asset
   const requested = []
   const session = {
     bars: [],
-    schema: 'apextrader.tardis-session/v2',
+    market: { exchange: 'bybit', marketType: 'spot', symbol: 'BTCUSDT' },
+    schema: 'apextrader.market-session/v4',
+    sessionEndExclusive: 86_400_000,
     sessionStart: 0
   }
   const fetchImpl = async (url) => {
     requested.push(url)
-    if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
-    if (url.endsWith('session.json.gz')) return gzipResponse(session)
-    if (url.endsWith('book-095.json.gz'))
-      return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
-    if (url.endsWith('liquidity-095.json.gz'))
+    if (url === '/api/market-data/manifest') return Response.json(runtimeManifest)
+    if (url.endsWith('/session')) return gzipResponse(session)
+    if (url.endsWith('/history-60'))
+      return gzipResponse({
+        bars: [{ timestamp: 0 }],
+        market: { exchange: 'bybit', marketType: 'spot', symbol: 'BTCUSDT' },
+        schema: 'apextrader.market-history/v4',
+        timeframeMinutes: 60
+      })
+    if (url.endsWith('/book-095'))
+      return gzipResponse({
+        checkpoint: { asks: [], bids: [] },
+        groups: [],
+        schema: 'apextrader.book-chunk/v4'
+      })
+    if (url.endsWith('/liquidity-095'))
       return gzipResponse({
         amountScale: 100,
         chunkStart: 0,
@@ -56,56 +80,90 @@ test('runtime manifest resolves the compressed session and versioned chunk asset
         schema: 'apextrader.liquidity-tile/v1',
         values: Buffer.from(Uint8Array.from([100, 0, 200, 0])).toString('base64')
       })
-    if (url.endsWith('trades-095.json.gz')) return gzipResponse({ trades: [] })
+    if (url.endsWith('/trades-095'))
+      return gzipResponse({ schema: 'apextrader.trades-chunk/v4', trades: [] })
     return new Response(null, { status: 404 })
   }
 
-  assert.deepEqual(await loadProfessionalSession(fetchImpl), session)
+  assert.deepEqual(await loadProfessionalSession(fetchImpl), {
+    ...session,
+    liquidityEnd: 86_400_000,
+    liquidityStart: 2_317,
+    playbackStart: 2_317
+  })
+  assert.deepEqual(await loadHistoricalBars(60, fetchImpl), [{ timestamp: 0 }])
   assert.deepEqual(await loadPlaybackChunk(95, fetchImpl), {
-    book: { checkpoint: { asks: [], bids: [] }, groups: [] },
+    book: {
+      checkpoint: { asks: [], bids: [] },
+      groups: [],
+      schema: 'apextrader.book-chunk/v4'
+    },
     index: 95,
-    trades: { trades: [] }
+    trades: { schema: 'apextrader.trades-chunk/v4', trades: [] }
   })
   const liquidity = await loadLiquidityChunk(95, fetchImpl)
   assert.equal(liquidity.normalizationMaxAmount, 25)
   assert.deepEqual([...liquidity.values], [100, 200])
   assert.deepEqual(requested, [
-    '/data/tardis/manifest-v3.json',
-    '/data/tardis/datasets/v3-test/session.json.gz',
-    '/data/tardis/manifest-v3.json',
-    '/data/tardis/datasets/v3-test/chunks/book-095.json.gz',
-    '/data/tardis/datasets/v3-test/chunks/trades-095.json.gz',
-    '/data/tardis/manifest-v3.json',
-    '/data/tardis/datasets/v3-test/liquidity/liquidity-095.json.gz'
+    '/api/market-data/manifest',
+    '/api/market-data/assets/session',
+    '/api/market-data/manifest',
+    '/api/market-data/assets/history-60',
+    '/api/market-data/manifest',
+    '/api/market-data/assets/book-095',
+    '/api/market-data/assets/trades-095',
+    '/api/market-data/manifest',
+    '/api/market-data/assets/liquidity-095'
   ])
 })
 
-test('a cached pre-heatmap manifest still loads the core replay safely', async () => {
-  const legacyManifest = {
+test('a v4 manifest without the requested liquidity tile still loads core replay safely', async () => {
+  const noLiquidityManifest = {
     ...runtimeManifest,
     assets: {
-      bookChunkTemplate: runtimeManifest.assets.bookChunkTemplate,
+      'book-000': { href: '/api/market-data/assets/book-000' },
       session: runtimeManifest.assets.session,
-      tradeChunkTemplate: runtimeManifest.assets.tradeChunkTemplate
+      'trades-000': { href: '/api/market-data/assets/trades-000' }
     }
   }
   const fetchImpl = async (url) => {
-    if (url.endsWith('manifest-v3.json')) return Response.json(legacyManifest)
-    if (url.endsWith('session.json.gz'))
-      return gzipResponse({ bars: [], schema: 'apextrader.tardis-session/v2' })
-    if (url.endsWith('book-000.json.gz'))
-      return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
-    if (url.endsWith('trades-000.json.gz')) return gzipResponse({ trades: [] })
+    if (url === '/api/market-data/manifest') return Response.json(noLiquidityManifest)
+    if (url.endsWith('/session'))
+      return gzipResponse({
+        bars: [],
+        market: { exchange: 'bybit', marketType: 'spot', symbol: 'BTCUSDT' },
+        schema: 'apextrader.market-session/v4',
+        sessionEndExclusive: 86_400_000,
+        sessionStart: 0
+      })
+    if (url.endsWith('/book-000'))
+      return gzipResponse({
+        checkpoint: { asks: [], bids: [] },
+        groups: [],
+        schema: 'apextrader.book-chunk/v4'
+      })
+    if (url.endsWith('/trades-000'))
+      return gzipResponse({ schema: 'apextrader.trades-chunk/v4', trades: [] })
     return new Response(null, { status: 404 })
   }
   assert.deepEqual(await loadProfessionalSession(fetchImpl), {
     bars: [],
-    schema: 'apextrader.tardis-session/v2'
+    liquidityEnd: 86_400_000,
+    liquidityStart: 2_317,
+    market: { exchange: 'bybit', marketType: 'spot', symbol: 'BTCUSDT' },
+    playbackStart: 2_317,
+    schema: 'apextrader.market-session/v4',
+    sessionEndExclusive: 86_400_000,
+    sessionStart: 0
   })
   assert.deepEqual(await loadPlaybackChunk(0, fetchImpl), {
-    book: { checkpoint: { asks: [], bids: [] }, groups: [] },
+    book: {
+      checkpoint: { asks: [], bids: [] },
+      groups: [],
+      schema: 'apextrader.book-chunk/v4'
+    },
     index: 0,
-    trades: { trades: [] }
+    trades: { schema: 'apextrader.trades-chunk/v4', trades: [] }
   })
   await assert.rejects(() => loadLiquidityChunk(0, fetchImpl), /does not include liquidity tiles/)
 })

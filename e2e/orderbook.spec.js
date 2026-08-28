@@ -121,23 +121,21 @@ test.describe('Professional historical order flow', () => {
     const grouping = page.getByLabel('DOM price grouping')
     await expect(settings).toBeVisible()
     await expect(grouping.locator('option')).toHaveText([
-      '0.01 USDT · x1',
-      '0.05 USDT · x5',
-      '0.10 USDT · x10',
-      '0.50 USDT · x50',
-      '1.00 USDT · x100',
-      '5.00 USDT · x500'
+      '0.10 USDT · x1',
+      '0.50 USDT · x5',
+      '1.00 USDT · x10',
+      '5.00 USDT · x50'
     ])
 
-    await grouping.selectOption('0.1')
-    await expect(page.locator('.dom')).toHaveAttribute('data-price-grouping', '0.1')
-    await expect(page.locator('.dom > header')).toContainText('BTC · 0.10 · x10')
+    await grouping.selectOption('1')
+    await expect(page.locator('.dom')).toHaveAttribute('data-price-grouping', '1')
+    await expect(page.locator('.dom > header')).toContainText('BTC · 1.00 · x10')
 
     const groupedRows = await page
       .locator('.dom-row')
       .evaluateAll((rows) => rows.map((row) => Number(row.dataset.price)))
     expect(groupedRows.length).toBeGreaterThan(2)
-    expect(groupedRows.every((price) => Math.abs(price * 10 - Math.round(price * 10)) < 1e-8)).toBe(
+    expect(groupedRows.every((price) => Math.abs(price - Math.round(price)) < 1e-8)).toBe(
       true
     )
 

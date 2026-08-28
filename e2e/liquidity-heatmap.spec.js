@@ -61,7 +61,24 @@ test('liquidity heatmap remains a Candles-only layer', async ({ page }) => {
   })
 })
 
-test('core replay survives a pre-heatmap manifest and Cache API write failure', async ({
+test('pre-roll outside the detailed session does not load or draw liquidity', async ({ page }) => {
+  await page.goto('/demo')
+  const chart = page.getByLabel('candles historical chart')
+  const marketChart = page.locator('.market-chart')
+  const canvas = page.locator('.liquidity-heatmap-canvas')
+  await expect(canvas).toHaveAttribute('data-status', 'ready', { timeout: 15_000 })
+
+  await page.getByLabel('Timeframe').selectOption('1440')
+  await expect(marketChart).toHaveAttribute('data-history-status', 'ready', { timeout: 15_000 })
+  await chart.focus()
+  await page.keyboard.press('ArrowLeft')
+
+  await expect(canvas).toHaveAttribute('data-status', 'idle')
+  await expect(canvas).toHaveAttribute('data-loaded-tiles', '0')
+  await expect.poll(() => opaquePixelCount(canvas)).toBe(0)
+})
+
+test('core replay survives a dataset without heatmap assets and Cache API write failure', async ({
   page
 }) => {
   await page.addInitScript(() => {
@@ -70,10 +87,11 @@ test('core replay survives a pre-heatmap manifest and Cache API write failure', 
         throw new DOMException('Cache.put() encountered a network error', 'NetworkError')
       }
   })
-  await page.route('**/data/tardis/manifest-v3.json', async (route) => {
+  await page.route('**/api/market-data/manifest', async (route) => {
     const response = await route.fetch()
     const manifest = await response.json()
-    delete manifest.assets.liquidityChunkTemplate
+    for (const assetId of Object.keys(manifest.assets))
+      if (assetId.startsWith('liquidity-')) delete manifest.assets[assetId]
     delete manifest.liquidity
     await route.fulfill({ json: manifest })
   })

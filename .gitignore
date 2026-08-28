@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 .cache/tardis/
+.cache/bybit/
 data/raw/tardis/
 .DS_Store
 dist
