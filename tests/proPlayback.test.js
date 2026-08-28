@@ -6,6 +6,7 @@ import {
   deriveProfessionalView,
   deriveVolumeProfile,
   formatCandleCloseCountdown,
+  loadLiquidityChunk,
   loadPlaybackChunk,
   loadProfessionalSession,
   reconstructBook
@@ -14,11 +15,13 @@ import {
 const runtimeManifest = {
   assets: {
     bookChunkTemplate: 'datasets/v3-test/chunks/book-{index}.json.gz',
+    liquidityChunkTemplate: 'datasets/v3-test/liquidity/liquidity-{index}.json.gz',
     session: 'datasets/v3-test/session.json.gz',
     tradeChunkTemplate: 'datasets/v3-test/chunks/trades-{index}.json.gz'
   },
   cache: { chunkLimit: 16 },
   datasetVersion: 'v3-test',
+  liquidity: { normalizationMaxAmount: 25 },
   schema: 'apextrader.tardis-runtime-manifest/v3'
 }
 
@@ -41,6 +44,18 @@ test('runtime manifest resolves the compressed session and versioned chunk asset
     if (url.endsWith('session.json.gz')) return gzipResponse(session)
     if (url.endsWith('book-095.json.gz'))
       return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
+    if (url.endsWith('liquidity-095.json.gz'))
+      return gzipResponse({
+        amountScale: 100,
+        chunkStart: 0,
+        priceCount: 2,
+        priceMin: 99,
+        priceStep: 1,
+        sampleCount: 1,
+        sampleDurationMs: 5000,
+        schema: 'apextrader.liquidity-tile/v1',
+        values: Buffer.from(Uint8Array.from([100, 0, 200, 0])).toString('base64')
+      })
     if (url.endsWith('trades-095.json.gz')) return gzipResponse({ trades: [] })
     return new Response(null, { status: 404 })
   }
@@ -51,13 +66,40 @@ test('runtime manifest resolves the compressed session and versioned chunk asset
     index: 95,
     trades: { trades: [] }
   })
+  const liquidity = await loadLiquidityChunk(95, fetchImpl)
+  assert.equal(liquidity.normalizationMaxAmount, 25)
+  assert.deepEqual([...liquidity.values], [100, 200])
   assert.deepEqual(requested, [
     '/data/tardis/manifest-v3.json',
     '/data/tardis/datasets/v3-test/session.json.gz',
     '/data/tardis/manifest-v3.json',
     '/data/tardis/datasets/v3-test/chunks/book-095.json.gz',
-    '/data/tardis/datasets/v3-test/chunks/trades-095.json.gz'
+    '/data/tardis/datasets/v3-test/chunks/trades-095.json.gz',
+    '/data/tardis/manifest-v3.json',
+    '/data/tardis/datasets/v3-test/liquidity/liquidity-095.json.gz'
   ])
+})
+
+test('a cached pre-heatmap manifest still loads the core replay safely', async () => {
+  const legacyManifest = {
+    ...runtimeManifest,
+    assets: {
+      bookChunkTemplate: runtimeManifest.assets.bookChunkTemplate,
+      session: runtimeManifest.assets.session,
+      tradeChunkTemplate: runtimeManifest.assets.tradeChunkTemplate
+    }
+  }
+  const fetchImpl = async (url) => {
+    if (url.endsWith('manifest-v3.json')) return Response.json(legacyManifest)
+    if (url.endsWith('session.json.gz'))
+      return gzipResponse({ bars: [], schema: 'apextrader.tardis-session/v2' })
+    return new Response(null, { status: 404 })
+  }
+  assert.deepEqual(await loadProfessionalSession(fetchImpl), {
+    bars: [],
+    schema: 'apextrader.tardis-session/v2'
+  })
+  await assert.rejects(() => loadLiquidityChunk(0, fetchImpl), /does not include liquidity tiles/)
 })
 
 test('browser L2 reconstruction applies only groups at or before the shared clock', () => {

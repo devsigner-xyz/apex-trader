@@ -14,6 +14,7 @@ export const optionalWatchlistColumns = watchlistColumns
 export const storageKeys = {
   chartPanelSizes: 'apex-trader:chart-panel-sizes:v1',
   chartPanelVisibility: 'apex-trader:chart-panel-visibility:v1',
+  chartLiquidity: 'apex-trader:chart-liquidity:v1',
   panelSizes: 'apex-trader:panel-sizes:v1',
   watchlistColumns: 'apex-trader:markets-columns'
 }
@@ -89,3 +90,4 @@ export const chartPanelSizeLimits = {
   volume: [72, 200]
 }
 export const chartPanelVisibilityDefaults = { profile: true, valueArea: true, volume: true }
+export const chartLiquidityDefaults = { enabled: true, intensity: 0.6 }

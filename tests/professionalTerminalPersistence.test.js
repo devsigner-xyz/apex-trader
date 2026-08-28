@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  normalizeChartLiquidity,
   normalizeChartPanelSizes,
   normalizeChartPanelVisibility,
   normalizePanelSizes,
@@ -35,6 +36,18 @@ test('normalizes chart panel sizes and visibility with backward-compatible defau
     profile: false,
     valueArea: true,
     volume: false
+  })
+})
+
+test('normalizes persistent liquidity heatmap controls', () => {
+  assert.deepEqual(normalizeChartLiquidity(), { enabled: true, intensity: 0.6 })
+  assert.deepEqual(normalizeChartLiquidity({ enabled: false, intensity: 2 }), {
+    enabled: false,
+    intensity: 1
+  })
+  assert.deepEqual(normalizeChartLiquidity({ enabled: 'false', intensity: 0.05 }), {
+    enabled: true,
+    intensity: 0.2
   })
 })
 

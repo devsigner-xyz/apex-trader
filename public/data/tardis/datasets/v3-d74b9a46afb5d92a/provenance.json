@@ -1160,6 +1160,584 @@
         "sha256": "e8d4cb91c29fb88d7167474aafb6fc2bb4150f9e4fd9fa31647a396a01eadc27",
         "trades": 2655
       }
+    ],
+    "liquidityChunks": [
+      {
+        "bytes": 28234,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-000.json.gz",
+        "samples": 180,
+        "sha256": "45a64a666e90b76935af92c0199f0f30b73582f74f734f6a33acbfaf77d55121"
+      },
+      {
+        "bytes": 31506,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-001.json.gz",
+        "samples": 180,
+        "sha256": "a0976539a6f225b436890b878e2c23c7a13f80f24f20b75e91c704e02575a616"
+      },
+      {
+        "bytes": 28088,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-002.json.gz",
+        "samples": 180,
+        "sha256": "cc09704f0e24c4e63248787b38f328abe3b806a998fd969f274a47c731d68c4c"
+      },
+      {
+        "bytes": 28285,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-003.json.gz",
+        "samples": 180,
+        "sha256": "76af7a0251a6042c5035b218468f5a77b900cf2b645123c7e70068b35e2da96e"
+      },
+      {
+        "bytes": 37489,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-004.json.gz",
+        "samples": 180,
+        "sha256": "1053b574db62d18b481d26acc095111b481d404e1bec6e9fcfd9b734bfa27387"
+      },
+      {
+        "bytes": 37656,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-005.json.gz",
+        "samples": 180,
+        "sha256": "dd854382f207369d8e1df6795fc85f39eaf089f1c835bad319283b8e59ba9286"
+      },
+      {
+        "bytes": 39429,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-006.json.gz",
+        "samples": 180,
+        "sha256": "d3e78c0431b716375c6b1a857e4f3b60b61d376f95c96b47c215cc635899e7a6"
+      },
+      {
+        "bytes": 34516,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-007.json.gz",
+        "samples": 180,
+        "sha256": "13fd6c306030babbe16ffe169216fdf3c3580d2960166a1b64aad558db6021d3"
+      },
+      {
+        "bytes": 34301,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-008.json.gz",
+        "samples": 180,
+        "sha256": "90eec62a6700371134bc44ec1361eb0f5e803c5347d059999070e06dd2064428"
+      },
+      {
+        "bytes": 31066,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-009.json.gz",
+        "samples": 180,
+        "sha256": "1d0d6571bb07d3384c0df3a3e2aedaf350660cf42acf85c7cdfdfd152b3a429a"
+      },
+      {
+        "bytes": 31047,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-010.json.gz",
+        "samples": 180,
+        "sha256": "d09f1cc4e48024a22cfd7cb1e2349e9caca6842fb77edad48b90ef5069d15722"
+      },
+      {
+        "bytes": 45066,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-011.json.gz",
+        "samples": 180,
+        "sha256": "85b13702161aadce915adf845670ca13d79e8e876b430564a79b6d39dda57887"
+      },
+      {
+        "bytes": 46087,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-012.json.gz",
+        "samples": 180,
+        "sha256": "c769a0689a658e52c29bffa6299558239de919d1a15f5f2007e3ecb8042aa8e5"
+      },
+      {
+        "bytes": 37452,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-013.json.gz",
+        "samples": 180,
+        "sha256": "235b0269510be7420ee21097c07bb08b9c5723e90c6025b410ff77d5a2e7efef"
+      },
+      {
+        "bytes": 38194,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-014.json.gz",
+        "samples": 180,
+        "sha256": "554104d92f257dfaac822d9207113fa2b32d461afa8dd38a8b9d77936b52b66a"
+      },
+      {
+        "bytes": 34989,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-015.json.gz",
+        "samples": 180,
+        "sha256": "08ada54fdb6a258fe15d36a2a8225b05ce29b0eef53e8441d43a79eb20e6f5f8"
+      },
+      {
+        "bytes": 34231,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-016.json.gz",
+        "samples": 180,
+        "sha256": "bab192aa9a2e83aade48255ce3c2ada70778593cfa33b6a04d69f3cc71c398a0"
+      },
+      {
+        "bytes": 30638,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-017.json.gz",
+        "samples": 180,
+        "sha256": "21e43ea8289402a67fd73cd25e5f27ead548d145b99b67e0fc5306c4f1ca7007"
+      },
+      {
+        "bytes": 31387,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-018.json.gz",
+        "samples": 180,
+        "sha256": "981e52e3e016ca402c38fafc4268f2d3095360583d8084d08e0b58824c5c61d1"
+      },
+      {
+        "bytes": 33559,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-019.json.gz",
+        "samples": 180,
+        "sha256": "89ca92bfad5b8f89c0549abb8a74cebae0a36dd9dcca25bec2eacaa571b832ab"
+      },
+      {
+        "bytes": 30168,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-020.json.gz",
+        "samples": 180,
+        "sha256": "f6bd8593d6b2c4e329014e4cce188685c5fa72b5ea6d699b935c27690862ec93"
+      },
+      {
+        "bytes": 30232,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-021.json.gz",
+        "samples": 180,
+        "sha256": "f12c41bec651e3b622f8b927c6521c9963ce2f77c5e7234cfa304c7e863507e1"
+      },
+      {
+        "bytes": 37686,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-022.json.gz",
+        "samples": 180,
+        "sha256": "adc7cfd79843c4261a844691973e14c4ae4d2ac911a64f3255351b1662d0f05b"
+      },
+      {
+        "bytes": 33689,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-023.json.gz",
+        "samples": 180,
+        "sha256": "335812c341a7910652bc83aab49a6344a4fadf6aa72bd99daa1ae00b62e47ebb"
+      },
+      {
+        "bytes": 34329,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-024.json.gz",
+        "samples": 180,
+        "sha256": "f31f5f65375709593b0dd0f53996528c86d8e6ca487452647e71c0159c3ecfd8"
+      },
+      {
+        "bytes": 30054,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-025.json.gz",
+        "samples": 180,
+        "sha256": "c4f97a003fc92fab95cd73bb1bac276529e5b4915dc522df2dfc85624a0e1dd4"
+      },
+      {
+        "bytes": 28307,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-026.json.gz",
+        "samples": 180,
+        "sha256": "783319727cf003fae0d71d1ed48e3a1950e809e22c9ff481f1d14d2885cebc24"
+      },
+      {
+        "bytes": 27066,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-027.json.gz",
+        "samples": 180,
+        "sha256": "1ffe0454d78d5c844a63eb580cd7dcae02a669357d55886733d47888343f40e7"
+      },
+      {
+        "bytes": 30077,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-028.json.gz",
+        "samples": 180,
+        "sha256": "891a6d750e6bdf3e91d19167d1d064068724a457cfeaec2c04a84c88b10b18eb"
+      },
+      {
+        "bytes": 27871,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-029.json.gz",
+        "samples": 180,
+        "sha256": "9857eae18a085a3b12b351ec8a50ffc3e79cca1bffed3e52020a523f1d3edc00"
+      },
+      {
+        "bytes": 25790,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-030.json.gz",
+        "samples": 180,
+        "sha256": "47ef7c3131b4f4e6a97eb97cb29effd3f5ea3ac3548eee8c61b2c53dc7508e7b"
+      },
+      {
+        "bytes": 33178,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-031.json.gz",
+        "samples": 180,
+        "sha256": "6ca975e9e7e39d1bf471f1cebe24b4127de9c00a5a5da9a8770a5aafa13fbf98"
+      },
+      {
+        "bytes": 32536,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-032.json.gz",
+        "samples": 180,
+        "sha256": "c8c95628bd18597fb91b5da8dd64881df17d70b8f5b35bb0109945c9561a5882"
+      },
+      {
+        "bytes": 29965,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-033.json.gz",
+        "samples": 180,
+        "sha256": "f9e50f35f7c4a1363ef7a8d1ae0b03f844c27c1ae4adbf1b56fd832ba0219a06"
+      },
+      {
+        "bytes": 29910,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-034.json.gz",
+        "samples": 180,
+        "sha256": "ae2468a29428ebadb38becf9ec6de7d3187e3b41ddbc92c761ec16555dda7795"
+      },
+      {
+        "bytes": 28284,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-035.json.gz",
+        "samples": 180,
+        "sha256": "dff4c196f7b8217cd4fa874df989bb810864c2bc06a5fc102dd6fa128e59b434"
+      },
+      {
+        "bytes": 29022,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-036.json.gz",
+        "samples": 180,
+        "sha256": "3569a57a6bba59790595d59114238cf8ae82555736df5c9785394e239b1dd854"
+      },
+      {
+        "bytes": 26699,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-037.json.gz",
+        "samples": 180,
+        "sha256": "f26848f2fd9e18a4b2009b1a1405ddda6a962ce0f3fbb324509a4e39ab1ed570"
+      },
+      {
+        "bytes": 29673,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-038.json.gz",
+        "samples": 180,
+        "sha256": "53b0560c78009c520955e42d35bb8a75b48496d5d8cee4405bbb65892d698c6b"
+      },
+      {
+        "bytes": 41467,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-039.json.gz",
+        "samples": 180,
+        "sha256": "6dd7036648004a2d55082d5bd25b9a13599436e287aed2098df08a7ac20fc5a8"
+      },
+      {
+        "bytes": 34375,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-040.json.gz",
+        "samples": 180,
+        "sha256": "857e93e8965d7f27e1a2b3b4d6a1b6d549c211f071c39f122630b680d435d687"
+      },
+      {
+        "bytes": 34061,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-041.json.gz",
+        "samples": 180,
+        "sha256": "62444f16564b5951ee60a094b29a0a6bef172dbe5691d0a6bfff2a521f78cb95"
+      },
+      {
+        "bytes": 37205,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-042.json.gz",
+        "samples": 180,
+        "sha256": "cce06686db4d23a395f86726037720d31286b5f0856868a7e37592445f6592d0"
+      },
+      {
+        "bytes": 31888,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-043.json.gz",
+        "samples": 180,
+        "sha256": "4facdd395ca15cb14ddb5ace4ab2d313a22d19522a2b0430bf9e3d6f742fadf2"
+      },
+      {
+        "bytes": 32838,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-044.json.gz",
+        "samples": 180,
+        "sha256": "cbbdc684daa4131f1e491d1789b49ad08b02a8fc01f45c50120e25719e7462e9"
+      },
+      {
+        "bytes": 30261,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-045.json.gz",
+        "samples": 180,
+        "sha256": "d94122d11fc4138ddb876b8d4342bdb19db07367e30a942b8648648ae11ce5de"
+      },
+      {
+        "bytes": 31524,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-046.json.gz",
+        "samples": 180,
+        "sha256": "b2105d270baed751b875ed3894433c1f9ed4ca45ce7d1033a2d7920dad4f3f30"
+      },
+      {
+        "bytes": 28822,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-047.json.gz",
+        "samples": 180,
+        "sha256": "a7cd858243167e1ba51bd07cb78435a431b013ce97a1d6b8678c4d8216e2d606"
+      },
+      {
+        "bytes": 27726,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-048.json.gz",
+        "samples": 180,
+        "sha256": "9c0d52b33374009f09d437e4877c908006013f1ca1d8ef4b4ea34d1896fdd3b0"
+      },
+      {
+        "bytes": 26574,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-049.json.gz",
+        "samples": 180,
+        "sha256": "1692561f7a28c54dd71cd12b9751ce48653f1d46da47bf244cb8e7870980162c"
+      },
+      {
+        "bytes": 29362,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-050.json.gz",
+        "samples": 180,
+        "sha256": "1fb95b41b973d92e20c14a413b26440537c3382697f12ddc2fedcace239f2f7c"
+      },
+      {
+        "bytes": 28971,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-051.json.gz",
+        "samples": 180,
+        "sha256": "7fbce52290f0ca7acec498d8e15a80d0fa71a58882a3693a10c3a44bc884d821"
+      },
+      {
+        "bytes": 35371,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-052.json.gz",
+        "samples": 180,
+        "sha256": "984ca9ea0e57c55803cd2691b5c86f750c051455045174a8f28abe08f6e2b29d"
+      },
+      {
+        "bytes": 30454,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-053.json.gz",
+        "samples": 180,
+        "sha256": "bb494f11d2e89df2e563bb201cf1bc800a3dd2c6b0447dcba56b12bc9b4f9651"
+      },
+      {
+        "bytes": 36617,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-054.json.gz",
+        "samples": 180,
+        "sha256": "95f87245a9dc0ac54bfe86aacb184715fb2e4451e4e0098f0e24ed65d4f9f3c5"
+      },
+      {
+        "bytes": 39303,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-055.json.gz",
+        "samples": 180,
+        "sha256": "0658cbad6a8b9077259b50b0398a1d79aa490ef2d1882b4d11c102ec63c0f7a3"
+      },
+      {
+        "bytes": 36483,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-056.json.gz",
+        "samples": 180,
+        "sha256": "8f8a79b4649b2fa6ee557d95f2803a18f39715353571707f40e422bd366fac9e"
+      },
+      {
+        "bytes": 33040,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-057.json.gz",
+        "samples": 180,
+        "sha256": "407944af4acff83ac9bc7bdfca701521a94ccbb67fbbd4647adc18da3fea02e4"
+      },
+      {
+        "bytes": 31434,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-058.json.gz",
+        "samples": 180,
+        "sha256": "1541738097fef7422c3f161b7f285636ba94815e2c7c54438bb9b94dcd1a20b0"
+      },
+      {
+        "bytes": 30411,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-059.json.gz",
+        "samples": 180,
+        "sha256": "05ba22518ab20c9ade3579d05054b87b2a7aaccdc6e97df741f06c4d84b4d317"
+      },
+      {
+        "bytes": 35584,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-060.json.gz",
+        "samples": 180,
+        "sha256": "ca4ba9453b5fe1b355c4e159664e88354a173adf4e111ad9644225d2fa894166"
+      },
+      {
+        "bytes": 36699,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-061.json.gz",
+        "samples": 180,
+        "sha256": "f2b43fa791b8d6c18e7961f1602bc9c0a0d1326337c09f1dc8ba1ad699d02ccc"
+      },
+      {
+        "bytes": 40794,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-062.json.gz",
+        "samples": 180,
+        "sha256": "d82d7df92017c27c98666f798a1d931306e601ce647a2e6a11ab1be00e8f66d2"
+      },
+      {
+        "bytes": 36985,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-063.json.gz",
+        "samples": 180,
+        "sha256": "5ed1044e0570cafdc3d234a673b63549fae2b0469fa28930899d12117495e415"
+      },
+      {
+        "bytes": 39077,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-064.json.gz",
+        "samples": 180,
+        "sha256": "dc29e7c30f4a6abab0f257248385ae840583f47474fd480938882a73a4ae8e5f"
+      },
+      {
+        "bytes": 34125,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-065.json.gz",
+        "samples": 180,
+        "sha256": "96cb9e0cb931c89491ee4840ab11d90af212bdcd49cdd6ccfd547cd9e9b910d7"
+      },
+      {
+        "bytes": 31720,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-066.json.gz",
+        "samples": 180,
+        "sha256": "91192b87ec44af4b73780c02b06b5c43bbbdf9807fc85b59723f5dc7720f1ed3"
+      },
+      {
+        "bytes": 27051,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-067.json.gz",
+        "samples": 180,
+        "sha256": "26f9013e42be71d92ff13b82ea7824ed4c1114db7a494140e63ee668b86c072e"
+      },
+      {
+        "bytes": 31977,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-068.json.gz",
+        "samples": 180,
+        "sha256": "78b1e2228414e50c343b51a3e9b0c1a6e5ffbc6c05557d79040555bd8f57bd98"
+      },
+      {
+        "bytes": 29842,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-069.json.gz",
+        "samples": 180,
+        "sha256": "36ec659e565af373a8c2afd2dbd6a0617011876165614eee236d2678084c5dce"
+      },
+      {
+        "bytes": 27812,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-070.json.gz",
+        "samples": 180,
+        "sha256": "a9820029acd105f4b7caa674fdaf9723d8a5155138d93f44da2b88982c05598e"
+      },
+      {
+        "bytes": 27522,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-071.json.gz",
+        "samples": 180,
+        "sha256": "cbc4314a23018fd395f8b8715bd4840f8d258f39a1326a203467d7befb67f747"
+      },
+      {
+        "bytes": 29136,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-072.json.gz",
+        "samples": 180,
+        "sha256": "62106f837865887b88566c1bf685ebec0cc790ac559e244f2543d6bca731d387"
+      },
+      {
+        "bytes": 26702,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-073.json.gz",
+        "samples": 180,
+        "sha256": "4376a1871c550d1fa61f8be4bd576076e9643e6e47d192b95f32b8d6e737fe53"
+      },
+      {
+        "bytes": 25979,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-074.json.gz",
+        "samples": 180,
+        "sha256": "c0998b84dfea3f9c27315c696dcffd92feaedaaf1861807d6a709b9e413b18a2"
+      },
+      {
+        "bytes": 28398,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-075.json.gz",
+        "samples": 180,
+        "sha256": "d05de6ed21ad0ed6a234b5c4a8b65817ee60f3024d03208d2629ecdd86de96d0"
+      },
+      {
+        "bytes": 30576,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-076.json.gz",
+        "samples": 180,
+        "sha256": "5de5e59a4458bc9ae4504b9bec0fe2aa2f68364f518128a3b3d25335f6f61d63"
+      },
+      {
+        "bytes": 25530,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-077.json.gz",
+        "samples": 180,
+        "sha256": "e26ae7316b23db12dd6312aef20da2bdfe3ccf1a21d936cf9429baf545060aa1"
+      },
+      {
+        "bytes": 28505,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-078.json.gz",
+        "samples": 180,
+        "sha256": "f3a6c9da0a44705f608013f62cb654b80efd661c5971ea23ad94d5759e2e0882"
+      },
+      {
+        "bytes": 33374,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-079.json.gz",
+        "samples": 180,
+        "sha256": "611f11ee6d30bf829a87a3aeee31618ae54492279b4f8ec6bcb4a2f48f102796"
+      },
+      {
+        "bytes": 33346,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-080.json.gz",
+        "samples": 180,
+        "sha256": "77903f44989244191f4c7eb055c8aab49a89010009176daaee451f8739fef6da"
+      },
+      {
+        "bytes": 28724,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-081.json.gz",
+        "samples": 180,
+        "sha256": "b9f4d0b79adfe75591bd73e2fe2dddb60b9f8b8a543a6546fcec8836e03b50f2"
+      },
+      {
+        "bytes": 28316,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-082.json.gz",
+        "samples": 180,
+        "sha256": "af92e1144f291540088c1a6f8ebbeb0301d129fec8331179bbb51d665413cb82"
+      },
+      {
+        "bytes": 26690,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-083.json.gz",
+        "samples": 180,
+        "sha256": "92ffcae34f782cc6ba8a2a5b98aa2d52fd65efc58ab09780f76174285984cbb2"
+      },
+      {
+        "bytes": 31262,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-084.json.gz",
+        "samples": 180,
+        "sha256": "a28e041065e84fccd4be08fa0df59229b1a2bc60c12bd12e16ac7527a7eee885"
+      },
+      {
+        "bytes": 29279,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-085.json.gz",
+        "samples": 180,
+        "sha256": "f0e76eb4e87606f603304cf3664ab302667d1990a3b6a0d59d502bcfc8a03e7c"
+      },
+      {
+        "bytes": 27577,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-086.json.gz",
+        "samples": 180,
+        "sha256": "19aae6a289d026d8c2de3661346090e8560375fac26ac4563ded9b176725bd26"
+      },
+      {
+        "bytes": 27512,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-087.json.gz",
+        "samples": 180,
+        "sha256": "6f8ee100bb0492b6f8d7f39aab6e13eea41e3fc0773d5f6844aa008b18343638"
+      },
+      {
+        "bytes": 37462,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-088.json.gz",
+        "samples": 180,
+        "sha256": "8ea92a3f692870b8242a8470331c3f3a1f54da6d52a1713a86d2192404baddc8"
+      },
+      {
+        "bytes": 31133,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-089.json.gz",
+        "samples": 180,
+        "sha256": "e14191444344d0269a6d86c625470071d5bfd27d504ee164fd15da0db8073831"
+      },
+      {
+        "bytes": 29674,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-090.json.gz",
+        "samples": 180,
+        "sha256": "836562e1b125d2662f21b53644ba0a1fd177fa2e418a8f5cdb443d443e5253b3"
+      },
+      {
+        "bytes": 30583,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-091.json.gz",
+        "samples": 180,
+        "sha256": "bedbc73657f9f1c0854730252fdf9a11dec8b4645aa493ac1607c36b79575f6a"
+      },
+      {
+        "bytes": 33113,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-092.json.gz",
+        "samples": 180,
+        "sha256": "338d33002cbada40414786e62f0751bb850ee6964c44051c16b5b1579259f92b"
+      },
+      {
+        "bytes": 36676,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-093.json.gz",
+        "samples": 180,
+        "sha256": "57dacce17aa5f1c2890c976ee3b2abb5e1d800da98d4abf244f11d16861da708"
+      },
+      {
+        "bytes": 34991,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-094.json.gz",
+        "samples": 180,
+        "sha256": "fa77c9a9fbe1b1bbd8da48cf9288e46576f4c3ce329e6407c132290f785d96b6"
+      },
+      {
+        "bytes": 30904,
+        "filename": "datasets/v3-d74b9a46afb5d92a/liquidity/v1-4b173c519fe639bd/liquidity-095.json.gz",
+        "samples": 180,
+        "sha256": "738f15f8d078d9d6678103e08b61dd7f587c05e4f6a6189b41f63053cf8d26b9"
+      }
     ]
   },
   "datasetVersion": "v3-d74b9a46afb5d92a",
@@ -1181,7 +1759,8 @@
     "book": "All rows grouped by exact local_timestamp; pre-snapshot deltas ignored; snapshots reset state; zero amounts delete levels; chunks contain an exact starting checkpoint.",
     "chunkDurationMs": 900000,
     "footprintTickSize": 0.01,
-    "trades": "Every trade retained in chunk assets; aggressor buy maps to ask and sell maps to bid."
+    "trades": "Every trade retained in chunk assets; aggressor buy maps to ask and sell maps to bid.",
+    "liquidity": "Aggregate resting bid and ask amount sampled every 5 seconds into 1 USDT bins; uint16 values use 100 units per BTC and clip at 655.35 BTC."
   },
   "schema": "apextrader.tardis-provenance/v3",
   "session": {
@@ -1195,6 +1774,19 @@
     "bookRows": 6486542,
     "ignoredPreSnapshotRows": 0,
     "snapshotResets": 0,
-    "trades": 420562
+    "trades": 420562,
+    "liquidityCells": 14376960,
+    "liquidityNonZeroCells": 12736221,
+    "liquidityTiles": 96
+  },
+  "liquidity": {
+    "amountScale": 100,
+    "normalization": "log1p using the 99.5th percentile of non-zero sampled bins",
+    "normalizationMaxAmount": 70.16,
+    "priceCount": 832,
+    "priceMin": 6960,
+    "priceStep": 1,
+    "sampleDurationMs": 5000,
+    "version": "v1-4b173c519fe639bd"
   }
 }

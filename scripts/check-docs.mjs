@@ -6,6 +6,7 @@ const required = [
   'AGENTS.md',
   'docs/README.md',
   'docs/product/landing-and-routing.md',
+  'docs/product/liquidity-heatmap.md',
   'docs/product/professional-terminal.md',
   'docs/design-system/README.md',
   'docs/design-system/chart-patterns.md',
@@ -18,8 +19,10 @@ const required = [
   'docs/decisions/0003-visible-range-volume-profile.md',
   'docs/decisions/0004-fractional-chart-viewport.md',
   'docs/decisions/0005-public-landing-and-demo-routes.md',
+  'docs/decisions/0006-historical-liquidity-tiles.md',
   'docs/verification/2026-08-27-chart-interaction-and-density.md',
-  'docs/verification/2026-08-28-landing-direction-b-local.md'
+  'docs/verification/2026-08-28-landing-direction-b-local.md',
+  'docs/verification/2026-08-28-liquidity-heatmap.md'
 ]
 
 const errors = []

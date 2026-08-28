@@ -34,6 +34,10 @@ Modos actuales: Candles, Footprint y Step Profile. Candles y Step Profile soport
 
 El significado visual y de datos de cada modo se define en [Chart patterns](../design-system/chart-patterns.md). Candles usa el acrónimo canónico OHLC; Footprint representa ejecuciones por precio y lado agresor; Step Profile repite un perfil por intervalo.
 
+Candles muestra por defecto un [Historical liquidity heatmap](liquidity-heatmap.md) derivado del
+L2 real, con visibilidad e intensidad persistentes en Chart settings. La capa respeta el viewport y
+el reloj del replay y no se monta en Footprint o Step Profile.
+
 ### Interacción y viewport temporal
 
 - Mover el puntero sobre una barra actualiza la toolbar con su `O`, `H`, `L`, `C`, `Δ` y `V`; al abandonar el gráfico vuelve a mostrar la barra actual del replay.

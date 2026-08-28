@@ -11,6 +11,7 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 ## Mapa canónico
 
 - [Professional terminal specification](product/professional-terminal.md): comportamiento, datos, persistencia y limitaciones.
+- [Historical liquidity heatmap](product/liquidity-heatmap.md): L2, tiles, controles, límites y renderizado.
 - [Landing and routing specification](product/landing-and-routing.md): narrativa pública, rutas canónicas, aliases y frontera de carga.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
 - [Marketing patterns](design-system/marketing-patterns.md): tokens, composición responsive y media de la landing.

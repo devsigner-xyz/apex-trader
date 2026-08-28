@@ -1,4 +1,5 @@
 import {
+  chartLiquidityDefaults,
   chartPanelSizeDefaults,
   chartPanelSizeLimits,
   chartPanelVisibilityDefaults,
@@ -36,6 +37,17 @@ export function normalizeChartPanelVisibility(candidate) {
       typeof candidate?.[panel] === 'boolean' ? candidate[panel] : fallback
     ])
   )
+}
+
+export function normalizeChartLiquidity(candidate) {
+  const intensity = Number(candidate?.intensity)
+  return {
+    enabled:
+      typeof candidate?.enabled === 'boolean' ? candidate.enabled : chartLiquidityDefaults.enabled,
+    intensity: Number.isFinite(intensity)
+      ? clamp(intensity, 0.2, 1)
+      : chartLiquidityDefaults.intensity
+  }
 }
 
 export function normalizeWatchlistColumns(candidate) {

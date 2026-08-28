@@ -1,5 +1,6 @@
 // @ts-check
 const { devices } = require('@playwright/test')
+const testPort = process.env.PLAYWRIGHT_PORT || '5173'
 
 /**
  * Read environment variables from file.
@@ -35,7 +36,7 @@ const config = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173',
+    baseURL: `http://localhost:${testPort}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry'
@@ -97,8 +98,8 @@ const config = {
   /* Run your local dev server before starting the tests */
   webServer: {
     /* Pin the React Vite dev server to the configured base URL. */
-    command: 'pnpm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
-    port: 5173,
+    command: `pnpm run dev --host 127.0.0.1 --port ${testPort} --strictPort`,
+    port: Number(testPort),
     reuseExistingServer: !process.env.CI,
     timeout: 30 * 1000
   }

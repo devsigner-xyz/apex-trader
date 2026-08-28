@@ -56,6 +56,18 @@ Agrega volumen ejecutado por precio usando las velas actualmente visibles:
 
 Se recalcula después de pan, zoom o cambio de timeframe. Las barras y los niveles VAH/POC/VAL son capas de visibilidad independientes.
 
+## Historical liquidity heatmap
+
+Candles puede incorporar una capa Canvas bajo el SVG con liquidez limit resting agregada por
+precio y tiempo. Azul verdoso expresa niveles menores; arena y terracota, concentraciones mayores.
+La intensidad cromática usa una escala logarítmica global y el control `INTENSITY` modifica solo la
+opacidad del overlay.
+
+La capa no sustituye OHLC, Footprint, Volume Profile ni DOM. Las velas, crosshair, ejes y markers
+permanecen por encima. Footprint y Step Profile no muestran el heatmap en la primera entrega. La
+definición de datos, resolución y límites vive en
+[Historical liquidity heatmap](../product/liquidity-heatmap.md).
+
 ## Reglas de documentación
 
 - La definición visible vive junto a cada pareja de variantes dentro de `05.10 · Trading · Market Chart`; el comportamiento compartido ocupa un bloque superior y el contexto de página usa `_Documentation/Page intro`.

@@ -4,11 +4,13 @@ import {
   recordPersistentChunk,
   removeStaleHistoricalCaches
 } from './historicalAssetCache.js'
+import { normalizeLiquidityTile } from './liquidityHeatmap.js'
 
 const RUNTIME_MANIFEST_URL = 'data/tardis/manifest-v3.json'
 const EXPECTED_MANIFEST_SCHEMA = 'apextrader.tardis-runtime-manifest/v3'
 const CHUNK_MS = 15 * 60 * 1000
 const playbackChunkCache = new Map()
+const liquidityChunkCache = new Map()
 let runtimeManifestPromise = null
 
 function assetUrl(path) {
@@ -74,6 +76,7 @@ function chunkAssetPaths(manifest, index) {
   const suffix = String(index).padStart(3, '0')
   return {
     book: runtimeAssetPath(manifest.assets.bookChunkTemplate.replace('{index}', suffix)),
+    liquidity: runtimeAssetPath(manifest.assets.liquidityChunkTemplate.replace('{index}', suffix)),
     trades: runtimeAssetPath(manifest.assets.tradeChunkTemplate.replace('{index}', suffix))
   }
 }
@@ -120,6 +123,37 @@ export function loadPlaybackChunk(index, fetchImpl = fetch) {
     playbackChunkCache.set(index, request)
   }
   return playbackChunkCache.get(index)
+}
+
+async function fetchLiquidityChunk(index, fetchImpl) {
+  const manifest = await loadRuntimeManifest(fetchImpl)
+  if (!manifest.assets?.liquidityChunkTemplate)
+    throw new Error('The historical dataset does not include liquidity tiles.')
+  const paths = chunkAssetPaths(manifest, index)
+  const cacheName = historicalCacheName(manifest.datasetVersion)
+  const raw = await fetchGzipJson(paths.liquidity, fetchImpl, cacheName)
+  if (fetchImpl === globalThis.fetch)
+    await recordPersistentChunk(
+      {
+        cacheName,
+        index,
+        urls: (nextIndex) => Object.values(chunkAssetPaths(manifest, nextIndex)).map(assetUrl)
+      },
+      { limit: manifest.cache?.chunkLimit }
+    )
+  return normalizeLiquidityTile(raw, manifest.liquidity?.normalizationMaxAmount)
+}
+
+export function loadLiquidityChunk(index, fetchImpl = fetch) {
+  if (fetchImpl !== globalThis.fetch) return fetchLiquidityChunk(index, fetchImpl)
+  if (!liquidityChunkCache.has(index)) {
+    const request = fetchLiquidityChunk(index, fetchImpl).catch((error) => {
+      liquidityChunkCache.delete(index)
+      throw error
+    })
+    liquidityChunkCache.set(index, request)
+  }
+  return liquidityChunkCache.get(index)
 }
 
 function sorted(book, descending) {

@@ -16,6 +16,7 @@ import {
   selectTimeTickIndexes
 } from '../../../services/professionalChartGeometry.js'
 import {
+  normalizeChartLiquidity,
   normalizeChartPanelSizes,
   normalizeChartPanelVisibility
 } from '../../../services/professionalTerminalPersistence.js'
@@ -35,6 +36,7 @@ import {
 import { formatClock as clock, formatNumber as fmt } from '../formatters.js'
 import CandlesLayer from './CandlesLayer.jsx'
 import FootprintLayer from './FootprintLayer.jsx'
+import LiquidityHeatmapLayer from './LiquidityHeatmapLayer.jsx'
 import SessionProfileOverlay from './SessionProfileOverlay.jsx'
 import StepProfileLayer from './StepProfileLayer.jsx'
 import VolumePanel from './VolumePanel.jsx'
@@ -53,6 +55,7 @@ const profileMarkerWidth = 38
 const profileMarkerX = plotLeft + 8
 const profileMarkerTextX = profileMarkerX + profileMarkerWidth / 2
 const {
+  chartLiquidity: chartLiquidityStorageKey,
   chartPanelSizes: chartPanelSizesStorageKey,
   chartPanelVisibility: chartPanelVisibilityStorageKey
 } = storageKeys
@@ -65,6 +68,10 @@ export default function MarketChart({
   timeframe,
   view
 }) {
+  const [liquidity, setLiquidity] = usePersistentState(
+    chartLiquidityStorageKey,
+    normalizeChartLiquidity
+  )
   const [panelSizes, setPanelSizes] = usePersistentState(
     chartPanelSizesStorageKey,
     normalizeChartPanelSizes
@@ -160,6 +167,8 @@ export default function MarketChart({
   const chartSlots = createTimeScale(renderBars.length, visibleCount, plotLeft, plotWidth, phase)
   const step = chartSlots.step
   const x = (index) => chartSlots.positions[index]
+  const viewportStart = bars[0].timestamp + logicalStart * timeframe * 60_000
+  const viewportEnd = bars[0].timestamp + logicalEnd * timeframe * 60_000
   const visibleProfile = deriveVolumeProfile(visible)
   const profile = buildSessionProfile(visibleProfile.levels, low, high)
   const maxProfile = Math.max(...profile.map((level) => level.ask + level.bid), 1)
@@ -217,10 +226,7 @@ export default function MarketChart({
     const chartX = ((event.clientX - bounds.left) / bounds.width) * chartWidth
     const chartY = ((event.clientY - bounds.top) / bounds.height) * priceChartHeight
     const insidePricePlot =
-      chartX >= plotLeft &&
-      chartX <= plotRight &&
-      chartY >= mainTop &&
-      chartY <= mainBottom
+      chartX >= plotLeft && chartX <= plotRight && chartY >= mainTop && chartY <= mainBottom
     setCrosshair(insidePricePlot ? { x: chartX, y: chartY } : null)
     setHoveredBarIndex(
       findTimeScaleBarIndex({
@@ -339,6 +345,36 @@ export default function MarketChart({
               />
               <span>VOLUME</span>
             </label>
+            <label>
+              <input
+                aria-label="Show liquidity heatmap"
+                checked={liquidity.enabled}
+                onChange={(event) =>
+                  setLiquidity((current) => ({ ...current, enabled: event.target.checked }))
+                }
+                type="checkbox"
+              />
+              <span>LIQUIDITY HEATMAP</span>
+            </label>
+            <label className="chart-liquidity-intensity">
+              <span>INTENSITY</span>
+              <input
+                aria-label="Liquidity heatmap intensity"
+                disabled={!liquidity.enabled}
+                max="100"
+                min="20"
+                onChange={(event) =>
+                  setLiquidity((current) => ({
+                    ...current,
+                    intensity: Number(event.target.value) / 100
+                  }))
+                }
+                step="5"
+                type="range"
+                value={Math.round(liquidity.intensity * 100)}
+              />
+              <output>{Math.round(liquidity.intensity * 100)}%</output>
+            </label>
           </div>
         </aside>
       )}
@@ -350,6 +386,17 @@ export default function MarketChart({
         style={chartPanelStyle}
       >
         <div className="price-chart-panel">
+          {mode === 'candles' && (
+            <LiquidityHeatmapLayer
+              enabled={liquidity.enabled}
+              intensity={liquidity.intensity}
+              priceDomain={priceDomain}
+              replayTimestamp={view.timestamp}
+              sessionStart={view.bars[0].timestamp}
+              viewportEnd={viewportEnd}
+              viewportStart={viewportStart}
+            />
+          )}
           <svg
             aria-description="Move the pointer over the price plot to show a dotted crosshair and inspect the bar OHLC, delta and volume. The vertical guide continues through the volume panel when visible. Hold the primary pointer button and drag to pan continuously. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
@@ -378,7 +425,7 @@ export default function MarketChart({
             tabIndex={0}
             viewBox={`0 0 ${chartWidth} ${priceChartHeight}`}
           >
-            <rect width={chartWidth} height={priceChartHeight} fill="#0b0f12" />
+            <rect width={chartWidth} height={priceChartHeight} fill="transparent" />
             <defs>
               <clipPath id="market-chart-price-plot-clip">
                 <rect height={priceChartHeight} width={plotWidth} x={plotLeft} y="0" />
