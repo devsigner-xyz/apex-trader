@@ -74,11 +74,15 @@ function runtimeAssetPath(filename) {
 
 function chunkAssetPaths(manifest, index) {
   const suffix = String(index).padStart(3, '0')
-  return {
+  const paths = {
     book: runtimeAssetPath(manifest.assets.bookChunkTemplate.replace('{index}', suffix)),
-    liquidity: runtimeAssetPath(manifest.assets.liquidityChunkTemplate.replace('{index}', suffix)),
     trades: runtimeAssetPath(manifest.assets.tradeChunkTemplate.replace('{index}', suffix))
   }
+  if (manifest.assets.liquidityChunkTemplate)
+    paths.liquidity = runtimeAssetPath(
+      manifest.assets.liquidityChunkTemplate.replace('{index}', suffix)
+    )
+  return paths
 }
 
 export async function loadProfessionalSession(fetchImpl = fetch) {

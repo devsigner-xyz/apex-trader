@@ -109,6 +109,10 @@ La tab bar mide 38 px, no muestra métricas globales y empieza en Positions sin 
 ## Datos y accesibilidad
 
 - Chart, DOM y Time & Sales usan replay histórico compartido.
+- El manifest mutable se revalida en cada visita. Durante una release, un manifest anterior sin
+  tiles de liquidez sigue cargando el replay base; la capa de heatmap degrada de forma aislada.
+- Cache Storage es una optimización. Fallos al abrir, escribir o desalojar su caché no bloquean una
+  respuesta histórica válida obtenida por red.
 - Markets, Activity, cuenta y submit de Execution son demostración o simulación.
 - Settings cierra con Escape o click exterior y debe llevar Tab al primer control habilitado.
 - La tab bar tiene roles ARIA, pero Arrow/Home/End sigue pendiente.

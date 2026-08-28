@@ -32,6 +32,9 @@ alimenta el DOM. No usa profundidad sintética ni deriva liquidez a partir de tr
 
 El runtime carga únicamente los tiles que intersectan el viewport visible. Los assets suman
 3.080.573 bytes comprimidos y comparten la caché versionada del replay.
+El manifest se revalida en cada visita. Si durante una release el navegador conserva el manifest
+anterior sin `liquidityChunkTemplate`, el replay base continúa y solo la capa de liquidez queda no
+disponible hasta recibir el manifest actual.
 
 ## Controles
 

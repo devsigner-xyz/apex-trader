@@ -93,11 +93,19 @@ test('a cached pre-heatmap manifest still loads the core replay safely', async (
     if (url.endsWith('manifest-v3.json')) return Response.json(legacyManifest)
     if (url.endsWith('session.json.gz'))
       return gzipResponse({ bars: [], schema: 'apextrader.tardis-session/v2' })
+    if (url.endsWith('book-000.json.gz'))
+      return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
+    if (url.endsWith('trades-000.json.gz')) return gzipResponse({ trades: [] })
     return new Response(null, { status: 404 })
   }
   assert.deepEqual(await loadProfessionalSession(fetchImpl), {
     bars: [],
     schema: 'apextrader.tardis-session/v2'
+  })
+  assert.deepEqual(await loadPlaybackChunk(0, fetchImpl), {
+    book: { checkpoint: { asks: [], bids: [] }, groups: [] },
+    index: 0,
+    trades: { trades: [] }
   })
   await assert.rejects(() => loadLiquidityChunk(0, fetchImpl), /does not include liquidity tiles/)
 })

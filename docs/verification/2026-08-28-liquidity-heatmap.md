@@ -43,5 +43,18 @@ La captura `output/playwright/liquidity-heatmap-local-1920x1080.png` confirma:
 - concentración alta arena/terracota y liquidez menor azul verdosa;
 - Canvas con `z-index: 0`, SVG con `z-index: 1` y sin interceptar input.
 
+## Runtime compatibility hotfix
+
+La verificación posterior de la demo detectó dos límites de rollout: un manifest cacheado anterior
+no incluía `liquidityChunkTemplate`, y un fallo de escritura de Cache Storage podía abortar una
+respuesta de red válida. El runtime ahora mantiene las rutas de book y trades independientes de la
+ruta opcional de liquidez, revalida el manifest en cada visita y trata toda persistencia de caché
+como best-effort.
+
+- Unit tests: manifest anterior carga sesión, book y trades; el heatmap falla de forma aislada.
+- Unit tests: `Cache.put` rechazado conserva la respuesta de red original.
+- E2E de liquidez y compatibilidad: 9/9 en Chromium, Firefox y WebKit.
+- Regresión de terminal y order book: 21/21 en Chromium.
+
 La verificación de producción se realiza después del commit y despliegue autorizado; no se infiere
 desde este resultado local.

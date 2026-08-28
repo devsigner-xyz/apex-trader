@@ -60,3 +60,27 @@ test('liquidity heatmap remains a Candles-only layer', async ({ page }) => {
     timeout: 15_000
   })
 })
+
+test('core replay survives a pre-heatmap manifest and Cache API write failure', async ({
+  page
+}) => {
+  await page.addInitScript(() => {
+    if (typeof Cache !== 'undefined')
+      Cache.prototype.put = async () => {
+        throw new DOMException('Cache.put() encountered a network error', 'NetworkError')
+      }
+  })
+  await page.route('**/data/tardis/manifest-v3.json', async (route) => {
+    const response = await route.fetch()
+    const manifest = await response.json()
+    delete manifest.assets.liquidityChunkTemplate
+    delete manifest.liquidity
+    await route.fulfill({ json: manifest })
+  })
+
+  await page.goto('/demo')
+
+  await expect(page.getByLabel('candles historical chart')).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await expect(page.locator('.liquidity-heatmap-canvas')).toHaveAttribute('data-status', 'error')
+})

@@ -89,6 +89,39 @@ test('persistent historical assets are fetched once and then served from Cache S
   }
 })
 
+test('a Cache API write failure does not discard the network response', async () => {
+  const previousFetch = globalThis.fetch
+  let requests = 0
+  const fetchImpl = async () => {
+    requests += 1
+    return new Response('network payload')
+  }
+  globalThis.fetch = fetchImpl
+  try {
+    const cacheStorage = {
+      async open() {
+        return {
+          async match() {
+            return undefined
+          },
+          async put() {
+            throw new DOMException('Cache.put() encountered a network error', 'NetworkError')
+          }
+        }
+      }
+    }
+    const response = await fetchPersistentAsset('/asset', {
+      cacheName: historicalCacheName('v3-test'),
+      cacheStorage,
+      fetchImpl
+    })
+    assert.equal(await response.text(), 'network payload')
+    assert.equal(requests, 1)
+  } finally {
+    globalThis.fetch = previousFetch
+  }
+})
+
 test('chunk cache keeps the most recent indices and evicts both assets of older chunks', async () => {
   const cacheStorage = new MemoryCacheStorage()
   const storage = new MemoryStorage()

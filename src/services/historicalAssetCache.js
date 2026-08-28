@@ -42,11 +42,16 @@ export async function removeStaleHistoricalCaches(
   storage = browserStorage()
 ) {
   if (!cacheStorage?.keys) return
-  const names = await cacheStorage.keys()
+  let names
+  try {
+    names = await cacheStorage.keys()
+  } catch {
+    return
+  }
   const stale = names.filter(
     (name) => name.startsWith(HISTORICAL_CACHE_PREFIX) && name !== activeCacheName
   )
-  await Promise.all(stale.map((name) => cacheStorage.delete(name)))
+  await Promise.allSettled(stale.map((name) => cacheStorage.delete(name)))
   if (!storage?.length || !storage?.key) return
   const activeKey = `${CHUNK_INDEX_KEY_PREFIX}${activeCacheName}`
   const staleKeys = []
@@ -54,7 +59,12 @@ export async function removeStaleHistoricalCaches(
     const key = storage.key(index)
     if (key?.startsWith(CHUNK_INDEX_KEY_PREFIX) && key !== activeKey) staleKeys.push(key)
   }
-  for (const key of staleKeys) storage.removeItem(key)
+  for (const key of staleKeys)
+    try {
+      storage.removeItem(key)
+    } catch {
+      // Persistent storage is an optimization and must never block playback.
+    }
 }
 
 export async function fetchPersistentAsset(
@@ -62,11 +72,22 @@ export async function fetchPersistentAsset(
   { cacheName, cacheStorage = browserCacheStorage(), fetchImpl = globalThis.fetch }
 ) {
   if (!cacheStorage?.open || fetchImpl !== globalThis.fetch) return fetchImpl(url)
-  const cache = await cacheStorage.open(cacheName)
-  const cached = await cache.match(url)
+  let cache
+  let cached
+  try {
+    cache = await cacheStorage.open(cacheName)
+    cached = await cache.match(url)
+  } catch {
+    return fetchImpl(url)
+  }
   if (cached) return cached
   const response = await fetchImpl(url, { cache: 'force-cache' })
-  if (response.ok) await cache.put(url, response.clone())
+  if (response.ok)
+    try {
+      await cache.put(url, response.clone())
+    } catch {
+      // A Cache API failure must not discard an otherwise valid network response.
+    }
   return response
 }
 
@@ -85,8 +106,12 @@ export async function recordPersistentChunk(
   const evicted = indices.splice(0, Math.max(0, indices.length - limit))
   writeIndices(storage, key, indices)
   if (!evicted.length) return
-  const cache = await cacheStorage.open(cacheName)
-  await Promise.all(
-    evicted.flatMap((chunkIndex) => urls(chunkIndex).map((url) => cache.delete(url)))
-  )
+  try {
+    const cache = await cacheStorage.open(cacheName)
+    await Promise.allSettled(
+      evicted.flatMap((chunkIndex) => urls(chunkIndex).map((url) => cache.delete(url)))
+    )
+  } catch {
+    // Eviction is best-effort and must never block playback.
+  }
 }
