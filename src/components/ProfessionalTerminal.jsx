@@ -27,7 +27,6 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const routeMode = (next) => {
     if (next === 'footprint') setTimeframe((current) => Math.max(current, 60))
     onMode(next)
-    history.pushState({}, '', next === 'candles' ? '/price-chart' : `/${next}`)
   }
   const workspaceStyle = {
     '--dom-width': `${columns.dom}px`,

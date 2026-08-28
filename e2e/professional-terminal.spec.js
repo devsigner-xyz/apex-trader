@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 const views = [
-  ['/price-chart', 'candles'],
-  ['/footprint', 'footprint'],
-  ['/step-profile', 'step-profile']
+  ['/demo', 'candles'],
+  ['/demo/footprint', 'footprint'],
+  ['/demo/step-profile', 'step-profile']
 ]
 
 test.use({ viewport: { height: 1080, width: 1920 } })
@@ -360,7 +360,7 @@ for (const [route, mode] of views) {
 test('Markets columns can be configured while required columns remain visible', async ({
   page
 }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const markets = page.getByLabel('Markets', { exact: true })
   const selectedRow = markets.locator('button.selected')
 
@@ -422,7 +422,7 @@ test('Markets columns can be configured while required columns remain visible', 
 })
 
 test('Markets can be filtered and its rows scroll independently', async ({ page }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
 
   const markets = page.getByLabel('Markets', { exact: true })
   const search = page.getByRole('searchbox', { name: 'Search markets' })
@@ -470,7 +470,7 @@ test('Markets can be filtered and its rows scroll independently', async ({ page 
 })
 
 test('panel sizes persist across reloads and later visits', async ({ context, page }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
 
   await page.getByLabel('Resize watchlist').focus()
   await page.keyboard.press('ArrowRight')
@@ -496,13 +496,13 @@ test('panel sizes persist across reloads and later visits', async ({ context, pa
   expect(await readPanelWidths(page)).toEqual(resizedWidths)
 
   const returningPage = await context.newPage()
-  await returningPage.goto('/footprint')
+  await returningPage.goto('/demo/footprint')
   expect(await readPanelWidths(returningPage)).toEqual(resizedWidths)
   await returningPage.close()
 })
 
 test('time-axis wheel zoom anchors the latest visible candle', async ({ page }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   const initialVisibleCount = Number(await chart.getAttribute('data-visible-count'))
   const initialWindowEnd = await chart.getAttribute('data-window-end')
@@ -530,7 +530,7 @@ test('time-axis wheel zoom anchors the latest visible candle', async ({ page }) 
 })
 
 test('candle hover updates OHLC data and leaving restores the latest summary', async ({ page }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   const summary = page.locator('.chart-summary > span')
   const candles = chart.locator('g.up, g.down')
@@ -569,7 +569,7 @@ test('candle hover updates OHLC data and leaving restores the latest summary', a
 
 test('chart hover shows a dotted crosshair aligned through the volume panel', async ({ page }) => {
   await page.setViewportSize({ height: 1080, width: 1920 })
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   const volumePanel = page.getByRole('img', { name: 'Volume panel', exact: true })
   const bounds = await chart.boundingBox()
@@ -605,7 +605,7 @@ test('chart hover shows a dotted crosshair aligned through the volume panel', as
 test('chart stays still on hover and pans continuously while the pointer is held', async ({
   page
 }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   const chartBounds = await chart.boundingBox()
   const candles = chart.locator('g.up, g.down')
@@ -682,9 +682,9 @@ test('chart stays still on hover and pans continuously while the pointer is held
 
 test('mode-specific zoom limits preserve readable chart geometry', async ({ page }) => {
   const cases = [
-    { deltaY: -10_000, expected: 28, mode: 'candles', route: '/price-chart' },
-    { deltaY: 10_000, expected: 13, mode: 'footprint', route: '/footprint' },
-    { deltaY: 10_000, expected: 12, mode: 'step-profile', route: '/step-profile' }
+    { deltaY: -10_000, expected: 28, mode: 'candles', route: '/demo' },
+    { deltaY: 10_000, expected: 13, mode: 'footprint', route: '/demo/footprint' },
+    { deltaY: 10_000, expected: 12, mode: 'step-profile', route: '/demo/step-profile' }
   ]
 
   for (const { deltaY, expected, mode, route } of cases) {
@@ -738,7 +738,7 @@ test('mode-specific zoom limits preserve readable chart geometry', async ({ page
 
 test('time-axis labels never overlap at the most compressed candle scale', async ({ page }) => {
   await page.setViewportSize({ height: 900, width: 1366 })
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   const bounds = await chart.boundingBox()
   await page.mouse.move(bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.45)
@@ -760,7 +760,7 @@ test('time-axis labels never overlap at the most compressed candle scale', async
 })
 
 test('step profile supports deep legible zoom without sparse profile bars', async ({ page }) => {
-  await page.goto('/step-profile')
+  await page.goto('/demo/step-profile')
   const chart = page.getByLabel('step-profile historical chart')
   const chartBounds = await chart.boundingBox()
 
@@ -812,7 +812,7 @@ test('step profile supports deep legible zoom without sparse profile bars', asyn
 test('historical synchronization, settings and keyboard controls remain coherent', async ({
   page
 }) => {
-  await page.goto('/price-chart')
+  await page.goto('/demo')
   const countdown = page.locator('.current-price-countdown')
   const countdownBefore = await countdown.textContent()
   await page.waitForTimeout(1000)
@@ -999,7 +999,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByRole('button', { name: /Layout 01/ })).toHaveCount(0)
   await expect(page.getByRole('dialog', { name: 'Workspace settings' })).toHaveCount(0)
   await page.getByLabel('Chart mode').selectOption('footprint')
-  await expect(page).toHaveURL(/\/footprint$/)
+  await expect(page).toHaveURL(/\/demo\/footprint$/)
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
   await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(2)
   await expect(page.getByLabel('Timeframe')).toHaveValue('60')
@@ -1065,7 +1065,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
 
 test('orders and positions remain visible at a smaller desktop viewport', async ({ page }) => {
   await page.setViewportSize({ height: 900, width: 1440 })
-  await page.goto('/step-profile')
+  await page.goto('/demo/step-profile')
 
   const activity = page.getByLabel('Orders and positions')
   const footer = page.locator('.terminal-footer')

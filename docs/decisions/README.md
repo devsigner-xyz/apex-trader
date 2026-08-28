@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-28
 owners: product-design-engineering
 ---
 
@@ -10,5 +10,6 @@ owners: product-design-engineering
 - [0002 — Contextual panel headers](0002-contextual-panel-headers.md)
 - [0003 — Visible-range volume profile](0003-visible-range-volume-profile.md)
 - [0004 — Fractional chart viewport](0004-fractional-chart-viewport.md)
+- [0005 — Public landing and canonical demo routes](0005-public-landing-and-demo-routes.md)
 
 Una decisión registra contexto, decisión, alternativas y consecuencias. La especificación operativa se actualiza por separado.

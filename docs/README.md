@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-28
 owners: product-design-engineering
 ---
 
@@ -11,12 +11,14 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 ## Mapa canónico
 
 - [Professional terminal specification](product/professional-terminal.md): comportamiento, datos, persistencia y limitaciones.
+- [Landing and routing specification](product/landing-and-routing.md): narrativa pública, rutas canónicas, aliases y frontera de carga.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
+- [Marketing patterns](design-system/marketing-patterns.md): tokens, composición responsive y media de la landing.
 - [Panel patterns](design-system/panel-patterns.md): headers, settings, tablas, overlays y accesibilidad.
 - [Chart patterns](design-system/chart-patterns.md): significado de Candles/OHLC, Footprint, Step Profile y Volume Profile.
 - [Figma contract](figma/README.md): archivo maestro, masters, variantes, anotaciones y trazabilidad.
 - [Decisions](decisions/README.md): decisiones duraderas y consecuencias.
-- [Verification](verification/2026-08-27-figma-product-alignment.md): última auditoría Figma ↔ web ↔ código.
+- [Verification](verification/2026-08-28-landing-direction-b-local.md): última verificación local de la landing y el routing de demo.
 
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
 

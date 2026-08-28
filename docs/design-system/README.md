@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-28
 owners: product-design
 ---
 
@@ -29,4 +29,6 @@ Figma organiza 28 primitivos, 37 roles semánticos y 24 dimensiones bajo `Apex P
 
 Los nuevos componentes enlazan propiedades a variables existentes cuando exista un rol aplicable. Los colores hard-coded de grid/profile son deuda a promover antes de ampliar temas.
 
-Consulta [Panel patterns](panel-patterns.md), [Chart patterns](chart-patterns.md) y [Figma contract](../figma/README.md).
+La extensión de marketing añade los espacios `--pro-space-24`, `32`, `48`, `64`, `80` y `96`, además de `--pro-button-marketing-height: 44px`, en la misma raíz canónica de `professional.css`. No constituye un tema nuevo y mantiene los roles de color existentes.
+
+Consulta [Panel patterns](panel-patterns.md), [Chart patterns](chart-patterns.md), [Marketing patterns](marketing-patterns.md) y [Figma contract](../figma/README.md).

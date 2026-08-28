@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-28
 owners: product-engineering
 ---
 
@@ -11,6 +11,14 @@ owners: product-engineering
 La terminal profesional es una experiencia desktop de replay histórico. Chart, DOM y Time & Sales comparten un único reloj y representan el mismo instante. Markets, Activity, cuenta y ejecución siguen siendo fixtures o simulación local salvo indicación contraria.
 
 El ancho interno requiere aproximadamente 1920 px para acceso simultáneo a todos los paneles. A 1366–1440 px existe desplazamiento horizontal; una experiencia compacta o plegable sigue pendiente de decisión.
+
+## Rutas
+
+- Candles: `/demo`.
+- Footprint: `/demo/footprint`.
+- Step Profile: `/demo/step-profile`.
+
+El selector de modo actualiza la URL canónica sin reiniciar el reloj compartido. `/price-chart`, `/footprint` y `/step-profile` son aliases de compatibilidad y no rutas canónicas nuevas. Consulta [Landing and routing specification](landing-and-routing.md).
 
 ## Markets
 

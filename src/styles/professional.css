@@ -12,6 +12,13 @@
   --pro-accent: #d68b54;
   --pro-buy: #2fb67c;
   --pro-sell: #e15b64;
+  --pro-space-24: 24px;
+  --pro-space-32: 32px;
+  --pro-space-48: 48px;
+  --pro-space-64: 64px;
+  --pro-space-80: 80px;
+  --pro-space-96: 96px;
+  --pro-button-marketing-height: 44px;
 }
 
 .pro-status {

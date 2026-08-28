@@ -4,7 +4,7 @@ test.use({ viewport: { height: 1080, width: 1920 } })
 
 test.describe('Professional historical order flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/price-chart')
+    await page.goto('/demo')
     await expect(page.locator('.replay-status')).toHaveCount(0)
     const footer = page.locator('.terminal-footer')
     const link = footer.getByRole('link', { name: 'devsigner.xyz', exact: true })

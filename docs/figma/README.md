@@ -1,12 +1,23 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-28
 owners: product-design
 ---
 
 # Figma contract
 
 Archivo maestro: [Apex Trader](https://www.figma.com/design/Ze9eGnPaNDj8u0oB1iUt3C?node-id=11-2).
+
+## Landing pública
+
+| Breakpoint   | Frame actual                                 | Estado                           |
+| ------------ | -------------------------------------------- | -------------------------------- |
+| Desktop 1440 | `609:7459` · Direction B · Beyond the candle | Current implementation reference |
+| Mobile 390   | `621:7636` · Direction B · Beyond the candle | Current implementation reference |
+
+Direction B sustituye a Direction A como referencia de la landing. Los roots y exploraciones de Direction A se retiraron del área activa; no deben usarse para reconstruir copy, estructura o responsive.
+
+La implementación conserva el orden Header → Opening thesis → The blind spot → Three readings → One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los ocho media exports de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que rutas, lazy loading, semántica y accesibilidad se verifican en código y navegador.
 
 ## Producción
 
@@ -50,12 +61,12 @@ La página `100:2` integra la documentación junto al component set `101:3457`. 
 
 La antigua página independiente `465:9587` se eliminó después de migrar y verificar viewport temporal, escala de precio, persistencia, settings, accesibilidad y definiciones por modo. Los límites visibles se reconciliaron con el contrato actual: Candles 28–160 barras, Footprint 4–13 y Step Profile 1–12. Las variantes activas mantienen además descripciones equivalentes y anotaciones Content:
 
-| Contrato       | Variantes o nodos                            | Anotación            |
-| -------------- | -------------------------------------------- | -------------------- |
-| Candles / OHLC | `132:3266`, `132:3521`                       | `AT-CHART-TYPE-001`  |
-| Footprint      | `132:867`, `132:1261`                        | `AT-CHART-TYPE-002`  |
-| Step Profile   | `167:2377`, `167:2633`                       | `AT-CHART-TYPE-003`  |
-| Volume Profile | `405:8931`, `405:9026`, `405:2`              | `AT-CHART-VP-002`    |
+| Contrato       | Variantes o nodos               | Anotación           |
+| -------------- | ------------------------------- | ------------------- |
+| Candles / OHLC | `132:3266`, `132:3521`          | `AT-CHART-TYPE-001` |
+| Footprint      | `132:867`, `132:1261`           | `AT-CHART-TYPE-002` |
+| Step Profile   | `167:2377`, `167:2633`          | `AT-CHART-TYPE-003` |
+| Volume Profile | `405:8931`, `405:9026`, `405:2` | `AT-CHART-VP-002`   |
 
 Las definiciones canónicas viven en [Chart patterns](../design-system/chart-patterns.md). `OHLC` es el identificador correcto; no introducir `PHCL` como alias.
 
