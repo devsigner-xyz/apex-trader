@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-29
 owners: product-engineering
 ---
 
@@ -27,6 +27,9 @@ alimenta el DOM. No usa profundidad sintética ni deriva liquidez a partir de tr
   actualmente 70,16 BTC. La comparación es consistente entre tiles y no se renormaliza al hacer
   pan o zoom.
 - El renderer nunca pinta timestamps posteriores al reloj compartido del replay.
+- En 5 min conserva la secuencia L2 muestreada cada 5 segundos. En 15 min, 30 min, 1 h y 4 h
+  agrega cada nivel mediante la media temporal de las muestras del intervalo, incluidos los ceros.
+  Así la intensidad prioriza liquidez persistente y no sobrerrepresenta órdenes fugaces.
 - Los tiles cubren 6960–7792 USDT, incluyendo 250 USDT de padding sobre los extremos OHLC de la
   sesión. Fuera de ese dominio la capa queda vacía.
 
@@ -35,6 +38,10 @@ El runtime carga únicamente los tiles que intersectan el viewport visible. Los 
 El manifest se revalida en cada visita. Si durante una release el navegador conserva el manifest
 anterior sin `liquidityChunkTemplate`, el replay base continúa y solo la capa de liquidez queda no
 disponible hasta recibir el manifest actual.
+
+El dominio temporal del canvas usa exactamente los mismos slots que las velas. Cuando una sesión
+corta contiene menos barras que el número visible —por ejemplo, 24 velas de 1 h dentro de 34
+slots— el resto queda vacío y la capa termina en el borde temporal de la última vela disponible.
 
 ## Controles
 

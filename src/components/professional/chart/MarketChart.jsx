@@ -9,6 +9,7 @@ import {
   clamp,
   createPriceScale,
   createPriceTicks,
+  createTemporalViewport,
   createTimeScale,
   derivePriceDomain,
   findTimeScaleBarIndex,
@@ -167,8 +168,12 @@ export default function MarketChart({
   const chartSlots = createTimeScale(renderBars.length, visibleCount, plotLeft, plotWidth, phase)
   const step = chartSlots.step
   const x = (index) => chartSlots.positions[index]
-  const viewportStart = bars[0].timestamp + logicalStart * timeframe * 60_000
-  const viewportEnd = bars[0].timestamp + logicalEnd * timeframe * 60_000
+  const { end: viewportEnd, start: viewportStart } = createTemporalViewport({
+    firstTimestamp: bars[0].timestamp,
+    intervalMs: timeframe * 60_000,
+    logicalStart,
+    slotCount: visibleCount
+  })
   const visibleProfile = deriveVolumeProfile(visible)
   const profile = buildSessionProfile(visibleProfile.levels, low, high)
   const maxProfile = Math.max(...profile.map((level) => level.ask + level.bid), 1)
@@ -393,6 +398,7 @@ export default function MarketChart({
               priceDomain={priceDomain}
               replayTimestamp={view.timestamp}
               sessionStart={view.bars[0].timestamp}
+              timeframe={timeframe}
               viewportEnd={viewportEnd}
               viewportStart={viewportStart}
             />

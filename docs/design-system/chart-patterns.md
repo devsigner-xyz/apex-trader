@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-29
 owners: product-design-engineering
 ---
 
@@ -62,6 +62,11 @@ Candles puede incorporar una capa Canvas bajo el SVG con liquidez limit resting 
 precio y tiempo. Azul verdoso expresa niveles menores; arena y terracota, concentraciones mayores.
 La intensidad cromática usa una escala logarítmica global y el control `INTENSITY` modifica solo la
 opacidad del overlay.
+
+En 5 min la textura conserva la evolución de 5 segundos. En temporalidades superiores cada nivel
+se resume por vela mediante una media temporal que incluye ausencias de liquidez. La presentación
+resultante enfatiza bandas persistentes, mantiene la alineación con las velas y deja vacío cualquier
+slot posterior al reloj histórico.
 
 La capa no sustituye OHLC, Footprint, Volume Profile ni DOM. Las velas, crosshair, ejes y markers
 permanecen por encima. Footprint y Step Profile no muestran el heatmap en la primera entrega. La

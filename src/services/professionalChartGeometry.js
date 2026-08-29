@@ -188,6 +188,18 @@ export function createTimeScale(itemCount, slotCount, plotLeft, plotWidth, phase
   return createFixedChartSlots(itemCount, slotCount, plotLeft, plotWidth, phase)
 }
 
+export function createTemporalViewport({ firstTimestamp, intervalMs, logicalStart, slotCount }) {
+  if (!Number.isFinite(firstTimestamp) || !Number.isFinite(logicalStart))
+    throw new TypeError('Temporal viewport origin must be finite.')
+  if (!Number.isFinite(intervalMs) || intervalMs <= 0)
+    throw new TypeError('Temporal viewport interval must be positive.')
+  if (!Number.isInteger(slotCount) || slotCount < 1)
+    throw new TypeError('Temporal viewport slot count must be a positive integer.')
+
+  const start = firstTimestamp + logicalStart * intervalMs
+  return { end: start + slotCount * intervalMs, start }
+}
+
 export function createPriceTicks(domain, count) {
   if (!Number.isInteger(count) || count < 2)
     throw new TypeError('Price tick count must be an integer of at least two.')

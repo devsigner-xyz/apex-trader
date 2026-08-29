@@ -5,6 +5,7 @@ import {
   clamp,
   createPriceScale,
   createPriceTicks,
+  createTemporalViewport,
   createTimeScale,
   deriveCandleGeometry,
   deriveFootprintCellGeometry,
@@ -237,6 +238,15 @@ test('uses one temporal slot model for every chart rendering mode', () => {
   assert.deepEqual(createTimeScale(3, 2, 0, 20, 0.5).positions, [0, 10, 20])
   assert.deepEqual(selectEvenIndexes(10, 4), [0, 3, 6, 9])
   assert.deepEqual(selectEvenIndexes(0, 4), [])
+})
+
+test('keeps short higher-timeframe histories aligned with their empty chart slots', () => {
+  const hour = 60 * 60 * 1000
+  assert.deepEqual(
+    createTemporalViewport({ firstTimestamp: 0, intervalMs: hour, logicalStart: 0, slotCount: 34 }),
+    { end: 34 * hour, start: 0 }
+  )
+  assert.equal((24 * hour) / (34 * hour), 24 / 34)
 })
 
 test('selects time ticks from real positions without exceeding count or spacing limits', () => {

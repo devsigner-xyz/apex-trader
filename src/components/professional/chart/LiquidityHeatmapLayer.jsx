@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { chunkIndexFor, loadLiquidityChunk } from '../../../services/proPlayback.js'
-import { createLiquidityColorLut } from '../../../services/liquidityHeatmap.js'
+import { averageLiquidityAt, createLiquidityColorLut } from '../../../services/liquidityHeatmap.js'
 import { chartDimensions } from '../config.js'
 
 const { mainBottom, mainTop, priceChartHeight } = chartDimensions
@@ -18,6 +18,7 @@ export default function LiquidityHeatmapLayer({
   priceDomain,
   replayTimestamp,
   sessionStart,
+  timeframe,
   viewportEnd,
   viewportStart
 }) {
@@ -105,6 +106,9 @@ export default function LiquidityHeatmapLayer({
     renderKeyRef.current = renderKey
 
     const firstTile = tiles.values().next().value
+    const loadedTiles = [...tiles.values()]
+    const aggregationMs = timeframe > 5 ? timeframe * 60_000 : 0
+    const aggregateCache = new Map()
     const lut = createLiquidityColorLut({
       amountScale: firstTile.amountScale,
       intensity,
@@ -131,7 +135,23 @@ export default function LiquidityHeatmapLayer({
       for (let y = top; y < bottom; y += 1) {
         const priceIndex = priceIndexes[y - top]
         if (priceIndex < 0 || priceIndex >= tile.priceCount) continue
-        const raw = tile.values[sampleOffset + priceIndex]
+        let raw
+        if (aggregationMs > 0) {
+          const bucketIndex = Math.floor((timestamp - sessionStart) / aggregationMs)
+          const cacheKey = `${bucketIndex}:${priceIndex}`
+          raw = aggregateCache.get(cacheKey)
+          if (raw === undefined) {
+            const bucketStart = sessionStart + bucketIndex * aggregationMs
+            const price = firstTile.priceMin + (priceIndex + 0.5) * firstTile.priceStep
+            raw = averageLiquidityAt(
+              loadedTiles,
+              bucketStart,
+              Math.min(bucketStart + aggregationMs, cutoff),
+              price
+            )
+            aggregateCache.set(cacheKey, raw)
+          }
+        } else raw = tile.values[sampleOffset + priceIndex]
         if (raw === 0) continue
         const source = raw * 4
         const target = (y * width + x) * 4
@@ -152,6 +172,7 @@ export default function LiquidityHeatmapLayer({
     sessionStart,
     status,
     tiles,
+    timeframe,
     viewportEnd,
     viewportStart
   ])
@@ -163,6 +184,7 @@ export default function LiquidityHeatmapLayer({
       data-intensity={Math.round(intensity * 100)}
       data-loaded-tiles={tiles.size}
       data-status={status}
+      data-temporal-aggregation={timeframe > 5 ? `${timeframe}m-average` : 'raw-5s'}
       ref={canvasRef}
     />
   )
@@ -178,6 +200,7 @@ LiquidityHeatmapLayer.propTypes = {
   }).isRequired,
   replayTimestamp: PropTypes.number.isRequired,
   sessionStart: PropTypes.number.isRequired,
+  timeframe: PropTypes.number.isRequired,
   viewportEnd: PropTypes.number.isRequired,
   viewportStart: PropTypes.number.isRequired
 }

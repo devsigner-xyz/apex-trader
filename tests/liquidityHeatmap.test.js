@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  averageLiquidityAt,
   createLiquidityColorLut,
   decodeLiquidityValues,
   liquiditySampleAt,
@@ -56,4 +57,24 @@ test('the logarithmic palette increases opacity with liquidity and respects inte
   assert.equal(subtle[3], 0)
   assert.ok(subtle[2500 * 4 + 3] > subtle[100 * 4 + 3])
   assert.ok(strong[100 * 4 + 3] > subtle[100 * 4 + 3])
+})
+
+test('higher-timeframe liquidity uses a time-weighted mean including empty samples', () => {
+  const tile = normalizeLiquidityTile(
+    {
+      amountScale: 100,
+      chunkStart: 1000,
+      priceCount: 2,
+      priceMin: 99,
+      priceStep: 1,
+      sampleCount: 3,
+      sampleDurationMs: 5000,
+      schema: 'apextrader.liquidity-tile/v1',
+      values: encoded([0, 100, 0, 300, 0, 0])
+    },
+    25
+  )
+
+  assert.equal(averageLiquidityAt([tile], 1000, 16_000, 100.2), 133)
+  assert.equal(averageLiquidityAt([tile], 1000, 16_000, 99.2), 0)
 })

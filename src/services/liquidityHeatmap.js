@@ -94,4 +94,33 @@ export function liquiditySampleAt(tile, timestamp, price) {
   return tile.values[sampleIndex * tile.priceCount + priceIndex]
 }
 
+export function averageLiquidityAt(tiles, start, end, price) {
+  if (!Array.isArray(tiles)) throw new TypeError('Liquidity tiles must be an array.')
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+    throw new TypeError('Liquidity aggregation range must be finite and increasing.')
+  if (!Number.isFinite(price)) throw new TypeError('Liquidity aggregation price must be finite.')
+
+  let count = 0
+  let sum = 0
+  for (const tile of tiles) {
+    const tileEnd = tile.chunkStart + tile.sampleCount * tile.sampleDurationMs
+    if (tileEnd <= start || tile.chunkStart >= end) continue
+    const priceIndex = Math.floor((price - tile.priceMin) / tile.priceStep)
+    if (priceIndex < 0 || priceIndex >= tile.priceCount) continue
+    const firstSample = Math.max(
+      0,
+      Math.floor((Math.max(start, tile.chunkStart) - tile.chunkStart) / tile.sampleDurationMs)
+    )
+    const lastSample = Math.min(
+      tile.sampleCount,
+      Math.ceil((Math.min(end, tileEnd) - tile.chunkStart) / tile.sampleDurationMs)
+    )
+    for (let sampleIndex = firstSample; sampleIndex < lastSample; sampleIndex += 1) {
+      sum += tile.values[sampleIndex * tile.priceCount + priceIndex]
+      count += 1
+    }
+  }
+  return count === 0 ? 0 : Math.round(sum / count)
+}
+
 export const liquidityTileSchema = EXPECTED_TILE_SCHEMA
