@@ -9,6 +9,7 @@ import {
   createTimeScale,
   deriveCandleGeometry,
   deriveFootprintCellGeometry,
+  deriveMinimumChartOffset,
   derivePannedOffset,
   derivePriceDomain,
   derivePriceScaleFactor,
@@ -40,6 +41,7 @@ test('selects and clamps visible windows for full, short and empty histories', (
     logicalEnd: 3,
     logicalStart: 1,
     maximumOffset: 2,
+    minimumOffset: 0,
     phase: 0,
     renderBars: bars.slice(1, 3),
     safeOffset: 1,
@@ -61,6 +63,30 @@ test('selects partial edge bars and exposes their logical rendering phase', () =
   assert.equal(window.phase, 0.5)
   assert.deepEqual(window.renderBars, bars.slice(1, 4))
   assert.equal(window.visible, window.renderBars)
+})
+
+test('allows drag to create bounded future space without changing chart density', () => {
+  const minimumOffset = deriveMinimumChartOffset(2, 0.3)
+  const window = selectVisibleWindow(bars, 2, minimumOffset, minimumOffset)
+
+  assert.equal(minimumOffset, -0.6)
+  assert.equal(window.safeOffset, -0.6)
+  assert.ok(Math.abs(window.logicalStart - 2.6) < Number.EPSILON * 4)
+  assert.equal(window.logicalEnd, 4.6)
+  assert.equal(window.minimumOffset, -0.6)
+  assert.deepEqual(window.renderBars, bars.slice(2))
+  assert.equal(
+    derivePannedOffset({
+      maximumOffset: window.maximumOffset,
+      minimumOffset,
+      pixelDelta: 100,
+      plotWidth: 1000,
+      rightOffset: 0,
+      visibleCount: 2
+    }),
+    -0.2
+  )
+  assert.throws(() => deriveMinimumChartOffset(2, 1), /between zero and one/)
 })
 
 test('normalizes wheel units and derives deterministic horizontal panning', () => {

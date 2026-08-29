@@ -29,6 +29,7 @@ import {
 import {
   chartDefaults,
   chartDimensions,
+  chartFutureSpaceRatio,
   chartTimeframes,
   chartViewportLimits,
   footprintTimeframes,
@@ -126,6 +127,7 @@ export default function MarketChart({
   } = useChartViewport({
     bars,
     defaultVisibleCount,
+    futureSpaceRatio: chartFutureSpaceRatio,
     limits: chartViewportLimits[mode],
     mode,
     plotRatio: plotRight / chartWidth,
@@ -404,7 +406,7 @@ export default function MarketChart({
             />
           )}
           <svg
-            aria-description="Move the pointer over the price plot to show a dotted crosshair and inspect the bar OHLC, delta and volume. The vertical guide continues through the volume panel when visible. Hold the primary pointer button and drag to pan continuously. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
+            aria-description="Move the pointer over the price plot to show a dotted crosshair and inspect the bar OHLC, delta and volume. The vertical guide continues through the volume panel when visible. Hold the primary pointer button and drag to pan continuously; drag current data left to create future space on the right. Use the wheel to resize the time axis around the last visible candle. Scroll horizontally, hold Shift while scrolling, or use the arrow keys to pan. Drag the price axis vertically to resize it. Press zero to reset to the latest data."
             aria-label={`${mode} historical chart`}
             className={resizingPriceScale ? 'resizing-price-scale' : dragging ? 'dragging' : ''}
             data-follow-latest={followLatest}

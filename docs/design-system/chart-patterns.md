@@ -41,6 +41,9 @@ La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfil
 - El cursor en reposo es neutral; la mano cerrada aparece únicamente durante pan con click principal mantenido.
 - El hover dentro del plot muestra un crosshair neutral de 1 px, punteado y con mayor contraste que VAH/POC/VAL. La guía horizontal se limita al área de precio y la vertical continúa por el panel de volumen cuando está visible.
 - El viewport admite offsets temporales fraccionales y recorta barras parciales en los bordes del plot.
+- El drag horizontal puede reservar hasta el 30% del plot como espacio futuro a la derecha sin
+  cambiar el nivel de zoom. Esto permite separar el último dato del Volume Profile; todas las capas
+  temporales se desplazan juntas y el seguimiento del último dato permanece activo.
 - Una barra participa en cálculos visibles cuando su centro temporal cae dentro del plot. Las barras buffer parcialmente dibujadas cuyo centro queda fuera son solo presentación.
 - Los ticks temporales se reducen dinámicamente según el ancho disponible y nunca se apoyan en un conteo fijo que pueda provocar solapamientos.
 - El resumen textual del rango visible no se dibuja sobre la escala temporal.

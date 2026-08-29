@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   clamp,
+  deriveMinimumChartOffset,
   derivePannedOffset,
   deriveZoomedViewport,
   isChartOffsetAtLatest,
@@ -11,6 +12,7 @@ import {
 export function useChartViewport({
   bars,
   defaultVisibleCount,
+  futureSpaceRatio = 0,
   limits,
   mode,
   plotRatio = 1,
@@ -23,12 +25,14 @@ export function useChartViewport({
   const dragState = useRef(null)
   const previousBarCount = useRef(bars.length)
   const wheelState = useRef({ delta: 0, frame: null, kind: 'zoom' })
-  const viewportWindow = selectVisibleWindow(bars, visibleCount, rightOffset)
+  const minimumOffset = deriveMinimumChartOffset(visibleCount, futureSpaceRatio)
+  const viewportWindow = selectVisibleWindow(bars, visibleCount, rightOffset, minimumOffset)
   const { maximumOffset, safeOffset } = viewportWindow
   const viewportState = useRef(null)
   viewportState.current = {
     barCount: bars.length,
     maximumOffset,
+    minimumOffset,
     rightOffset: safeOffset,
     visibleCount
   }
@@ -46,14 +50,14 @@ export function useChartViewport({
   useEffect(() => {
     const normalizedOffset = isChartOffsetAtLatest(safeOffset) ? 0 : safeOffset
     if (rightOffset !== normalizedOffset) setRightOffset(normalizedOffset)
-    const nextFollowLatest = isChartOffsetAtLatest(normalizedOffset)
+    const nextFollowLatest = normalizedOffset <= 0
     if (followLatest !== nextFollowLatest) setFollowLatest(nextFollowLatest)
   }, [followLatest, rightOffset, safeOffset])
 
   useEffect(() => {
     const addedBars = bars.length - previousBarCount.current
     if (addedBars > 0) {
-      if (followLatest) setRightOffset(0)
+      if (followLatest) setRightOffset((current) => Math.min(current, 0))
       else setRightOffset((current) => current + addedBars)
     }
     previousBarCount.current = bars.length
@@ -71,13 +75,14 @@ export function useChartViewport({
   const applyOffset = (nextOffset) => {
     const normalizedOffset = isChartOffsetAtLatest(nextOffset) ? 0 : nextOffset
     setRightOffset(normalizedOffset)
-    setFollowLatest(isChartOffsetAtLatest(normalizedOffset))
+    setFollowLatest(normalizedOffset <= 0)
   }
 
   const applyDragPosition = (drag) => {
     const current = viewportState.current
     const nextOffset = derivePannedOffset({
       maximumOffset: current.maximumOffset,
+      minimumOffset: current.minimumOffset,
       pixelDelta: drag.startX - drag.latestX,
       plotWidth: drag.plotWidth,
       rightOffset: drag.offset,
@@ -159,6 +164,7 @@ export function useChartViewport({
       if (action === 'pan') {
         const nextOffset = derivePannedOffset({
           maximumOffset: current.maximumOffset,
+          minimumOffset: current.minimumOffset,
           pixelDelta: delta,
           plotWidth,
           rightOffset: current.rightOffset,
@@ -174,6 +180,7 @@ export function useChartViewport({
         anchorRatio: 1,
         barCount: current.barCount,
         delta,
+        futureSpaceRatio,
         maximumVisibleCount: limits.maximum,
         minimumVisibleCount: limits.minimum,
         rightOffset: current.rightOffset,
@@ -187,8 +194,10 @@ export function useChartViewport({
 
   const handleKeyDown = (event) => {
     let nextOffset
-    if (event.key === 'ArrowLeft') nextOffset = clamp(safeOffset + 1, 0, maximumOffset)
-    else if (event.key === 'ArrowRight') nextOffset = clamp(safeOffset - 1, 0, maximumOffset)
+    if (event.key === 'ArrowLeft')
+      nextOffset = clamp(safeOffset + 1, minimumOffset, maximumOffset)
+    else if (event.key === 'ArrowRight')
+      nextOffset = clamp(safeOffset - 1, minimumOffset, maximumOffset)
     else if (event.key === '0') resetViewport()
     else return
 
@@ -206,10 +215,11 @@ export function useChartViewport({
     handlePointerMove,
     handleWheel,
     endIndex: viewportWindow.endIndex,
-    isAtLatest: isChartOffsetAtLatest(safeOffset),
+    isAtLatest: safeOffset <= 0,
     logicalEnd: viewportWindow.logicalEnd,
     logicalStart: viewportWindow.logicalStart,
     maximumOffset,
+    minimumOffset,
     phase: viewportWindow.phase,
     renderBars: viewportWindow.renderBars,
     resetViewport,

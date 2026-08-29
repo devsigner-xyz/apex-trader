@@ -681,6 +681,60 @@ test('chart stays still on hover and pans continuously while the pointer is held
   await expect.poll(() => chart.evaluate((node) => getComputedStyle(node).cursor)).toBe('crosshair')
 })
 
+test('drag can move current data left of the volume profile in every chart mode', async ({
+  page
+}) => {
+  const cases = [
+    { mode: 'candles', route: '/demo' },
+    { mode: 'footprint', route: '/demo/footprint' },
+    { mode: 'step-profile', route: '/demo/step-profile' }
+  ]
+
+  for (const { mode, route } of cases) {
+    await page.goto(route)
+    const chart = page.getByLabel(`${mode} historical chart`)
+    const bounds = await chart.boundingBox()
+    const initialVisibleCount = await chart.getAttribute('data-visible-count')
+    const initialVolumeBar = await page.locator('.volume-bar').last().boundingBox()
+    const initialGeometry = await chart.evaluate((node) => {
+      const data = node.querySelector('.chart-data-layer').getBoundingClientRect()
+      const profile = node
+        .querySelector('[aria-label="Visible range volume profile overlay"]')
+        .getBoundingClientRect()
+      return { dataRight: data.right, profileLeft: profile.left }
+    })
+
+    await page.mouse.move(bounds.x + bounds.width * 0.65, bounds.y + bounds.height * 0.45)
+    await page.mouse.down()
+    await page.mouse.move(bounds.x + bounds.width * 0.3, bounds.y + bounds.height * 0.45, {
+      steps: 8
+    })
+    await page.mouse.up()
+
+    await expect
+      .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+      .toBeLessThan(0)
+    await expect(chart).toHaveAttribute('data-visible-count', initialVisibleCount)
+    await expect(chart).toHaveAttribute('data-follow-latest', 'true')
+
+    const shiftedGeometry = await chart.evaluate((node) => {
+      const data = node.querySelector('.chart-data-layer').getBoundingClientRect()
+      const profile = node
+        .querySelector('[aria-label="Visible range volume profile overlay"]')
+        .getBoundingClientRect()
+      return { dataRight: data.right, profileLeft: profile.left }
+    })
+    const shiftedVolumeBar = await page.locator('.volume-bar').last().boundingBox()
+    expect(shiftedGeometry.dataRight).toBeLessThan(initialGeometry.dataRight)
+    expect(shiftedGeometry.dataRight).toBeLessThan(shiftedGeometry.profileLeft)
+    expect(shiftedVolumeBar.x).toBeLessThan(initialVolumeBar.x)
+
+    await chart.focus()
+    await page.keyboard.press('0')
+    await expect(chart).toHaveAttribute('data-right-offset', '0')
+  }
+})
+
 test('mode-specific zoom limits preserve readable chart geometry', async ({ page }) => {
   const cases = [
     { deltaY: -10_000, expected: 28, mode: 'candles', route: '/demo' },

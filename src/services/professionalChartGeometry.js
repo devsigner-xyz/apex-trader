@@ -6,13 +6,27 @@ export function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum)
 }
 
-export function selectVisibleWindow(bars, visibleCount, rightOffset) {
+export function deriveMinimumChartOffset(visibleCount, futureSpaceRatio = 0) {
+  if (!Number.isInteger(visibleCount) || visibleCount < 1)
+    throw new TypeError('Visible chart bar count must be a positive integer.')
+  if (!Number.isFinite(futureSpaceRatio) || futureSpaceRatio < 0 || futureSpaceRatio >= 1)
+    throw new TypeError('Future chart space ratio must be finite and between zero and one.')
+  return -visibleCount * futureSpaceRatio
+}
+
+export function selectVisibleWindow(bars, visibleCount, rightOffset, minimumOffset = 0) {
   if (!Array.isArray(bars)) throw new TypeError('Chart bars must be an array.')
   if (!Number.isInteger(visibleCount) || visibleCount < 1)
     throw new TypeError('Visible chart bar count must be a positive integer.')
+  if (!Number.isFinite(minimumOffset) || minimumOffset > 0)
+    throw new TypeError('Minimum chart offset must be a finite non-positive number.')
 
   const maximumOffset = Math.max(0, bars.length - Math.min(visibleCount, bars.length))
-  const safeOffset = clamp(Number.isFinite(rightOffset) ? rightOffset : 0, 0, maximumOffset)
+  const safeOffset = clamp(
+    Number.isFinite(rightOffset) ? rightOffset : 0,
+    minimumOffset,
+    maximumOffset
+  )
   const logicalEnd = bars.length - safeOffset
   const logicalStart = Math.max(0, logicalEnd - visibleCount)
   const startIndex = clamp(Math.floor(logicalStart), 0, bars.length)
@@ -25,6 +39,7 @@ export function selectVisibleWindow(bars, visibleCount, rightOffset) {
     logicalEnd,
     logicalStart,
     maximumOffset,
+    minimumOffset,
     phase,
     renderBars,
     safeOffset,
@@ -79,6 +94,7 @@ export function deriveZoomedViewport({
   anchorRatio,
   barCount,
   delta,
+  futureSpaceRatio = 0,
   maximumVisibleCount,
   minimumVisibleCount,
   rightOffset,
@@ -92,10 +108,11 @@ export function deriveZoomedViewport({
     maximumVisibleCount
   )
   const maximumOffset = Math.max(0, barCount - nextVisibleCount)
+  const minimumOffset = deriveMinimumChartOffset(nextVisibleCount, futureSpaceRatio)
 
   if (nextVisibleCount === safeVisibleCount) {
     return {
-      rightOffset: clamp(rightOffset, 0, maximumOffset),
+      rightOffset: clamp(rightOffset, minimumOffset, maximumOffset),
       visibleCount: safeVisibleCount
     }
   }
@@ -106,13 +123,14 @@ export function deriveZoomedViewport({
   const nextRightOffset = barCount - (nextStart + nextVisibleCount)
 
   return {
-    rightOffset: clamp(nextRightOffset, 0, maximumOffset),
+    rightOffset: clamp(nextRightOffset, minimumOffset, maximumOffset),
     visibleCount: nextVisibleCount
   }
 }
 
 export function derivePannedOffset({
   maximumOffset,
+  minimumOffset = 0,
   pixelDelta,
   plotWidth,
   rightOffset,
@@ -120,7 +138,7 @@ export function derivePannedOffset({
 }) {
   const pixelsPerBar = plotWidth / Math.max(visibleCount, 1)
   const barDelta = pixelDelta / Math.max(pixelsPerBar, Number.EPSILON)
-  return clamp(rightOffset - barDelta, 0, maximumOffset)
+  return clamp(rightOffset - barDelta, minimumOffset, maximumOffset)
 }
 
 export function derivePriceDomain(visibleBars, mode) {

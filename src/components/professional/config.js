@@ -55,6 +55,7 @@ export const panelSizeLimits = {
 }
 
 export const chartDefaults = { candles: 34, footprint: 12, 'step-profile': 9 }
+export const chartFutureSpaceRatio = 0.3
 export const defaultChartTimeframe = 30
 export const chartViewportLimits = {
   candles: { maximum: 160, minimum: 28 },

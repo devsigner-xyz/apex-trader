@@ -53,6 +53,10 @@ exceso del tick para que el loop sea continuo. Cualquier seek se limita a esta v
 - Dentro del plot de precio, el puntero muestra guías horizontal y vertical punteadas. La horizontal no invade la escala de precio y la vertical conserva la misma coordenada temporal en el panel de volumen cuando este está visible.
 - El puntero en reposo no muestra la mano. El pan se activa solo con el botón principal pulsado y conserva `grabbing` hasta `pointerup` o cancelación.
 - El desplazamiento horizontal usa un offset lógico fraccional y se renderiza de forma continua. Una barra puede quedar parcialmente visible en cualquiera de los bordes sin saltar a intervalos enteros.
+- Con la densidad actual intacta, el drag hacia la izquierda puede desplazar el último dato hasta
+  dejar un 30% del plot como espacio futuro a la derecha. Candles, Footprint, Step Profile, volumen
+  y heatmap comparten ese desplazamiento. El margen futuro mantiene el seguimiento del dato más
+  reciente; `0` elimina el margen y restaura el encaje al borde derecho.
 - El cálculo analítico incluye una barra cuando su centro temporal está dentro del plot. Las barras buffer recortadas fuera de ese criterio sirven únicamente para continuidad visual y no alteran profile, POC, VAH o VAL.
 - Los límites de barras visibles son 28–160 para Candles, 4–13 para Footprint y 1–12 para Step Profile. Estos límites protegen respectivamente la separación máxima de velas y la legibilidad mínima de celdas densas.
 - Los labels temporales se seleccionan según el ancho renderizado y conservan una separación mínima; el zoom-out reduce su cantidad antes de permitir solapamientos.

@@ -2,12 +2,14 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  chartFutureSpaceRatio,
   chartTimeframes,
   defaultChartTimeframe,
   footprintTimeframes
 } from '../src/components/professional/config.js'
 
 test('professional chart defaults to thirty minutes and stops at one hour', () => {
+  assert.equal(chartFutureSpaceRatio, 0.3)
   assert.equal(defaultChartTimeframe, 30)
   assert.deepEqual(
     chartTimeframes.map(({ minutes }) => minutes),
