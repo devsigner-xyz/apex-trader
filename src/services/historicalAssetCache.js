@@ -2,6 +2,47 @@ export const HISTORICAL_CACHE_PREFIX = 'apextrader-tardis-'
 export const DEFAULT_PERSISTENT_CHUNK_LIMIT = 16
 
 const CHUNK_INDEX_KEY_PREFIX = 'apextrader.tardis.chunk-indices.'
+const HISTORICAL_FETCH_DELAYS_MS = [100, 200]
+
+function sleep(delay) {
+  return new Promise((resolve) => globalThis.setTimeout(resolve, delay))
+}
+
+function isRecoverableResponse(response) {
+  return (
+    response.status === 408 ||
+    response.status === 429 ||
+    (response.status >= 500 && response.status <= 599)
+  )
+}
+
+function isRecoverableFetchError(error) {
+  if (error?.name === 'AbortError') return false
+  return (
+    error instanceof TypeError || error?.name === 'NetworkError' || error?.name === 'TimeoutError'
+  )
+}
+
+export async function fetchHistoricalAsset(
+  url,
+  { fetchImpl = globalThis.fetch, init, sleep: sleepImpl = sleep } = {}
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetchImpl(url, init)
+      const delay = HISTORICAL_FETCH_DELAYS_MS[attempt]
+      if (!response.ok && isRecoverableResponse(response) && delay !== undefined) {
+        await sleepImpl(delay)
+        continue
+      }
+      return response
+    } catch (error) {
+      const delay = HISTORICAL_FETCH_DELAYS_MS[attempt]
+      if (!isRecoverableFetchError(error) || delay === undefined) throw error
+      await sleepImpl(delay)
+    }
+  }
+}
 
 function browserCacheStorage() {
   return typeof globalThis.caches === 'undefined' ? null : globalThis.caches
@@ -69,19 +110,26 @@ export async function removeStaleHistoricalCaches(
 
 export async function fetchPersistentAsset(
   url,
-  { cacheName, cacheStorage = browserCacheStorage(), fetchImpl = globalThis.fetch }
+  {
+    cacheName,
+    cacheStorage = browserCacheStorage(),
+    fetchImpl = globalThis.fetch,
+    sleep: sleepImpl
+  }
 ) {
-  if (!cacheStorage?.open || fetchImpl !== globalThis.fetch) return fetchImpl(url)
+  const fetchNetwork = (init) =>
+    fetchHistoricalAsset(url, { fetchImpl, init, sleep: sleepImpl })
+  if (!cacheStorage?.open || fetchImpl !== globalThis.fetch) return fetchNetwork()
   let cache
   let cached
   try {
     cache = await cacheStorage.open(cacheName)
     cached = await cache.match(url)
   } catch {
-    return fetchImpl(url)
+    return fetchNetwork()
   }
   if (cached) return cached
-  const response = await fetchImpl(url, { cache: 'force-cache' })
+  const response = await fetchNetwork({ cache: 'force-cache' })
   if (response.ok)
     try {
       await cache.put(url, response.clone())

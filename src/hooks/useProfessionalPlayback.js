@@ -22,6 +22,7 @@ export function useProfessionalPlayback() {
       .then((next) => {
         setSession(next)
         setTimestamp(professionalDemoStart(next))
+        setError(null)
       })
       .catch((reason) => setError(reason.message))
   }, [])
@@ -33,7 +34,10 @@ export function useProfessionalPlayback() {
     let current = true
     loadPlaybackChunk(chunkIndex)
       .then((next) => {
-        if (current) setChunk(next)
+        if (current) {
+          setChunk(next)
+          setError(null)
+        }
       })
       .catch((reason) => setError(reason.message))
     return () => {

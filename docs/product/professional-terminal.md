@@ -128,6 +128,19 @@ La tab bar mide 38 px, no muestra métricas globales y empieza en Positions sin 
 - Chart, DOM y Time & Sales usan replay histórico compartido.
 - El manifest mutable se revalida en cada visita. Durante una release, un manifest anterior sin
   tiles de liquidez sigue cargando el replay base; la capa de heatmap degrada de forma aislada.
+- Cada operación de red del replay —manifest, sesión, book, trades o liquidez— admite como máximo
+  tres intentos totales. El primero es inmediato y los dos siguientes esperan 100 ms y 200 ms. Se
+  reintentan rechazos de transporte de `fetch` (`TypeError`, `NetworkError` y `TimeoutError`), HTTP
+  408, 429 y 5xx. Son terminales una cancelación intencionada (`AbortError`), cualquier otro 4xx,
+  un schema inesperado, JSON o gzip corrupto, y los errores de validación o normalización.
+- La carga inicial conserva `Loading the real BTCUSDT session…` hasta que la operación se recupera
+  o agota sus tres intentos. En un cambio de chunk, la última vista válida sigue montada con el
+  estado interno de buffering mientras quedan intentos; al recuperarse, el replay limpia el error
+  transitorio y continúa con el mismo reloj histórico. Solo el agotamiento de una carga requerida
+  conserva el error fatal existente.
+- El prefetch del siguiente chunk ignora su error después de agotar la misma política y elimina la
+  promesa fallida para permitir una carga posterior. La liquidez también falla dentro de su propia
+  capa, sin convertir el heatmap opcional en un error fatal de la terminal.
 - Cache Storage es una optimización. Fallos al abrir, escribir o desalojar su caché no bloquean una
   respuesta histórica válida obtenida por red.
 - Markets, Activity, cuenta y submit de Execution son demostración o simulación.

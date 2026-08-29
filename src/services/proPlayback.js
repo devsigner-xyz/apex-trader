@@ -1,4 +1,5 @@
 import {
+  fetchHistoricalAsset,
   fetchPersistentAsset,
   historicalCacheName,
   recordPersistentChunk,
@@ -50,14 +51,22 @@ export function advanceProfessionalPlaybackTime(timestamp, elapsedMs, session) {
   return start + (offset < 0 ? offset + duration : offset)
 }
 
-async function fetchJson(url, fetchImpl = fetch, init) {
-  const response = await fetchImpl(assetUrl(url), init)
+async function fetchJson(url, fetchImpl = fetch, init, retryOptions) {
+  const response = await fetchHistoricalAsset(assetUrl(url), {
+    ...retryOptions,
+    fetchImpl,
+    init
+  })
   if (!response.ok) throw new Error(`Unable to load historical asset (${response.status})`)
   return response.json()
 }
 
-async function fetchGzipJson(url, fetchImpl = fetch, cacheName) {
-  const response = await fetchPersistentAsset(assetUrl(url), { cacheName, fetchImpl })
+async function fetchGzipJson(url, fetchImpl = fetch, cacheName, retryOptions) {
+  const response = await fetchPersistentAsset(assetUrl(url), {
+    ...retryOptions,
+    cacheName,
+    fetchImpl
+  })
   if (!response.ok) throw new Error(`Unable to load historical chunk (${response.status})`)
   // Vite and correctly configured CDNs transparently decode Content-Encoding.
   if (response.headers.get('content-encoding') === 'gzip') return response.json()
@@ -79,17 +88,19 @@ function validateRuntimeManifest(manifest) {
   return manifest
 }
 
-async function fetchRuntimeManifest(fetchImpl) {
-  const manifest = validateRuntimeManifest(await fetchJson(RUNTIME_MANIFEST_URL, fetchImpl))
+async function fetchRuntimeManifest(fetchImpl, retryOptions) {
+  const manifest = validateRuntimeManifest(
+    await fetchJson(RUNTIME_MANIFEST_URL, fetchImpl, undefined, retryOptions)
+  )
   if (fetchImpl === globalThis.fetch)
     await removeStaleHistoricalCaches(historicalCacheName(manifest.datasetVersion))
   return manifest
 }
 
-export function loadRuntimeManifest(fetchImpl = fetch) {
-  if (fetchImpl !== globalThis.fetch) return fetchRuntimeManifest(fetchImpl)
+export function loadRuntimeManifest(fetchImpl = fetch, retryOptions) {
+  if (fetchImpl !== globalThis.fetch) return fetchRuntimeManifest(fetchImpl, retryOptions)
   if (!runtimeManifestPromise)
-    runtimeManifestPromise = fetchRuntimeManifest(fetchImpl).catch((error) => {
+    runtimeManifestPromise = fetchRuntimeManifest(fetchImpl, retryOptions).catch((error) => {
       runtimeManifestPromise = null
       throw error
     })
@@ -113,25 +124,26 @@ function chunkAssetPaths(manifest, index) {
   return paths
 }
 
-export async function loadProfessionalSession(fetchImpl = fetch) {
-  const manifest = await loadRuntimeManifest(fetchImpl)
+export async function loadProfessionalSession(fetchImpl = fetch, retryOptions) {
+  const manifest = await loadRuntimeManifest(fetchImpl, retryOptions)
   const session = await fetchGzipJson(
     runtimeAssetPath(manifest.assets.session),
     fetchImpl,
-    historicalCacheName(manifest.datasetVersion)
+    historicalCacheName(manifest.datasetVersion),
+    retryOptions
   )
   if (session.schema !== 'apextrader.tardis-session/v2')
     throw new Error('Unexpected session schema.')
   return session
 }
 
-async function fetchPlaybackChunk(index, fetchImpl) {
-  const manifest = await loadRuntimeManifest(fetchImpl)
+async function fetchPlaybackChunk(index, fetchImpl, retryOptions) {
+  const manifest = await loadRuntimeManifest(fetchImpl, retryOptions)
   const paths = chunkAssetPaths(manifest, index)
   const cacheName = historicalCacheName(manifest.datasetVersion)
   const [book, trades] = await Promise.all([
-    fetchGzipJson(paths.book, fetchImpl, cacheName),
-    fetchGzipJson(paths.trades, fetchImpl, cacheName)
+    fetchGzipJson(paths.book, fetchImpl, cacheName, retryOptions),
+    fetchGzipJson(paths.trades, fetchImpl, cacheName, retryOptions)
   ])
   if (fetchImpl === globalThis.fetch)
     await recordPersistentChunk(
@@ -145,10 +157,10 @@ async function fetchPlaybackChunk(index, fetchImpl) {
   return { book, index, trades }
 }
 
-export function loadPlaybackChunk(index, fetchImpl = fetch) {
-  if (fetchImpl !== globalThis.fetch) return fetchPlaybackChunk(index, fetchImpl)
+export function loadPlaybackChunk(index, fetchImpl = fetch, retryOptions) {
+  if (fetchImpl !== globalThis.fetch) return fetchPlaybackChunk(index, fetchImpl, retryOptions)
   if (!playbackChunkCache.has(index)) {
-    const request = fetchPlaybackChunk(index, fetchImpl).catch((error) => {
+    const request = fetchPlaybackChunk(index, fetchImpl, retryOptions).catch((error) => {
       playbackChunkCache.delete(index)
       throw error
     })
@@ -157,13 +169,13 @@ export function loadPlaybackChunk(index, fetchImpl = fetch) {
   return playbackChunkCache.get(index)
 }
 
-async function fetchLiquidityChunk(index, fetchImpl) {
-  const manifest = await loadRuntimeManifest(fetchImpl)
+async function fetchLiquidityChunk(index, fetchImpl, retryOptions) {
+  const manifest = await loadRuntimeManifest(fetchImpl, retryOptions)
   if (!manifest.assets?.liquidityChunkTemplate)
     throw new Error('The historical dataset does not include liquidity tiles.')
   const paths = chunkAssetPaths(manifest, index)
   const cacheName = historicalCacheName(manifest.datasetVersion)
-  const raw = await fetchGzipJson(paths.liquidity, fetchImpl, cacheName)
+  const raw = await fetchGzipJson(paths.liquidity, fetchImpl, cacheName, retryOptions)
   if (fetchImpl === globalThis.fetch)
     await recordPersistentChunk(
       {
@@ -176,10 +188,10 @@ async function fetchLiquidityChunk(index, fetchImpl) {
   return normalizeLiquidityTile(raw, manifest.liquidity?.normalizationMaxAmount)
 }
 
-export function loadLiquidityChunk(index, fetchImpl = fetch) {
-  if (fetchImpl !== globalThis.fetch) return fetchLiquidityChunk(index, fetchImpl)
+export function loadLiquidityChunk(index, fetchImpl = fetch, retryOptions) {
+  if (fetchImpl !== globalThis.fetch) return fetchLiquidityChunk(index, fetchImpl, retryOptions)
   if (!liquidityChunkCache.has(index)) {
-    const request = fetchLiquidityChunk(index, fetchImpl).catch((error) => {
+    const request = fetchLiquidityChunk(index, fetchImpl, retryOptions).catch((error) => {
       liquidityChunkCache.delete(index)
       throw error
     })

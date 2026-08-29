@@ -1,11 +1,50 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  fetchHistoricalAsset,
   fetchPersistentAsset,
   historicalCacheName,
   recordPersistentChunk,
   removeStaleHistoricalCaches
 } from '../src/services/historicalAssetCache.js'
+
+test('timeouts retry, while intentional cancellations remain terminal', async (t) => {
+  await t.test('timeout', async () => {
+    const delays = []
+    let requests = 0
+    const response = await fetchHistoricalAsset('/asset', {
+      fetchImpl: async () => {
+        requests += 1
+        if (requests === 1) throw new DOMException('timed out', 'TimeoutError')
+        return new Response('recovered')
+      },
+      sleep: async (delay) => delays.push(delay)
+    })
+
+    assert.equal(await response.text(), 'recovered')
+    assert.equal(requests, 2)
+    assert.deepEqual(delays, [100])
+  })
+
+  await t.test('intentional cancellation', async () => {
+    const delays = []
+    let requests = 0
+    await assert.rejects(
+      () =>
+        fetchHistoricalAsset('/asset', {
+          fetchImpl: async () => {
+            requests += 1
+            throw new DOMException('cancelled', 'AbortError')
+          },
+          sleep: async (delay) => delays.push(delay)
+        }),
+      { name: 'AbortError' }
+    )
+
+    assert.equal(requests, 1)
+    assert.deepEqual(delays, [])
+  })
+})
 
 class MemoryCache {
   constructor() {

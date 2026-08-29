@@ -33,6 +33,143 @@ function gzipResponse(value) {
   })
 }
 
+function retryProbe() {
+  const delays = []
+  return {
+    delays,
+    options: {
+      sleep: async (delay) => delays.push(delay)
+    }
+  }
+}
+
+test('a transient network failure retries once and then loads the historical session', async () => {
+  const { delays, options } = retryProbe()
+  let sessionRequests = 0
+  const session = {
+    bars: [],
+    schema: 'apextrader.tardis-session/v2',
+    sessionStart: 0
+  }
+  const fetchImpl = async (url) => {
+    if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
+    if (url.endsWith('session.json.gz')) {
+      sessionRequests += 1
+      if (sessionRequests === 1) throw new TypeError('fetch failed')
+      return gzipResponse(session)
+    }
+    return new Response(null, { status: 404 })
+  }
+
+  assert.deepEqual(await loadProfessionalSession(fetchImpl, options), session)
+  assert.equal(sessionRequests, 2)
+  assert.deepEqual(delays, [100])
+})
+
+test('a recoverable 503 retries within the limit and can recover', async () => {
+  const { delays, options } = retryProbe()
+  let manifestRequests = 0
+  const fetchImpl = async (url) => {
+    if (url.endsWith('manifest-v3.json')) {
+      manifestRequests += 1
+      if (manifestRequests === 1) return new Response(null, { status: 503 })
+      return Response.json(runtimeManifest)
+    }
+    if (url.endsWith('session.json.gz'))
+      return gzipResponse({ bars: [], schema: 'apextrader.tardis-session/v2' })
+    return new Response(null, { status: 404 })
+  }
+
+  await loadProfessionalSession(fetchImpl, options)
+  assert.equal(manifestRequests, 2)
+  assert.deepEqual(delays, [100])
+})
+
+test('a non-recoverable 404 is not retried', async () => {
+  const { delays, options } = retryProbe()
+  let requests = 0
+  const fetchImpl = async () => {
+    requests += 1
+    return new Response(null, { status: 404 })
+  }
+
+  await assert.rejects(
+    () => loadProfessionalSession(fetchImpl, options),
+    /Unable to load historical asset \(404\)/
+  )
+  assert.equal(requests, 1)
+  assert.deepEqual(delays, [])
+})
+
+test('invalid schemas and corrupt payloads are terminal and are not retried', async (t) => {
+  await t.test('invalid session schema', async () => {
+    const { delays, options } = retryProbe()
+    let sessionRequests = 0
+    const fetchImpl = async (url) => {
+      if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
+      sessionRequests += 1
+      return gzipResponse({ bars: [], schema: 'unexpected' })
+    }
+
+    await assert.rejects(
+      () => loadProfessionalSession(fetchImpl, options),
+      /Unexpected session schema/
+    )
+    assert.equal(sessionRequests, 1)
+    assert.deepEqual(delays, [])
+  })
+
+  await t.test('corrupt gzip payload', async () => {
+    const { delays, options } = retryProbe()
+    let sessionRequests = 0
+    const fetchImpl = async (url) => {
+      if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
+      sessionRequests += 1
+      return new Response('not gzip', {
+        headers: { 'content-type': 'application/gzip' }
+      })
+    }
+
+    await assert.rejects(() => loadProfessionalSession(fetchImpl, options))
+    assert.equal(sessionRequests, 1)
+    assert.deepEqual(delays, [])
+  })
+})
+
+test('exhausted chunk retries do not leave a failed request promise cached', async () => {
+  const previousFetch = globalThis.fetch
+  const { delays, options } = retryProbe()
+  let bookRequests = 0
+  const fetchImpl = async (url) => {
+    if (url.endsWith('manifest-v3.json')) return Response.json(runtimeManifest)
+    if (url.endsWith('book-094.json.gz')) {
+      bookRequests += 1
+      if (bookRequests <= 3) return new Response(null, { status: 503 })
+      return gzipResponse({ checkpoint: { asks: [], bids: [] }, groups: [] })
+    }
+    if (url.endsWith('trades-094.json.gz')) return gzipResponse({ trades: [] })
+    return new Response(null, { status: 404 })
+  }
+  globalThis.fetch = fetchImpl
+  try {
+    await assert.rejects(
+      () => loadPlaybackChunk(94, fetchImpl, options),
+      /Unable to load historical chunk \(503\)/
+    )
+    assert.equal(bookRequests, 3)
+    assert.deepEqual(delays, [100, 200])
+
+    assert.deepEqual(await loadPlaybackChunk(94, fetchImpl, options), {
+      book: { checkpoint: { asks: [], bids: [] }, groups: [] },
+      index: 94,
+      trades: { trades: [] }
+    })
+    assert.equal(bookRequests, 4)
+  } finally {
+    globalThis.fetch = previousFetch
+  }
+})
+
 test('runtime manifest resolves the compressed session and versioned chunk assets', async () => {
   const requested = []
   const session = {
