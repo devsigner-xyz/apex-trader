@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { gzipSync } from 'node:zlib'
 import {
+  advanceProfessionalPlaybackTime,
   aggregateProfessionalBars,
   deriveProfessionalView,
   deriveVolumeProfile,
@@ -9,6 +10,7 @@ import {
   loadLiquidityChunk,
   loadPlaybackChunk,
   loadProfessionalSession,
+  professionalDemoStart,
   reconstructBook
 } from '../src/services/proPlayback.js'
 
@@ -292,4 +294,21 @@ test('candle close countdown follows the selected timeframe boundary', () => {
   assert.equal(formatCandleCloseCountdown(Date.UTC(2019, 11, 1, 4, 5), 5), '05:00')
   assert.throws(() => formatCandleCloseCountdown(Number.NaN, 5), /finite/)
   assert.throws(() => formatCandleCloseCountdown(timestamp, 0), /positive integer/)
+})
+
+test('professional replay starts at 16:30 UTC and loops over the demo window', () => {
+  const sessionStart = Date.UTC(2019, 11, 1)
+  const session = {
+    playbackStart: sessionStart + 5_045,
+    sessionEndExclusive: sessionStart + 24 * 60 * 60 * 1000,
+    sessionStart
+  }
+  const demoStart = Date.UTC(2019, 11, 1, 16, 30)
+
+  assert.equal(professionalDemoStart(session), demoStart)
+  assert.equal(
+    advanceProfessionalPlaybackTime(session.sessionEndExclusive - 10, 25, session),
+    demoStart + 15
+  )
+  assert.throws(() => professionalDemoStart({}), /bounds/)
 })

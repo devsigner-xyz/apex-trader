@@ -6,7 +6,7 @@ import { clamp } from '../services/professionalChartGeometry.js'
 import { normalizePanelSizes } from '../services/professionalTerminalPersistence.js'
 import Activity from './professional/Activity.jsx'
 import MarketChart from './professional/chart/MarketChart.jsx'
-import { storageKeys } from './professional/config.js'
+import { defaultChartTimeframe, storageKeys } from './professional/config.js'
 import Dom from './professional/Dom.jsx'
 import Execution from './professional/execution/Execution.jsx'
 import PanelResizer from './professional/PanelResizer.jsx'
@@ -17,7 +17,9 @@ const { panelSizes: panelSizesStorageKey } = storageKeys
 export default function ProfessionalTerminal({ mode, onMode, playback }) {
   const { session, view } = playback
   const [price, setPrice] = useState(Number(view.current.close).toFixed(2))
-  const [timeframe, setTimeframe] = useState(() => (mode === 'footprint' ? 60 : 5))
+  const [timeframe, setTimeframe] = useState(() =>
+    mode === 'footprint' ? 60 : defaultChartTimeframe
+  )
   const [columns, setColumns] = usePersistentState(panelSizesStorageKey, normalizePanelSizes)
 
   useEffect(() => {

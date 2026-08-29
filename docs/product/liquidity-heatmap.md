@@ -27,7 +27,7 @@ alimenta el DOM. No usa profundidad sintética ni deriva liquidez a partir de tr
   actualmente 70,16 BTC. La comparación es consistente entre tiles y no se renormaliza al hacer
   pan o zoom.
 - El renderer nunca pinta timestamps posteriores al reloj compartido del replay.
-- En 5 min conserva la secuencia L2 muestreada cada 5 segundos. En 15 min, 30 min, 1 h y 4 h
+- En 5 min conserva la secuencia L2 muestreada cada 5 segundos. En 15 min, 30 min y 1 h
   agrega cada nivel mediante la media temporal de las muestras del intervalo, incluidos los ceros.
   Así la intensidad prioriza liquidez persistente y no sobrerrepresenta órdenes fugaces.
 - Los tiles cubren 6960–7792 USDT, incluyendo 250 USDT de padding sobre los extremos OHLC de la

@@ -55,6 +55,7 @@ export const panelSizeLimits = {
 }
 
 export const chartDefaults = { candles: 34, footprint: 12, 'step-profile': 9 }
+export const defaultChartTimeframe = 30
 export const chartViewportLimits = {
   candles: { maximum: 160, minimum: 28 },
   footprint: { maximum: 13, minimum: 4 },
@@ -64,8 +65,7 @@ export const chartTimeframes = [
   { label: '5 min', minutes: 5 },
   { label: '15 min', minutes: 15 },
   { label: '30 min', minutes: 30 },
-  { label: '1 hour', minutes: 60 },
-  { label: '4 hours', minutes: 240 }
+  { label: '1 hour', minutes: 60 }
 ]
 export const footprintTimeframes = chartTimeframes.filter(({ minutes }) => minutes >= 60)
 

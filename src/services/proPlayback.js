@@ -9,6 +9,7 @@ import { normalizeLiquidityTile } from './liquidityHeatmap.js'
 const RUNTIME_MANIFEST_URL = 'data/tardis/manifest-v3.json'
 const EXPECTED_MANIFEST_SCHEMA = 'apextrader.tardis-runtime-manifest/v3'
 const CHUNK_MS = 15 * 60 * 1000
+const PROFESSIONAL_DEMO_START_OFFSET_MS = (16 * 60 + 30) * 60 * 1000
 const playbackChunkCache = new Map()
 const liquidityChunkCache = new Map()
 let runtimeManifestPromise = null
@@ -20,6 +21,33 @@ function assetUrl(path) {
 
 export function chunkIndexFor(timestamp, sessionStart) {
   return Math.max(0, Math.min(95, Math.floor((timestamp - sessionStart) / CHUNK_MS)))
+}
+
+export function professionalDemoStart(session) {
+  const sessionStart = Number(session?.sessionStart)
+  const playbackStart = Number(session?.playbackStart ?? sessionStart)
+  const sessionEndExclusive = Number(session?.sessionEndExclusive)
+  if (
+    !Number.isFinite(sessionStart) ||
+    !Number.isFinite(playbackStart) ||
+    !Number.isFinite(sessionEndExclusive) ||
+    sessionEndExclusive <= sessionStart
+  )
+    throw new TypeError('Professional playback session bounds must be finite and ordered.')
+
+  return Math.min(
+    Math.max(sessionStart + PROFESSIONAL_DEMO_START_OFFSET_MS, playbackStart),
+    sessionEndExclusive - 1
+  )
+}
+
+export function advanceProfessionalPlaybackTime(timestamp, elapsedMs, session) {
+  if (!Number.isFinite(timestamp) || !Number.isFinite(elapsedMs))
+    throw new TypeError('Professional playback time and elapsed time must be finite.')
+  const start = professionalDemoStart(session)
+  const duration = session.sessionEndExclusive - start
+  const offset = (timestamp - start + elapsedMs) % duration
+  return start + (offset < 0 ? offset + duration : offset)
 }
 
 async function fetchJson(url, fetchImpl = fetch, init) {

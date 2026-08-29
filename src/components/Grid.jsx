@@ -181,7 +181,7 @@ Grid.propTypes = {
     barDurationMs: PropTypes.number.isRequired,
     candlesticks: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
     chartMode: PropTypes.oneOf(['price', 'footprint']).isRequired,
-    chartTimeframe: PropTypes.oneOf([5, 15, 30, 60, 240]).isRequired,
+    chartTimeframe: PropTypes.oneOf([5, 15, 30, 60]).isRequired,
     cvd: PropTypes.number.isRequired,
     cvdBars: PropTypes.arrayOf(
       PropTypes.shape({

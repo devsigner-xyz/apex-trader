@@ -607,6 +607,7 @@ test('chart stays still on hover and pans continuously while the pointer is held
 }) => {
   await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
+  await page.getByLabel('Timeframe').selectOption('15')
   const chartBounds = await chart.boundingBox()
   const candles = chart.locator('g.up, g.down')
   const initialWindow = await readChartWindow(chart)
@@ -761,9 +762,12 @@ test('time-axis labels never overlap at the most compressed candle scale', async
 
 test('step profile supports deep legible zoom without sparse profile bars', async ({ page }) => {
   await page.goto('/demo/step-profile')
+  await page.getByLabel('Timeframe').selectOption('5')
   const chart = page.getByLabel('step-profile historical chart')
   const chartBounds = await chart.boundingBox()
 
+  await chart.focus()
+  await page.keyboard.press('ArrowLeft')
   await page.mouse.move(
     chartBounds.x + chartBounds.width * 0.5,
     chartBounds.y + chartBounds.height * 0.5
@@ -825,15 +829,21 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await expect(page.getByRole('button', { name: /^(PLAY|PAUSE)$/ })).toHaveCount(0)
 
   const timeframe = page.getByLabel('Timeframe')
-  await expect(timeframe.locator('option')).toHaveCount(5)
+  await expect(timeframe).toHaveValue('30')
+  await expect(timeframe.locator('option')).toHaveCount(4)
+  await expect(page.getByLabel('candles historical chart')).toHaveAttribute(
+    'data-window-end',
+    String(Date.UTC(2019, 11, 1, 16, 30))
+  )
+  await expect(
+    page.locator('.market-chart .chart-data-layer > g.up, .market-chart .chart-data-layer > g.down')
+  ).toHaveCount(34)
   await timeframe.selectOption('15')
   await expect(timeframe).toHaveValue('15')
   await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)
   await timeframe.selectOption('60')
   await expect(timeframe).toHaveValue('60')
   await expect(countdown).toHaveText(/CLOSE \d{2}:\d{2}/)
-  await timeframe.selectOption('240')
-  await expect(timeframe).toHaveValue('240')
   await timeframe.selectOption('5')
 
   const chart = page.getByLabel('candles historical chart')
@@ -1001,9 +1011,9 @@ test('historical synchronization, settings and keyboard controls remain coherent
   await page.getByLabel('Chart mode').selectOption('footprint')
   await expect(page).toHaveURL(/\/demo\/footprint$/)
   await expect(page.getByLabel('footprint historical chart')).toBeVisible()
-  await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(2)
+  await expect(page.getByLabel('Timeframe').locator('option')).toHaveCount(1)
   await expect(page.getByLabel('Timeframe')).toHaveValue('60')
-  await expect(page.getByLabel('Timeframe').locator('option')).toHaveText(['1 hour', '4 hours'])
+  await expect(page.getByLabel('Timeframe').locator('option')).toHaveText(['1 hour'])
 
   const profilePanel = page.getByRole('img', {
     name: 'Visible range volume profile overlay',

@@ -3,16 +3,18 @@ import test from 'node:test'
 
 import {
   chartTimeframes,
+  defaultChartTimeframe,
   footprintTimeframes
 } from '../src/components/professional/config.js'
 
-test('professional timeframes stop at four hours for the one-day session', () => {
+test('professional chart defaults to thirty minutes and stops at one hour', () => {
+  assert.equal(defaultChartTimeframe, 30)
   assert.deepEqual(
     chartTimeframes.map(({ minutes }) => minutes),
-    [5, 15, 30, 60, 240]
+    [5, 15, 30, 60]
   )
   assert.deepEqual(
     footprintTimeframes.map(({ minutes }) => minutes),
-    [60, 240]
+    [60]
   )
 })

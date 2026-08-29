@@ -20,6 +20,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Figma contract](figma/README.md): archivo maestro, masters, variantes, anotaciones y trazabilidad.
 - [Decisions](decisions/README.md): decisiones duraderas y consecuencias.
 - [Verification](verification/2026-08-28-landing-direction-b-local.md): última verificación local de la landing y el routing de demo.
+- [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
+  timeframe inicial, ventana 16:30–24:00 UTC y regresión local del replay profesional.
 
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
 

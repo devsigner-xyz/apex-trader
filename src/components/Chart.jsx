@@ -266,6 +266,6 @@ Chart.propTypes = {
   chartType: PropTypes.oneOf(['candlestick', 'line', 'heikinAshi']).isRequired,
   selectedPrice: PropTypes.number,
   showSma: PropTypes.bool.isRequired,
-  timeframe: PropTypes.oneOf([5, 15, 30, 60, 240]).isRequired,
+  timeframe: PropTypes.oneOf([5, 15, 30, 60]).isRequired,
   volumes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired
 }

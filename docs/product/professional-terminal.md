@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-29
 owners: product-engineering
 ---
 
@@ -30,13 +30,22 @@ El selector de modo actualiza la URL canónica sin reiniciar el reloj compartido
 
 ## Chart
 
-Modos actuales: Candles, Footprint y Step Profile. Candles y Step Profile soportan 5 min, 15 min, 30 min, 1 hour y 4 hours; Footprint soporta 1 hour y 4 hours. Pan, zoom y timeframe actualizan el rango visible.
+Modos actuales: Candles, Footprint y Step Profile. Candles y Step Profile soportan 5 min, 15 min,
+30 min y 1 hour; Footprint soporta 1 hour. Candles inicia en 30 min. Pan, zoom y timeframe
+actualizan el rango visible.
 
 El significado visual y de datos de cada modo se define en [Chart patterns](../design-system/chart-patterns.md). Candles usa el acrónimo canónico OHLC; Footprint representa ejecuciones por precio y lado agresor; Step Profile repite un perfil por intervalo.
 
 Candles muestra por defecto un [Historical liquidity heatmap](liquidity-heatmap.md) derivado del
 L2 real, con visibilidad e intensidad persistentes en Chart settings. La capa respeta el viewport y
 el reloj del replay y no se monta en Footprint o Step Profile.
+
+### Ventana de replay
+
+La demo conserva la sesión Spot BTCUSDT de un día y empieza a reproducirla a las 16:30 UTC. Ese
+punto ofrece 34 intervalos agregados de 30 min —incluida la vela activa— sin aumentar el dataset.
+Al alcanzar el final de la sesión, el reloj vuelve a las 16:30 UTC y conserva cualquier pequeño
+exceso del tick para que el loop sea continuo. Cualquier seek se limita a esta ventana de demo.
 
 ### Interacción y viewport temporal
 

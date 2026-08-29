@@ -12,5 +12,6 @@ owners: product-design-engineering
 - [0004 — Fractional chart viewport](0004-fractional-chart-viewport.md)
 - [0005 — Public landing and canonical demo routes](0005-public-landing-and-demo-routes.md)
 - [0006 — Historical liquidity tiles behind Candles](0006-historical-liquidity-tiles.md)
+- [0007 — Bounded replay window for the one-day demo](0007-bounded-replay-window.md)
 
 Una decisión registra contexto, decisión, alternativas y consecuencias. La especificación operativa se actualiza por separado.

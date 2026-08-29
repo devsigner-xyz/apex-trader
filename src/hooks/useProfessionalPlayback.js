@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  advanceProfessionalPlaybackTime,
   chunkIndexFor,
   deriveProfessionalView,
   loadPlaybackChunk,
-  loadProfessionalSession
+  loadProfessionalSession,
+  professionalDemoStart
 } from '../services/proPlayback.js'
 
 export function useProfessionalPlayback() {
@@ -19,9 +21,7 @@ export function useProfessionalPlayback() {
     loadProfessionalSession()
       .then((next) => {
         setSession(next)
-        setTimestamp(
-          Math.min(next.playbackStart + 4 * 60 * 60 * 1000, next.sessionEndExclusive - 1)
-        )
+        setTimestamp(professionalDemoStart(next))
       })
       .catch((reason) => setError(reason.message))
   }, [])
@@ -54,14 +54,26 @@ export function useProfessionalPlayback() {
       const elapsed = now - tick.current
       tick.current = now
       setTimestamp((value) => {
-        const next = value + elapsed
-        return next >= session.sessionEndExclusive ? session.playbackStart : next
+        return advanceProfessionalPlaybackTime(value, elapsed, session)
       })
     }, 50)
     return () => window.clearInterval(timer)
   }, [chunk?.index, chunkIndex, playing, session])
 
-  const seek = useCallback((next) => setTimestamp(Number(next)), [])
+  const seek = useCallback(
+    (next) => {
+      const value = Number(next)
+      setTimestamp(
+        session
+          ? Math.min(
+              Math.max(value, professionalDemoStart(session)),
+              session.sessionEndExclusive - 1
+            )
+          : value
+      )
+    },
+    [session]
+  )
   const currentView = useMemo(
     () =>
       session && chunk?.index === chunkIndex && timestamp !== null
