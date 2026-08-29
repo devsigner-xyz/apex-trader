@@ -24,6 +24,10 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   timeframe inicial, ventana 16:30–24:00 UTC y regresión local del replay profesional.
 - [Future chart space verification](verification/2026-08-29-future-chart-space-local.md): drag
   hacia espacio futuro en Candles, Footprint y Step Profile sin modificar el zoom.
+- [Heatmap drag stability verification](verification/2026-08-29-liquidity-heatmap-drag-stability-local.md):
+  continuidad del Canvas y de los tiles de liquidez durante pan fraccional.
+- [Timeframe future-space default verification](verification/2026-08-29-timeframe-future-space-default-local.md):
+  separación inicial del Volume Profile tras cambiar timeframe y overlay recuperable por drag.
 
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
 

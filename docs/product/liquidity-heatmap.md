@@ -39,6 +39,11 @@ El manifest se revalida en cada visita. Si durante una release el navegador cons
 anterior sin `liquidityChunkTemplate`, el replay base continúa y solo la capa de liquidez queda no
 disponible hasta recibir el manifest actual.
 
+Durante pan continuo, los tiles ya resueltos permanecen montados y solo se incorporan los que
+falte cargar. Cruzar un límite de tile no devuelve el canvas a `loading`, no limpia la imagen
+intermedia y no altera la normalización. El repintado temporal se sincroniza con el mismo frame de
+layout que mueve el SVG para que heatmap, velas y volumen no presenten un frame desalineado.
+
 El dominio temporal del canvas usa exactamente los mismos slots que las velas. Cuando una sesión
 corta contiene menos barras que el número visible —por ejemplo, 24 velas de 1 h dentro de 34
 slots— el resto queda vacío y la capa termina en el borde temporal de la última vela disponible.

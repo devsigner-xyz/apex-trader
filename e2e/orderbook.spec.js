@@ -195,17 +195,22 @@ test.describe('Professional historical order flow', () => {
   test('aggregates the retained five-minute market bars into selectable intervals', async ({
     page
   }) => {
+    const chart = page.getByLabel('candles historical chart')
     const timeframe = page.getByLabel('Timeframe')
     const visibleBars = page.locator(
       '.market-chart .chart-data-layer > g.up, .market-chart .chart-data-layer > g.down'
     )
+    const defaultVisibleCount = 34
+    const renderedCountWithFutureSpace = Math.ceil(defaultVisibleCount * (1 - 0.3))
 
     await timeframe.selectOption('5')
-    await expect(visibleBars).toHaveCount(34)
+    await expect(chart).toHaveAttribute('data-visible-count', String(defaultVisibleCount))
+    await expect(visibleBars).toHaveCount(renderedCountWithFutureSpace)
     await timeframe.selectOption('15')
     await expect(timeframe).toHaveValue('15')
+    await expect(chart).toHaveAttribute('data-visible-count', String(defaultVisibleCount))
     const fifteenMinuteBars = await visibleBars.count()
-    expect(fifteenMinuteBars).toBe(34)
+    expect(fifteenMinuteBars).toBe(renderedCountWithFutureSpace)
     await timeframe.selectOption('60')
     await expect(timeframe).toHaveValue('60')
     const hourlyBars = await visibleBars.count()

@@ -56,7 +56,11 @@ exceso del tick para que el loop sea continuo. Cualquier seek se limita a esta v
 - Con la densidad actual intacta, el drag hacia la izquierda puede desplazar el último dato hasta
   dejar un 30% del plot como espacio futuro a la derecha. Candles, Footprint, Step Profile, volumen
   y heatmap comparten ese desplazamiento. El margen futuro mantiene el seguimiento del dato más
-  reciente; `0` elimina el margen y restaura el encaje al borde derecho.
+  reciente; `0` elimina el margen y restaura el encaje al borde derecho. Si el heatmap está activo,
+  el gesto conserva sus tiles cargados y lo repinta en el mismo frame visual sin flashes de carga.
+- Cada cambio real de timeframe restaura la densidad por defecto del modo y aplica inicialmente ese
+  margen futuro máximo. No es padding fijo: el usuario puede arrastrar hacia la derecha para volver
+  a situar datos bajo el Volume Profile. La carga inicial y `0` conservan el encaje al borde derecho.
 - El cálculo analítico incluye una barra cuando su centro temporal está dentro del plot. Las barras buffer recortadas fuera de ese criterio sirven únicamente para continuidad visual y no alteran profile, POC, VAH o VAL.
 - Los límites de barras visibles son 28–160 para Candles, 4–13 para Footprint y 1–12 para Step Profile. Estos límites protegen respectivamente la separación máxima de velas y la legibilidad mínima de celdas densas.
 - Los labels temporales se seleccionan según el ancho renderizado y conservan una separación mínima; el zoom-out reduce su cantidad antes de permitir solapamientos.

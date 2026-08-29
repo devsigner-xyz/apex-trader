@@ -44,6 +44,9 @@ La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfil
 - El drag horizontal puede reservar hasta el 30% del plot como espacio futuro a la derecha sin
   cambiar el nivel de zoom. Esto permite separar el último dato del Volume Profile; todas las capas
   temporales se desplazan juntas y el seguimiento del último dato permanece activo.
+- Al seleccionar otra temporalidad, el viewport comienza con ese 30% reservado. El margen sigue
+  siendo interactivo: arrastrar hacia la derecha devuelve datos bajo el Volume Profile y `0`
+  restaura el encaje al borde derecho.
 - Una barra participa en cálculos visibles cuando su centro temporal cae dentro del plot. Las barras buffer parcialmente dibujadas cuyo centro queda fuera son solo presentación.
 - Los ticks temporales se reducen dinámicamente según el ancho disponible y nunca se apoyan en un conteo fijo que pueda provocar solapamientos.
 - El resumen textual del rango visible no se dibuja sobre la escala temporal.
@@ -70,6 +73,10 @@ En 5 min la textura conserva la evolución de 5 segundos. En temporalidades supe
 se resume por vela mediante una media temporal que incluye ausencias de liquidez. La presentación
 resultante enfatiza bandas persistentes, mantiene la alineación con las velas y deja vacío cualquier
 slot posterior al reloj histórico.
+
+El pan conserva la imagen existente mientras cambia el conjunto de tiles y sincroniza el repintado
+del Canvas con el desplazamiento del SVG. No se admite un flash transparente, un estado de carga
+intermedio ni una desalineación de un frame al cruzar límites de tile.
 
 La capa no sustituye OHLC, Footprint, Volume Profile ni DOM. Las velas, crosshair, ejes y markers
 permanecen por encima. Footprint y Step Profile no muestran el heatmap en la primera entrega. La

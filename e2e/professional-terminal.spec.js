@@ -608,6 +608,8 @@ test('chart stays still on hover and pans continuously while the pointer is held
   await page.goto('/demo')
   const chart = page.getByLabel('candles historical chart')
   await page.getByLabel('Timeframe').selectOption('15')
+  await chart.focus()
+  await page.keyboard.press('0')
   const chartBounds = await chart.boundingBox()
   const candles = chart.locator('g.up, g.down')
   const initialWindow = await readChartWindow(chart)
@@ -679,6 +681,51 @@ test('chart stays still on hover and pans continuously while the pointer is held
 
   await page.mouse.up()
   await expect.poll(() => chart.evaluate((node) => getComputedStyle(node).cursor)).toBe('crosshair')
+})
+
+test('timeframe changes maximize future space while drag can restore profile overlap', async ({
+  page
+}) => {
+  await page.goto('/demo')
+  const chart = page.getByLabel('candles historical chart')
+  const timeframe = page.getByLabel('Timeframe')
+
+  for (const value of ['15', '60', '5', '30']) {
+    await timeframe.selectOption(value)
+    const visibleCount = Number(await chart.getAttribute('data-visible-count'))
+    await expect
+      .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+      .toBe(-visibleCount * 0.3)
+    const geometry = await chart.evaluate((node) => {
+      const data = node.querySelector('.chart-data-layer').getBoundingClientRect()
+      const profile = node
+        .querySelector('[aria-label="Visible range volume profile overlay"]')
+        .getBoundingClientRect()
+      return { dataRight: data.right, profileLeft: profile.left }
+    })
+    expect(geometry.dataRight).toBeLessThan(geometry.profileLeft)
+  }
+
+  const initialVisibleCount = await chart.getAttribute('data-visible-count')
+  const bounds = await chart.boundingBox()
+  const y = bounds.y + bounds.height * 0.45
+  await page.mouse.move(bounds.x + bounds.width * 0.3, y)
+  await page.mouse.down()
+  await page.mouse.move(bounds.x + bounds.width * 0.62, y, { steps: 8 })
+  await page.mouse.up()
+
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+    .toBeGreaterThan(-Number(initialVisibleCount) * 0.3)
+  await expect(chart).toHaveAttribute('data-visible-count', initialVisibleCount)
+  const overlappedGeometry = await chart.evaluate((node) => {
+    const data = node.querySelector('.chart-data-layer').getBoundingClientRect()
+    const profile = node
+      .querySelector('[aria-label="Visible range volume profile overlay"]')
+      .getBoundingClientRect()
+    return { dataRight: data.right, profileLeft: profile.left }
+  })
+  expect(overlappedGeometry.dataRight).toBeGreaterThan(overlappedGeometry.profileLeft)
 })
 
 test('drag can move current data left of the volume profile in every chart mode', async ({
@@ -821,6 +868,7 @@ test('step profile supports deep legible zoom without sparse profile bars', asyn
   const chartBounds = await chart.boundingBox()
 
   await chart.focus()
+  await page.keyboard.press('0')
   await page.keyboard.press('ArrowLeft')
   await page.mouse.move(
     chartBounds.x + chartBounds.width * 0.5,

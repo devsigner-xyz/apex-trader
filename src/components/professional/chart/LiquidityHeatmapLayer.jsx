@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { chunkIndexFor, loadLiquidityChunk } from '../../../services/proPlayback.js'
 import { averageLiquidityAt, createLiquidityColorLut } from '../../../services/liquidityHeatmap.js'
@@ -24,6 +24,7 @@ export default function LiquidityHeatmapLayer({
 }) {
   const canvasRef = useRef(null)
   const renderKeyRef = useRef('')
+  const tilesRef = useRef(new Map())
   const [canvasSize, setCanvasSize] = useState({ height: 0, width: 0 })
   const [status, setStatus] = useState('idle')
   const [tiles, setTiles] = useState(new Map())
@@ -35,6 +36,10 @@ export default function LiquidityHeatmapLayer({
     [enabled, replayTimestamp, sessionStart, viewportEnd, viewportStart]
   )
   const indexKey = indexes.join(',')
+  const tileKey = useMemo(
+    () => [...tiles.keys()].sort((left, right) => left - right).join(','),
+    [tiles]
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -53,15 +58,29 @@ export default function LiquidityHeatmapLayer({
   useEffect(() => {
     if (!enabled || indexes.length === 0) {
       setStatus('idle')
-      setTiles(new Map())
+      const emptyTiles = new Map()
+      tilesRef.current = emptyTiles
+      setTiles(emptyTiles)
       return undefined
     }
+
+    const missingIndexes = indexes.filter((index) => !tilesRef.current.has(index))
+    if (missingIndexes.length === 0) {
+      setStatus('ready')
+      return undefined
+    }
+
     let current = true
-    setStatus('loading')
-    Promise.all(indexes.map(async (index) => [index, await loadLiquidityChunk(index)]))
+    if (tilesRef.current.size === 0) setStatus('loading')
+    Promise.all(missingIndexes.map(async (index) => [index, await loadLiquidityChunk(index)]))
       .then((entries) => {
         if (!current) return
-        setTiles(new Map(entries))
+        setTiles((loadedTiles) => {
+          const nextTiles = new Map(loadedTiles)
+          for (const [index, tile] of entries) nextTiles.set(index, tile)
+          tilesRef.current = nextTiles
+          return nextTiles
+        })
         setStatus('ready')
       })
       .catch(() => {
@@ -72,7 +91,7 @@ export default function LiquidityHeatmapLayer({
     }
   }, [enabled, indexKey])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current
     const { height, width } = canvasSize
     if (!canvas || width < 1 || height < 1) return
@@ -81,7 +100,7 @@ export default function LiquidityHeatmapLayer({
     const context = canvas.getContext('2d')
     if (!context) return
 
-    if (!enabled || status !== 'ready' || tiles.size === 0) {
+    if (!enabled || tiles.size === 0) {
       context.clearRect(0, 0, width, height)
       renderKeyRef.current = ''
       return
@@ -100,7 +119,8 @@ export default function LiquidityHeatmapLayer({
       priceDomain.high,
       intensity,
       cutoffPixel,
-      indexKey
+      indexKey,
+      tileKey
     ].join(':')
     if (renderKeyRef.current === renderKey) return
     renderKeyRef.current = renderKey
@@ -171,6 +191,7 @@ export default function LiquidityHeatmapLayer({
     replayTimestamp,
     sessionStart,
     status,
+    tileKey,
     tiles,
     timeframe,
     viewportEnd,

@@ -1,44 +1,3 @@
-export const footprintModes = ['bidAsk', 'delta', 'volume']
-export const footprintScales = ['linear', 'logarithmic']
-export const footprintFormats = ['compact', 'precise']
-export const footprintStackSizes = [2, 3, 4, 5]
-
-export function createDefaultFootprintSettings(sourceTickSize) {
-  return {
-    format: 'compact',
-    imbalanceRatio: 3,
-    minimumVolume: 0,
-    mode: 'bidAsk',
-    scale: 'linear',
-    stackedImbalanceSize: 3,
-    tickSize: sourceTickSize
-  }
-}
-
-function isPositiveFinite(value) {
-  return Number.isFinite(value) && value > 0
-}
-
-export function normalizeFootprintSettings(candidate, sourceTickSize) {
-  const defaults = createDefaultFootprintSettings(sourceTickSize)
-  const tickSize = Number(candidate?.tickSize)
-  const imbalanceRatio = Number(candidate?.imbalanceRatio)
-  const minimumVolume = Number(candidate?.minimumVolume)
-  const stackedImbalanceSize = Number(candidate?.stackedImbalanceSize)
-
-  return {
-    format: footprintFormats.includes(candidate?.format) ? candidate.format : defaults.format,
-    imbalanceRatio: isPositiveFinite(imbalanceRatio) ? imbalanceRatio : defaults.imbalanceRatio,
-    minimumVolume: Number.isFinite(minimumVolume) && minimumVolume >= 0 ? minimumVolume : 0,
-    mode: footprintModes.includes(candidate?.mode) ? candidate.mode : defaults.mode,
-    scale: footprintScales.includes(candidate?.scale) ? candidate.scale : defaults.scale,
-    stackedImbalanceSize: footprintStackSizes.includes(stackedImbalanceSize)
-      ? stackedImbalanceSize
-      : defaults.stackedImbalanceSize,
-    tickSize: isPositiveFinite(tickSize) && tickSize >= sourceTickSize ? tickSize : sourceTickSize
-  }
-}
-
 function rounded(value) {
   return Number(value.toFixed(8))
 }
@@ -127,35 +86,6 @@ export function deriveFootprintBar(rawBar, settings) {
   }
 }
 
-export function deriveFootprintBars(rawBars, settings) {
-  return rawBars.map((bar) => deriveFootprintBar(bar, settings))
-}
-
-export function deriveFootprintProfile(rawProfile, settings) {
-  return deriveFootprintBar({ ...rawProfile, timestamp: 0 }, settings)
-}
-
-export function getDiagonalPair(level, levels, settings) {
-  const byPrice = new Map(levels.map((item) => [item.price, item]))
-  const askCounterpart = byPrice.get(level.price - settings.tickSize)
-  const bidCounterpart = byPrice.get(level.price + settings.tickSize)
-
-  return {
-    ask: {
-      counterpart: askCounterpart?.bid ?? 0,
-      counterpartPrice: level.price - settings.tickSize,
-      ratio: askCounterpart?.bid ? level.ask / askCounterpart.bid : null,
-      side: 'ask'
-    },
-    bid: {
-      counterpart: bidCounterpart?.ask ?? 0,
-      counterpartPrice: level.price + settings.tickSize,
-      ratio: bidCounterpart?.ask ? level.bid / bidCounterpart.ask : null,
-      side: 'bid'
-    }
-  }
-}
-
 export function formatFootprintVolume(value, format) {
   if (value === 0) return '—'
   if (format === 'precise') return value.toFixed(3)
@@ -163,13 +93,4 @@ export function formatFootprintVolume(value, format) {
   if (Math.abs(value) >= 100) return value.toFixed(0)
   if (Math.abs(value) >= 10) return value.toFixed(1)
   return value.toFixed(2)
-}
-
-export function formatCellValue(level, settings) {
-  if (settings.mode === 'delta') return `Δ ${formatFootprintVolume(level.delta, settings.format)}`
-  if (settings.mode === 'volume') return `V ${formatFootprintVolume(level.total, settings.format)}`
-  return `${formatFootprintVolume(level.bid, settings.format)} × ${formatFootprintVolume(
-    level.ask,
-    settings.format
-  )}`
 }

@@ -47,6 +47,49 @@ test('real L2 liquidity heatmap renders behind candles and persists its controls
   await expect(page.getByLabel('Liquidity heatmap intensity')).toBeDisabled()
 })
 
+test('liquidity heatmap remains ready while current data is dragged into future space', async ({
+  page
+}) => {
+  await page.goto('/demo')
+  const canvas = page.locator('.liquidity-heatmap-canvas')
+  const chart = page.getByLabel('candles historical chart')
+  await expect(canvas).toHaveAttribute('data-status', 'ready', { timeout: 15_000 })
+  await expect.poll(() => opaquePixelCount(canvas)).toBeGreaterThan(1000)
+
+  await canvas.evaluate((node) => {
+    window.__liquidityHeatmapStatuses = [node.dataset.status]
+    window.__liquidityHeatmapObserver = new MutationObserver(() => {
+      window.__liquidityHeatmapStatuses.push(node.dataset.status)
+    })
+    window.__liquidityHeatmapObserver.observe(node, {
+      attributeFilter: ['data-status'],
+      attributes: true
+    })
+  })
+
+  const bounds = await chart.boundingBox()
+  const y = bounds.y + bounds.height * 0.45
+  await page.mouse.move(bounds.x + bounds.width * 0.65, y)
+  await page.mouse.down()
+  for (let ratio = 0.62; ratio >= 0.3; ratio -= 0.02) {
+    await page.mouse.move(bounds.x + bounds.width * ratio, y)
+    await page.waitForTimeout(16)
+  }
+  await page.mouse.up()
+
+  await expect
+    .poll(async () => Number(await chart.getAttribute('data-right-offset')))
+    .toBeLessThan(0)
+  await expect(canvas).toHaveAttribute('data-status', 'ready')
+  expect(
+    await canvas.evaluate(() => {
+      window.__liquidityHeatmapObserver.disconnect()
+      return window.__liquidityHeatmapStatuses
+    })
+  ).toEqual(['ready'])
+  await expect.poll(() => opaquePixelCount(canvas)).toBeGreaterThan(1000)
+})
+
 test('liquidity heatmap remains a Candles-only layer', async ({ page }) => {
   await page.goto('/demo')
   const canvas = page.locator('.liquidity-heatmap-canvas')

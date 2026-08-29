@@ -23,6 +23,7 @@ export function useChartViewport({
   const [followLatest, setFollowLatest] = useState(true)
   const [dragging, setDragging] = useState(false)
   const dragState = useRef(null)
+  const previousConfiguration = useRef({ mode, timeframe })
   const previousBarCount = useRef(bars.length)
   const wheelState = useRef({ delta: 0, frame: null, kind: 'zoom' })
   const minimumOffset = deriveMinimumChartOffset(visibleCount, futureSpaceRatio)
@@ -43,9 +44,19 @@ export function useChartViewport({
     setFollowLatest(true)
   }, [defaultVisibleCount])
 
+  const separateViewport = useCallback(() => {
+    setVisibleCount(defaultVisibleCount)
+    setRightOffset(deriveMinimumChartOffset(defaultVisibleCount, futureSpaceRatio))
+    setFollowLatest(true)
+  }, [defaultVisibleCount, futureSpaceRatio])
+
   useEffect(() => {
-    resetViewport()
-  }, [mode, resetViewport, timeframe])
+    const previous = previousConfiguration.current
+    if (previous.mode === mode && previous.timeframe === timeframe) return
+    if (previous.timeframe !== timeframe) separateViewport()
+    else resetViewport()
+    previousConfiguration.current = { mode, timeframe }
+  }, [mode, resetViewport, separateViewport, timeframe])
 
   useEffect(() => {
     const normalizedOffset = isChartOffsetAtLatest(safeOffset) ? 0 : safeOffset

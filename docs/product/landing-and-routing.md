@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-29
 owners: product-design-engineering
 ---
 
@@ -29,7 +29,9 @@ Las secciones son navegables mediante `#modes`, `#session` y `#workspace`. Los C
 
 ## Frontera de carga
 
-La landing no importa ni inicializa `ProfessionalTerminal`, `useProfessionalPlayback`, `TradingStateProvider` o `demoOrderFlow`. `DemoPage` se carga mediante `React.lazy` y es el único propietario del hook de replay. Visitar `/` no debe solicitar ningún asset bajo `/data/tardis/**`.
+La landing no importa ni inicializa `ProfessionalTerminal` ni `useProfessionalPlayback`.
+`DemoPage` se carga mediante `React.lazy` y es el único propietario del hook de replay. Visitar `/`
+no debe solicitar ningún asset bajo `/data/tardis/**`.
 
 Los PNG de `public/media/` son exports exactos de Figma y se sirven con caché immutable. Opening thesis usa carga eager; toda imagen por debajo del fold usa lazy loading.
 

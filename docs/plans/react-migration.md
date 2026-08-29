@@ -1,5 +1,9 @@
 # Plan de migración Vue a React
 
+> **Snapshot histórico.** Este plan documenta la primera migración desde Vue y la terminal React
+> anterior. No describe la arquitectura profesional actual ni autoriza conservar sus módulos,
+> estilos, datasets o dependencias legacy.
+
 ## Objetivo
 
 Migrar ApexTrader de Vue 3 a React manteniendo la apariencia terminal oscura, la cuadrícula de escritorio y los flujos de demostración actuales. Los estilos se consolidarán en un sistema de diseño local; no se añadirá una biblioteca de componentes ni se conectarán servicios de trading reales.
