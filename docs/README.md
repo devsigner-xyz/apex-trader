@@ -30,6 +30,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   separación inicial del Volume Profile tras cambiar timeframe y overlay recuperable por drag.
 - [Historical replay recovery verification](verification/2026-08-29-historical-replay-recovery-local.md):
   retries deterministas, conservación de la terminal y degradación no fatal del prefetch.
+- [Settings popovers and Activity keyboard verification](verification/2026-08-29-settings-popovers-activity-keyboard-local.md):
+  foco cíclico, restauración, cierre exterior y tabs con roving `tabIndex` en los tres motores.
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 

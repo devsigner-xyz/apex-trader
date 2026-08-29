@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { accountSummary, activityTables, activityTabs, riskLimits } from './fixtures.js'
 import { activityTabId } from './formatters.js'
 
@@ -12,7 +12,25 @@ function cellTone(cell) {
 
 export default function Activity() {
   const [tab, setTab] = useState('POSITIONS')
+  const tabRefs = useRef(new Map())
   const table = activityTables[tab]
+  const selectTab = (id) => {
+    setTab(id)
+    tabRefs.current.get(id)?.focus()
+  }
+  const handleTabKeyDown = (event, id) => {
+    const index = activityTabs.findIndex(([tabId]) => tabId === id)
+    let nextIndex = index
+
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % activityTabs.length
+    else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + activityTabs.length) % activityTabs.length
+    else if (event.key === 'Home') nextIndex = 0
+    else if (event.key === 'End') nextIndex = activityTabs.length - 1
+    else return
+
+    event.preventDefault()
+    selectTab(activityTabs[nextIndex][0])
+  }
   return (
     <section aria-label="Orders and positions" className="activity">
       <header>
@@ -24,7 +42,13 @@ export default function Activity() {
               id={activityTabId(id)}
               key={id}
               onClick={() => setTab(id)}
+              onKeyDown={(event) => handleTabKeyDown(event, id)}
+              ref={(node) => {
+                if (node) tabRefs.current.set(id, node)
+                else tabRefs.current.delete(id)
+              }}
               role="tab"
+              tabIndex={tab === id ? 0 : -1}
               type="button"
             >
               {label}

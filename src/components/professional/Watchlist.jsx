@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Search as SearchIcon, Settings as SettingsIcon } from 'lucide-react'
 import { usePersistentState } from '../../hooks/usePersistentState.js'
+import { useSettingsPopoverFocus } from '../../hooks/useSettingsPopoverFocus.js'
 import { normalizeWatchlistColumns } from '../../services/professionalTerminalPersistence.js'
 import { storageKeys, watchlistColumns } from './config.js'
 import { fixtureMarkets } from './fixtures.js'
@@ -13,6 +14,15 @@ export default function Watchlist() {
     normalizeWatchlistColumns
   )
   const watchlistRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: watchlistRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
   const visibleColumns = watchlistColumns.filter(
     ({ id, required }) => required || optionalColumns.includes(id)
   )
@@ -22,21 +32,6 @@ export default function Watchlist() {
     if (!query) return fixtureMarkets
     return fixtureMarkets.filter(([symbol]) => symbol.includes(query))
   }, [marketQuery])
-
-  useEffect(() => {
-    if (!settingsOpen) return undefined
-    const close = (event) => {
-      if (event.type === 'keydown' && event.key !== 'Escape') return
-      if (event.type === 'pointerdown' && watchlistRef.current?.contains(event.target)) return
-      setSettingsOpen(false)
-    }
-    window.addEventListener('keydown', close)
-    window.addEventListener('pointerdown', close)
-    return () => {
-      window.removeEventListener('keydown', close)
-      window.removeEventListener('pointerdown', close)
-    }
-  }, [settingsOpen])
 
   return (
     <section className="pro-watchlist" aria-label="Markets" ref={watchlistRef}>
@@ -57,7 +52,8 @@ export default function Watchlist() {
           aria-expanded={settingsOpen}
           aria-label="Markets settings"
           className="watch-settings-button"
-          onClick={() => setSettingsOpen((current) => !current)}
+          onClick={handleTriggerClick}
+          ref={settingsTriggerRef}
           title="Markets settings"
           type="button"
         >
@@ -69,6 +65,7 @@ export default function Watchlist() {
           aria-label="Markets columns"
           className="watch-settings-popover"
           id="markets-settings-panel"
+          ref={settingsPopoverRef}
           role="dialog"
         >
           <strong>VISIBLE COLUMNS</strong>

@@ -144,7 +144,20 @@ La tab bar mide 38 px, no muestra métricas globales y empieza en Positions sin 
 - Cache Storage es una optimización. Fallos al abrir, escribir o desalojar su caché no bloquean una
   respuesta histórica válida obtenida por red.
 - Markets, Activity, cuenta y submit de Execution son demostración o simulación.
-- Settings cierra con Escape o click exterior y debe llevar Tab al primer control habilitado.
-- La tab bar tiene roles ARIA, pero Arrow/Home/End sigue pendiente.
-- Focus trap y restauración explícita de foco siguen pendientes.
+- Los settings de Markets, Chart, DOM y Time & Sales comparten un único contrato de foco sin
+  modificar su contenido, persistencia ni estados locales. Al abrirlos, el trigger conserva el
+  foco; el primer Tab llega al primer control habilitado y Tab/Shift+Tab recorren cíclicamente el
+  trigger y los controles habilitados del panel. Los controles disabled no entran en ese recorrido.
+- Escape desde cualquier control cierra el panel y devuelve el foco al trigger. Activar de nuevo
+  el trigger lo cierra y conserva el foco allí. Un `pointerdown` exterior cierra el panel sin
+  cancelar el foco nativo del destino pulsado. Los listeners se instalan solo mientras está abierto
+  y se limpian al cerrar, re-renderizar o desmontar.
+- Los triggers conservan `aria-controls`, `aria-expanded` y sus nombres; cada panel conserva
+  `role="dialog"` y su nombre accesible. Los popovers no son modales: el resto de la terminal
+  sigue siendo operable con pointer y un click exterior los cierra.
+- Activity usa roving `tabIndex`: solo la tab activa tiene `tabIndex=0`; las demás tienen `-1`.
+  ArrowLeft/ArrowRight seleccionan y enfocan la anterior/siguiente con wrap; Home y End van a los
+  extremos. Enter, Space y click mantienen la activación nativa. Después de cada cambio,
+  `aria-selected`, `aria-controls`, `aria-labelledby`, `role="tablist"`, `role="tab"` y
+  `role="tabpanel"` continúan describiendo la vista activa.
 - La política responsive menor de 1920 px sigue pendiente.

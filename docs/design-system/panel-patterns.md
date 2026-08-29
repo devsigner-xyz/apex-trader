@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-27
+last_verified: 2026-08-29
 owners: product-design-engineering
 ---
 
@@ -29,7 +29,13 @@ temporal como popovers, focos o asas; no se apilan dos bordes en una misma unió
 - Título terracota uppercase de 10 px y filas de 28–30 px.
 - Cierre con Escape y pointer fuera.
 - Trigger con `aria-controls`, `aria-expanded` y nombre; dialog con nombre.
-- El primer Tab llega al primer control habilitado.
+- El trigger conserva foco al abrir; el primer Tab llega al primer control habilitado.
+- Tab y Shift+Tab ciclan el trigger y los controles habilitados del panel. Los disabled no entran
+  en ese scope.
+- Escape desde un control cierra y restaura foco al trigger; reactivar el trigger cierra sin mover
+  el foco. Un `pointerdown` exterior cierra sin impedir que el destino reciba su foco nativo.
+- El listener de teclado y pointer existe solo mientras el panel está abierto y debe limpiarse al
+  cerrar o desmontar. No se usa `aria-modal="true"`: los settings siguen siendo popovers no modales.
 
 | Contexto     | Control                        | Persistencia       |
 | ------------ | ------------------------------ | ------------------ |
@@ -38,11 +44,16 @@ temporal como popovers, focos o asas; no se apilan dos bordes en una misma unió
 | DOM          | Select de grouping             | Transitorio actual |
 | Time & Sales | Radio single-select            | Transitorio        |
 
-Focus trap, restauración explícita y una medida única de ancho/anclaje siguen sin normalizar.
+Una medida única de ancho/anclaje sigue sin normalizar.
 
 ## Tablas y vistas
 
 Cada tab declara columnas, acciones, vacío, densidad y disclosure. Account & Risk usa métricas y límites, no una tabla genérica.
+
+La tab bar de Activity usa roving `tabIndex`: la seleccionada tiene `0` y las demás `-1`.
+ArrowLeft/ArrowRight circulan y activan la tab anterior/siguiente; Home y End activan los extremos.
+Click, Enter y Space conservan la activación nativa. Las relaciones `aria-selected`,
+`aria-controls` y `aria-labelledby` se actualizan junto con el `tabpanel` activo.
 
 - Danger: Close y Cancel.
 - Neutral navigation: Details.

@@ -4,6 +4,7 @@ import { Settings as SettingsIcon } from 'lucide-react'
 import { useChartViewport } from '../../../hooks/useChartViewport.js'
 import { usePersistentState } from '../../../hooks/usePersistentState.js'
 import { usePriceAxisScale } from '../../../hooks/usePriceAxisScale.js'
+import { useSettingsPopoverFocus } from '../../../hooks/useSettingsPopoverFocus.js'
 import {
   buildSessionProfile,
   clamp,
@@ -87,26 +88,20 @@ export default function MarketChart({
   const [crosshair, setCrosshair] = useState(null)
   const chartRef = useRef(null)
   const priceChartRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: chartRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
   const bars = useMemo(
     () => aggregateProfessionalBars(view.bars, timeframe),
     [timeframe, view.bars]
   )
   const current = bars.at(-1)
-
-  useEffect(() => {
-    if (!settingsOpen) return undefined
-    const close = (event) => {
-      if (event.type === 'keydown' && event.key !== 'Escape') return
-      if (event.type === 'pointerdown' && chartRef.current?.contains(event.target)) return
-      setSettingsOpen(false)
-    }
-    window.addEventListener('keydown', close)
-    window.addEventListener('pointerdown', close)
-    return () => {
-      window.removeEventListener('keydown', close)
-      window.removeEventListener('pointerdown', close)
-    }
-  }, [settingsOpen])
 
   const defaultVisibleCount = chartDefaults[mode]
   const {
@@ -293,7 +288,8 @@ export default function MarketChart({
             aria-expanded={settingsOpen}
             aria-label="Chart settings"
             className="chart-settings-button"
-            onClick={() => setSettingsOpen((current) => !current)}
+            onClick={handleTriggerClick}
+            ref={settingsTriggerRef}
             title="Chart settings"
             type="button"
           >
@@ -306,6 +302,7 @@ export default function MarketChart({
           aria-label="Chart settings"
           className="chart-settings-popover"
           id="chart-settings-panel"
+          ref={settingsPopoverRef}
           role="dialog"
         >
           <strong>CHART SETTINGS</strong>

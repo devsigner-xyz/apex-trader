@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Settings as SettingsIcon } from 'lucide-react'
 import PropTypes from 'prop-types'
+import { useSettingsPopoverFocus } from '../../hooks/useSettingsPopoverFocus.js'
 import {
   aggregateDomOrderbook,
   domPriceGroupings,
@@ -12,6 +13,8 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
   const [priceGrouping, setPriceGrouping] = useState(sourceTickSize)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const domRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
   const askLevelsRef = useRef(null)
   const bidLevelsRef = useRef(null)
   const domScrollPosition = useRef({ askFromBottom: 0, bidFromTop: 0 })
@@ -36,6 +39,13 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
   const bestBid = Number(orderbook.bids[0]?.price)
   const spread = Number.isFinite(bestAsk) && Number.isFinite(bestBid) ? bestAsk - bestBid : 0
   const groupingMultiple = Math.round(priceGrouping / sourceTickSize)
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: domRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
 
   useLayoutEffect(() => {
     if (previousDomGrouping.current !== priceGrouping) {
@@ -54,21 +64,6 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
     }
     if (bidsElement) bidsElement.scrollTop = domScrollPosition.current.bidFromTop
   }, [groupedOrderbook, priceGrouping])
-
-  useEffect(() => {
-    if (!settingsOpen) return undefined
-    const close = (event) => {
-      if (event.type === 'keydown' && event.key !== 'Escape') return
-      if (event.type === 'pointerdown' && domRef.current?.contains(event.target)) return
-      setSettingsOpen(false)
-    }
-    window.addEventListener('keydown', close)
-    window.addEventListener('pointerdown', close)
-    return () => {
-      window.removeEventListener('keydown', close)
-      window.removeEventListener('pointerdown', close)
-    }
-  }, [settingsOpen])
 
   const renderRow = (row, side, index) => (
     <button
@@ -106,7 +101,8 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
           aria-expanded={settingsOpen}
           aria-label="DOM settings"
           className="dom-settings-button"
-          onClick={() => setSettingsOpen((current) => !current)}
+          onClick={handleTriggerClick}
+          ref={settingsTriggerRef}
           title="DOM settings"
           type="button"
         >
@@ -118,6 +114,7 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
           aria-label="DOM settings"
           className="dom-settings-popover"
           id="dom-settings-panel"
+          ref={settingsPopoverRef}
           role="dialog"
         >
           <strong>DOM SETTINGS</strong>
