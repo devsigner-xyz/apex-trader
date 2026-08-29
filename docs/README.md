@@ -28,6 +28,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   continuidad del Canvas y de los tiles de liquidez durante pan fraccional.
 - [Timeframe future-space default verification](verification/2026-08-29-timeframe-future-space-default-local.md):
   separación inicial del Volume Profile tras cambiar timeframe y overlay recuperable por drag.
+- [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
+  commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
 

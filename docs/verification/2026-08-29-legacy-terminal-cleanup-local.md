@@ -126,4 +126,6 @@ reloj compartido, heatmap, Candles, Footprint, Step Profile, drag, zoom, geometr
 
 ## Publicación
 
-Esta verificación es exclusivamente local. No se hizo commit, push, PR, publicación ni despliegue.
+Los gates de este informe son exclusivamente locales. La publicación posterior y su evidencia de
+producción se registran por separado en
+[2026-08-29-legacy-terminal-cleanup-production.md](2026-08-29-legacy-terminal-cleanup-production.md).
