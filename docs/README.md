@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-29
+last_verified: 2026-08-30
 owners: product-design-engineering
 ---
 
@@ -30,6 +30,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   separación inicial del Volume Profile tras cambiar timeframe y overlay recuperable por drag.
 - [Historical replay recovery verification](verification/2026-08-29-historical-replay-recovery-local.md):
   retries deterministas, conservación de la terminal y degradación no fatal del prefetch.
+- [Historical replay engine modularization verification](verification/2026-08-30-replay-engine-modularization-local.md):
+  fachada pública compatible, límites internos, cobertura estricta y regresión local del replay.
 - [Settings popovers and Activity keyboard verification](verification/2026-08-29-settings-popovers-activity-keyboard-local.md):
   foco cíclico, restauración, cierre exterior y tabs con roving `tabIndex` en los tres motores.
 - [Volume panel persistence cleanup verification](verification/2026-08-29-volume-panel-persistence-cleanup-local.md):

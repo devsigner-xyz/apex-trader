@@ -46,6 +46,77 @@ test('timeouts retry, while intentional cancellations remain terminal', async (t
   })
 })
 
+test('only the specified transport errors and HTTP statuses are retried', async (t) => {
+  for (const status of [408, 429, 500, 599])
+    await t.test(`HTTP ${status}`, async () => {
+      const delays = []
+      let requests = 0
+      const response = await fetchHistoricalAsset('/asset', {
+        fetchImpl: async () => {
+          requests += 1
+          return requests === 1 ? new Response(null, { status }) : new Response('recovered')
+        },
+        sleep: async (delay) => delays.push(delay)
+      })
+
+      assert.equal(await response.text(), 'recovered')
+      assert.equal(requests, 2)
+      assert.deepEqual(delays, [100])
+    })
+
+  await t.test('NetworkError', async () => {
+    const delays = []
+    let requests = 0
+    const response = await fetchHistoricalAsset('/asset', {
+      fetchImpl: async () => {
+        requests += 1
+        if (requests === 1) throw new DOMException('network changed', 'NetworkError')
+        return new Response('recovered')
+      },
+      sleep: async (delay) => delays.push(delay)
+    })
+
+    assert.equal(await response.text(), 'recovered')
+    assert.equal(requests, 2)
+    assert.deepEqual(delays, [100])
+  })
+
+  for (const status of [400, 499])
+    await t.test(`terminal HTTP ${status}`, async () => {
+      const delays = []
+      let requests = 0
+      const response = await fetchHistoricalAsset('/asset', {
+        fetchImpl: async () => {
+          requests += 1
+          return new Response(null, { status })
+        },
+        sleep: async (delay) => delays.push(delay)
+      })
+
+      assert.equal(response.status, status)
+      assert.equal(requests, 1)
+      assert.deepEqual(delays, [])
+    })
+
+  await t.test('generic application error', async () => {
+    const delays = []
+    let requests = 0
+    await assert.rejects(
+      () =>
+        fetchHistoricalAsset('/asset', {
+          fetchImpl: async () => {
+            requests += 1
+            throw new Error('terminal')
+          },
+          sleep: async (delay) => delays.push(delay)
+        }),
+      /terminal/
+    )
+    assert.equal(requests, 1)
+    assert.deepEqual(delays, [])
+  })
+})
+
 class MemoryCache {
   constructor() {
     this.responses = new Map()
