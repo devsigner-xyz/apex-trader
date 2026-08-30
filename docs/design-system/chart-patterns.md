@@ -39,7 +39,7 @@ La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfil
 ## Densidad temporal e interacción
 
 - El cursor en reposo es neutral; la mano cerrada aparece únicamente durante pan con click principal mantenido.
-- El hover dentro del plot muestra un crosshair neutral de 1 px, punteado y con mayor contraste que VAH/POC/VAL. La guía horizontal se limita al área de precio y la vertical continúa por el panel de volumen cuando está visible.
+- El hover dentro del plot muestra un crosshair neutral de 1 px, punteado y con mayor contraste que VAH/POC/VAL. La guía horizontal se limita al área de precio y la vertical continúa por el panel de volumen cuando está visible. El eje de precio muestra una etiqueta con el nivel bajo el cursor, ajustado al tick de la fuente; es visual y no emite anuncios continuos a lectores de pantalla.
 - El viewport admite offsets temporales fraccionales y recorta barras parciales en los bordes del plot.
 - El drag horizontal puede reservar hasta el 30% del plot como espacio futuro a la derecha sin
   cambiar el nivel de zoom. Esto permite separar el último dato del Volume Profile; todas las capas
@@ -67,7 +67,7 @@ Se recalcula después de pan, zoom o cambio de timeframe. Las barras y los nivel
 Candles puede incorporar una capa Canvas bajo el SVG con liquidez limit resting agregada por
 precio y tiempo. Azul verdoso expresa niveles menores; arena y terracota, concentraciones mayores.
 La intensidad cromática usa una escala logarítmica global y el control `INTENSITY` modifica solo la
-opacidad del overlay.
+opacidad del overlay. Su label y porcentaje ocupan la primera fila del control; el range queda completo en una segunda fila y no puede cubrir la etiqueta.
 
 En 5 min la textura conserva la evolución de 5 segundos. En temporalidades superiores cada nivel
 se resume por vela mediante una media temporal que incluye ausencias de liquidez. La presentación

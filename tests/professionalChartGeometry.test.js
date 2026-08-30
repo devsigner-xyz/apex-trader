@@ -240,6 +240,9 @@ test('derives the existing padded price domains and a deterministic price scale'
   assert.equal(scale.toY(110), 40)
   assert.equal(scale.toY(100), 320)
   assert.equal(scale.toY(90), 600)
+  assert.equal(scale.fromY(40), 110)
+  assert.equal(scale.fromY(320), 100)
+  assert.equal(scale.fromY(600), 90)
   assert.deepEqual(createPriceTicks({ high: 110, low: 90, range: 20 }, 3), [110, 100, 90])
 })
 

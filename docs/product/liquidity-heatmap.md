@@ -54,7 +54,7 @@ Chart settings contiene:
 
 - `LIQUIDITY HEATMAP`: visible por defecto y persistente.
 - `INTENSITY`: 20–100%, en pasos de 5; 60% por defecto. Modifica opacidad, no los datos ni su
-  normalización.
+  normalización. El label y porcentaje se muestran sobre el slider, que ocupa una segunda fila completa para mantener ambos legibles.
 
 La persistencia usa `apex-trader:chart-liquidity:v1`. Al desactivar la capa se limpia el canvas y
 el slider queda deshabilitado sin perder su valor. La primera entrega está limitada a Candles;

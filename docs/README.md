@@ -44,6 +44,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   catálogo estático de componentes, enlace desde la landing y límites de verificación local.
 - [Storybook production verification](verification/2026-08-30-storybook-production.md):
   commit, despliegue Railway y comprobación pública de la biblioteca de componentes.
+- [Storybook coverage local verification](verification/2026-08-30-storybook-coverage-local.md):
+  foundations y superficies de producto tras la auditoría de Storybook.
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 

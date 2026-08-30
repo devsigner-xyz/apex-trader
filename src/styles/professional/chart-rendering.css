@@ -299,7 +299,8 @@
 }
 
 .price-tick,
-.current-price-text {
+.current-price-text,
+.hover-price-text {
   fill: var(--pro-text);
   font: 700 11px 'Roboto Mono', monospace;
 }
@@ -311,6 +312,12 @@
 
 .current-price-tag {
   fill: var(--pro-current-price-tag);
+}
+
+.hover-price-tag {
+  fill: var(--pro-raised);
+  stroke: var(--pro-muted);
+  stroke-width: 1;
 }
 
 .current-price-countdown {

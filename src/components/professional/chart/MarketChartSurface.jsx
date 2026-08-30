@@ -22,6 +22,7 @@ const plotWidth = plotRight - plotLeft
 const profileMarkerWidth = 38
 const profileMarkerX = plotLeft + 8
 const profileMarkerTextX = profileMarkerX + profileMarkerWidth / 2
+const hoverPriceTagHeight = 22
 
 export default function MarketChartSurface({
   candleCloseCountdown,
@@ -64,6 +65,9 @@ export default function MarketChartSurface({
   const { high, low, range } = priceDomain
   const y = priceScale.toY
   const x = (index) => chartSlots.positions[index]
+  const hoverPriceTagY = crosshair
+    ? Math.max(0, Math.min(priceChartHeight - hoverPriceTagHeight, crosshair.y - hoverPriceTagHeight / 2))
+    : 0
 
   return (
     <>
@@ -284,6 +288,16 @@ export default function MarketChartSurface({
                 y1={crosshair.y}
                 y2={crosshair.y}
               />
+              <rect
+                className="hover-price-tag"
+                height={hoverPriceTagHeight}
+                width={chartWidth - priceAxisX - 4}
+                x={priceAxisX + 2}
+                y={hoverPriceTagY}
+              />
+              <text className="hover-price-text" x={priceAxisX + 6} y={hoverPriceTagY + 14}>
+                {fmt(crosshair.price)}
+              </text>
             </g>
           )}
 

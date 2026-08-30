@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 import { executionOrderTypes } from '../config.js'
 import { formatNumber as fmt } from '../formatters.js'
 
-export default function OrderTicket({ price, setPrice }) {
-  const [side, setSide] = useState('buy')
+export default function OrderTicket({ initialOrderType = 'limit', initialSide = 'buy', price, setPrice }) {
+  const [side, setSide] = useState(initialSide)
   const [quantity, setQuantity] = useState('0.10')
-  const [orderType, setOrderType] = useState('limit')
-  const [timeInForce, setTimeInForce] = useState('GTC')
+  const [orderType, setOrderType] = useState(initialOrderType)
+  const [timeInForce, setTimeInForce] = useState(() => executionOrderTypes[initialOrderType].timeInForce[0])
   const [stopPrice, setStopPrice] = useState(() =>
     Number(price) > 0 ? (Number(price) - 25).toFixed(2) : ''
   )
@@ -166,6 +166,8 @@ export default function OrderTicket({ price, setPrice }) {
 }
 
 OrderTicket.propTypes = {
+  initialOrderType: PropTypes.oneOf(Object.keys(executionOrderTypes)),
+  initialSide: PropTypes.oneOf(['buy', 'sell']),
   price: PropTypes.string.isRequired,
   setPrice: PropTypes.func.isRequired
 }

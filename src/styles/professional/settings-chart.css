@@ -53,17 +53,28 @@
 
 .chart-liquidity-intensity {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 92px 34px;
-  gap: 8px;
+  grid-template-areas:
+    'label value'
+    'range range';
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+}
+
+.chart-liquidity-intensity > span {
+  grid-area: label;
+  min-width: 0;
 }
 
 .chart-liquidity-intensity input[type='range'] {
-  width: 92px;
+  grid-area: range;
+  width: 100%;
+  min-width: 0;
   margin: 0;
   accent-color: var(--pro-accent);
 }
 
 .chart-liquidity-intensity output {
+  grid-area: value;
   color: var(--pro-muted);
   font: 10px 'Roboto Mono', monospace;
   text-align: right;

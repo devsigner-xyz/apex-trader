@@ -195,6 +195,9 @@ export function createPriceScale(domain, top, bottom) {
   return {
     bottom,
     domain,
+    fromY(position) {
+      return domain.low + ((bottom - position) / (bottom - top)) * domain.range
+    },
     toY(price) {
       return bottom - ((price - domain.low) / domain.range) * (bottom - top)
     },

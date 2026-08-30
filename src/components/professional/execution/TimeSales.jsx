@@ -10,9 +10,9 @@ const tradeFilters = [
   { id: 'sell', label: 'Sells only', summary: 'Showing sells' }
 ]
 
-export default function TimeSales({ trades }) {
-  const [filter, setFilter] = useState('all')
-  const [settingsOpen, setSettingsOpen] = useState(false)
+export default function TimeSales({ initialFilter = 'all', initialSettingsOpen = false, trades }) {
+  const [filter, setFilter] = useState(initialFilter)
+  const [settingsOpen, setSettingsOpen] = useState(initialSettingsOpen)
   const tapeRef = useRef(null)
   const settingsPopoverRef = useRef(null)
   const settingsTriggerRef = useRef(null)
@@ -93,6 +93,8 @@ export default function TimeSales({ trades }) {
 }
 
 TimeSales.propTypes = {
+  initialFilter: PropTypes.oneOf(tradeFilters.map(({ id }) => id)),
+  initialSettingsOpen: PropTypes.bool,
   trades: PropTypes.arrayOf(
     PropTypes.shape({
       amount: PropTypes.number.isRequired,

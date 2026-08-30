@@ -50,6 +50,8 @@ const {
 } = storageKeys
 
 export default function MarketChart({
+  initialLiquidity,
+  initialPanelVisibility,
   mode,
   onMode,
   onTimeframe,
@@ -57,7 +59,7 @@ export default function MarketChart({
   timeframe,
   view
 }) {
-  const [liquidity, setLiquidity] = usePersistentState(
+  const [persistedLiquidity, setPersistedLiquidity] = usePersistentState(
     chartLiquidityStorageKey,
     normalizeChartLiquidity
   )
@@ -65,10 +67,20 @@ export default function MarketChart({
     chartPanelSizesStorageKey,
     normalizeChartPanelSizes
   )
-  const [panelVisibility, setPanelVisibility] = usePersistentState(
+  const [persistedPanelVisibility, setPersistedPanelVisibility] = usePersistentState(
     chartPanelVisibilityStorageKey,
     normalizeChartPanelVisibility
   )
+  const [storyLiquidity, setStoryLiquidity] = useState(() => normalizeChartLiquidity(initialLiquidity))
+  const [storyPanelVisibility, setStoryPanelVisibility] = useState(() =>
+    normalizeChartPanelVisibility(initialPanelVisibility)
+  )
+  const liquidity = initialLiquidity ? storyLiquidity : persistedLiquidity
+  const panelVisibility = initialPanelVisibility ? storyPanelVisibility : persistedPanelVisibility
+  const setLiquidity = initialLiquidity ? setStoryLiquidity : setPersistedLiquidity
+  const setPanelVisibility = initialPanelVisibility
+    ? setStoryPanelVisibility
+    : setPersistedPanelVisibility
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null)
   const [crosshair, setCrosshair] = useState(null)
@@ -181,7 +193,9 @@ export default function MarketChart({
     const chartY = ((event.clientY - bounds.top) / bounds.height) * priceChartHeight
     const insidePricePlot =
       chartX >= plotLeft && chartX <= plotRight && chartY >= mainTop && chartY <= mainBottom
-    setCrosshair(insidePricePlot ? { x: chartX, y: chartY } : null)
+    const price = priceScale.fromY(chartY)
+    const roundedPrice = Math.round(price / sourceTickSize) * sourceTickSize
+    setCrosshair(insidePricePlot ? { price: roundedPrice, x: chartX, y: chartY } : null)
     setHoveredBarIndex(
       findTimeScaleBarIndex({
         barCount: bars.length,

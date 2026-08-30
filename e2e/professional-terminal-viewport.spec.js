@@ -81,9 +81,12 @@ test('chart hover shows a dotted crosshair aligned through the volume panel', as
 
   const priceVertical = chart.locator('.chart-crosshair-line--vertical')
   const priceHorizontal = chart.locator('.chart-crosshair-line--horizontal')
+  const hoverPrice = chart.locator('.hover-price-text')
   const volumeVertical = volumePanel.locator('.chart-crosshair-line--vertical')
   await expect(priceVertical).toHaveCount(1)
   await expect(priceHorizontal).toHaveCount(1)
+  await expect(hoverPrice).toHaveCount(1)
+  await expect(hoverPrice).toHaveText(/[\d,.]+/)
   await expect(volumeVertical).toHaveCount(1)
   expect(await volumeVertical.getAttribute('x1')).toBe(await priceVertical.getAttribute('x1'))
 
@@ -96,6 +99,7 @@ test('chart hover shows a dotted crosshair aligned through the volume panel', as
   expect(opacities.crosshair).toBeGreaterThan(opacities.valueArea)
   await page.mouse.move(0, 0)
   await expect(chart.locator('.chart-crosshair-line')).toHaveCount(0)
+  await expect(hoverPrice).toHaveCount(0)
   await expect(volumePanel.locator('.chart-crosshair-line')).toHaveCount(0)
 })
 

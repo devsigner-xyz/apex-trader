@@ -40,3 +40,7 @@ de los ficheros que los definen.
 La extensión de marketing añade los espacios `--pro-space-24`, `32`, `48`, `64`, `80` y `96`, además de `--pro-button-marketing-height: 44px`, en la misma raíz canónica de `professional.css`. No constituye un tema nuevo y mantiene los roles de color existentes.
 
 Consulta [Panel patterns](panel-patterns.md), [Chart patterns](chart-patterns.md), [Marketing patterns](marketing-patterns.md) y [Figma contract](../figma/README.md).
+
+## Storybook
+
+`/storybook/` documenta los roles CSS ejecutables bajo Foundations y las superficies de producto sin crear una segunda implementación. MarketChart se presenta con barras, profile y volumen generados localmente; el heatmap se mantiene desactivado en esas historias porque depende de tiles históricos y no es un fixture determinista. Las capas SVG internas del chart permanecen privadas: se verifican a través de las historias compuestas, no como una API pública del sistema.

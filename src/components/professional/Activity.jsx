@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { accountSummary, activityTables, activityTabs, riskLimits } from './fixtures.js'
 import { activityTabId } from './formatters.js'
 
@@ -10,8 +11,8 @@ function cellTone(cell) {
   return ''
 }
 
-export default function Activity() {
-  const [tab, setTab] = useState('POSITIONS')
+export default function Activity({ initialTab = 'POSITIONS' }) {
+  const [tab, setTab] = useState(initialTab)
   const tabRefs = useRef(new Map())
   const table = activityTables[tab]
   const selectTab = (id) => {
@@ -130,4 +131,8 @@ export default function Activity() {
       </div>
     </section>
   )
+}
+
+Activity.propTypes = {
+  initialTab: PropTypes.oneOf(activityTabs.map(([id]) => id))
 }

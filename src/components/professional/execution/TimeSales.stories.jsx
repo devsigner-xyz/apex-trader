@@ -23,3 +23,21 @@ export const Default = {
     </div>
   )
 }
+
+export const BuysOnly = {
+  args: { initialFilter: 'buy', trades },
+  render: (args) => (
+    <div className="storybook-panel">
+      <TimeSales {...args} />
+    </div>
+  )
+}
+
+export const SettingsOpen = {
+  args: { initialSettingsOpen: true, trades },
+  render: (args) => (
+    <div className="storybook-panel">
+      <TimeSales {...args} />
+    </div>
+  )
+}
