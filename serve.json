@@ -1,4 +1,23 @@
 {
+  "cleanUrls": false,
+  "rewrites": [
+    {
+      "source": "/storybook",
+      "destination": "/storybook/index.html"
+    },
+    {
+      "source": "/storybook/",
+      "destination": "/storybook/index.html"
+    },
+    {
+      "source": "/storybook/**",
+      "destination": "/storybook/index.html"
+    },
+    {
+      "source": "/{,!(storybook),!(storybook)/**}",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/**",

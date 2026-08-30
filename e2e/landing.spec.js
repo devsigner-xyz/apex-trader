@@ -30,6 +30,10 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     '#workspace'
   )
+  await expect(page.getByRole('link', { name: 'Components', exact: true })).toHaveAttribute(
+    'href',
+    '/storybook/'
+  )
   await expect(page.getByRole('link', { name: /Devsigner/ }).first()).toHaveAttribute(
     'href',
     'https://devsigner.xyz'

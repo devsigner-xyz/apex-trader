@@ -40,6 +40,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   descomposición contractual del chart, E2E por contratos, cobertura y regresión visual local.
 - [Professional frontend maintainability release verification](verification/2026-08-30-professional-maintainability-production.md):
   publicación del commit de modularización y comprobación de Railway, dominios y assets públicos.
+- [Storybook local verification](verification/2026-08-30-storybook-local.md):
+  catálogo estático de componentes, enlace desde la landing y límites de verificación local.
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 

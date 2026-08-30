@@ -61,6 +61,7 @@ export default function LandingPage() {
           <a href="#modes">Modes</a>
           <a href="#session">Session</a>
           <a href="#workspace">Workspace</a>
+          <a href="/storybook/">Components</a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             Devsigner ↗
           </a>
