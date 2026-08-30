@@ -29,6 +29,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   snapshot histórico del prototipo R1 con `MarketChart` completo, sustituido por R2.
 - [Interactive portfolio landing isolated modules](verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md):
   contrato R2, seis módulos React compactos, carga diferida, responsive y evidencia local.
+- [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
+  commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
   timeframe inicial, ventana 16:30–24:00 UTC y regresión local del replay profesional.
 - [Future chart space verification](verification/2026-08-29-future-chart-space-local.md): drag
@@ -63,8 +65,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. El [plan de landing interactiva](plans/interactive-portfolio-landing.md)
-está en progreso: la revisión Figma R2 y sus seis módulos React están implementados localmente,
-pendientes de gates finales y publicación verificada.
+está completo: la revisión Figma R2 y sus seis módulos React están implementados, publicados y
+verificados en producción.
 
 ## Jerarquía y estados
 

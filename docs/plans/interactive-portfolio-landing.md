@@ -1,5 +1,5 @@
 ---
-status: in_progress
+status: complete
 last_verified: 2026-08-31
 owners: product-design-engineering
 ---
@@ -111,15 +111,15 @@ masters permanecen intactos.
 
 ## Fases y ledger reanudable
 
-| Fase                               | Estado      | Evidencia / artefactos                                                                                      | Siguiente acción                         |
-| ---------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| 0 · Baseline                       | complete    | `docs/verification/2026-08-30-interactive-portfolio-landing-baseline.md`                                    | —                                        |
-| 1 · Figma R1                       | complete    | `656:7413`, `656:7414`, `656:7415`; aprobación del 2026-08-30                                               | Preservada como snapshot                 |
-| 2 · Prototipo R1                   | complete    | `docs/verification/2026-08-30-interactive-portfolio-landing-phase2-local.md`                                | Sustituido por feedback R2               |
-| 3 · Revisión Figma R2              | complete    | `688:21215`; `output/figma/interactive-landing-isolated-modules-r2.png`                                     | Sincronizar código                       |
-| 4 · Módulos React y composición    | complete    | Seis escenas aisladas, carga lazy, fixture compartido, imágenes de UI completa limitadas a contexto         | Cerrar docs y QA                         |
-| 5 · Contratos, documentación y QA  | complete    | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright | —                                        |
-| 6 · Release y verificación pública | in_progress | Publicación final autorizada el 2026-08-30                                                                  | Commit, push, Railway y comprobación web |
+| Fase                               | Estado   | Evidencia / artefactos                                                                                         | Siguiente acción           |
+| ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 0 · Baseline                       | complete | `docs/verification/2026-08-30-interactive-portfolio-landing-baseline.md`                                       | —                          |
+| 1 · Figma R1                       | complete | `656:7413`, `656:7414`, `656:7415`; aprobación del 2026-08-30                                                  | Preservada como snapshot   |
+| 2 · Prototipo R1                   | complete | `docs/verification/2026-08-30-interactive-portfolio-landing-phase2-local.md`                                   | Sustituido por feedback R2 |
+| 3 · Revisión Figma R2              | complete | `688:21215`; `output/figma/interactive-landing-isolated-modules-r2.png`                                        | Sincronizar código         |
+| 4 · Módulos React y composición    | complete | Seis escenas aisladas, carga lazy, fixture compartido, imágenes de UI completa limitadas a contexto            | Cerrar docs y QA           |
+| 5 · Contratos, documentación y QA  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright    | —                          |
+| 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 

@@ -69,6 +69,7 @@ permanecen físicamente en `public/media/`; esta iniciativa no autoriza borrarlo
 
 ## Estado de publicación
 
-El contrato R2 está implementado en el checkout local. No se considera desplegado ni verificado en
-`apex.devsigner.xyz` hasta una release con comprobación directa de Railway, commit, rutas, UI y
-assets públicos.
+El contrato R2 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit
+funcional `23879f6e6c669b4dae471d46add8c4eadaa05300`; rutas, assets, desktop, mobile, consola y los modos
+Footprint/Step Profile se comprobaron directamente. La evidencia está en
+[Interactive portfolio landing · production verification](../verification/2026-08-31-interactive-portfolio-landing-production.md).
