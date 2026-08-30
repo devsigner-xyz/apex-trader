@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-30
 owners: product-design
 ---
 
@@ -27,7 +27,15 @@ Figma organiza 28 primitivos, 37 roles semánticos y 24 dimensiones bajo `Apex P
 3. Dimensiones: spacing, radius, row/control sizes, strokes y font sizes.
 4. Patrón/componente: headers, popovers, filas, tabs y markers.
 
-Los nuevos componentes enlazan propiedades a variables existentes cuando exista un rol aplicable. Los colores hard-coded de grid/profile son deuda a promover antes de ampliar temas.
+Los nuevos componentes enlazan propiedades a variables existentes cuando exista un rol aplicable.
+Las reglas de UI y JSX no introducen literales de color: `--pro-*` cubre superficies, estados de
+mercado, profile, Footprint, ejes, acciones, actualizaciones y popovers. Los valores físicos viven
+solamente en las definiciones de token, preservando la paleta independiente de Apex.
+
+El chevron de los selects usa `--pro-select-chevron`: el navegador no puede interpolar una variable
+CSS dentro del SVG data-URI, por lo que su color se conserva dentro de ese token de recurso. La
+prueba de tokens recorre los CSS, JS y JSX ejecutables de `src` para impedir nuevos literales fuera
+de los ficheros que los definen.
 
 La extensión de marketing añade los espacios `--pro-space-24`, `32`, `48`, `64`, `80` y `96`, además de `--pro-button-marketing-height: 44px`, en la misma raíz canónica de `professional.css`. No constituye un tema nuevo y mantiene los roles de color existentes.
 

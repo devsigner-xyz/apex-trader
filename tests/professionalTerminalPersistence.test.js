@@ -19,11 +19,10 @@ test('normalizes workspace panel sizes with the existing defaults and limits', (
   assert.deepEqual(normalizePanelSizes(null), { dom: 218, execution: 280, watch: 360 })
 })
 
-test('normalizes chart panel sizes and visibility with backward-compatible defaults', () => {
-  assert.deepEqual(normalizeChartPanelSizes({ profile: 100, volume: 500 }), {
-    profile: 120,
-    volume: 200
-  })
+test('normalizes only the resizable chart volume panel size', () => {
+  assert.deepEqual(normalizeChartPanelSizes(), { volume: 110 })
+  assert.deepEqual(normalizeChartPanelSizes({ profile: 100, volume: 500 }), { volume: 200 })
+  assert.deepEqual(normalizeChartPanelSizes({ profile: 280, volume: 60 }), { volume: 72 })
   assert.deepEqual(
     normalizeChartPanelVisibility({ profile: false, valueArea: false, volume: 'false' }),
     {
@@ -37,6 +36,27 @@ test('normalizes chart panel sizes and visibility with backward-compatible defau
     valueArea: true,
     volume: false
   })
+})
+
+test('reads legacy chart panel sizes and writes the normalized volume size alone', () => {
+  const values = new Map([['chart-panel-sizes', '{"profile":180,"volume":118}']])
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value)
+  }
+
+  assert.deepEqual(readPersistentValue(storage, 'chart-panel-sizes', normalizeChartPanelSizes), {
+    volume: 118
+  })
+  assert.equal(
+    writePersistentValue(
+      storage,
+      'chart-panel-sizes',
+      normalizeChartPanelSizes({ profile: 120, volume: 400 })
+    ),
+    true
+  )
+  assert.equal(values.get('chart-panel-sizes'), '{"volume":200}')
 })
 
 test('normalizes persistent liquidity heatmap controls', () => {

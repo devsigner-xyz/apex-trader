@@ -32,6 +32,10 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   retries deterministas, conservación de la terminal y degradación no fatal del prefetch.
 - [Settings popovers and Activity keyboard verification](verification/2026-08-29-settings-popovers-activity-keyboard-local.md):
   foco cíclico, restauración, cierre exterior y tabs con roving `tabIndex` en los tres motores.
+- [Volume panel persistence cleanup verification](verification/2026-08-29-volume-panel-persistence-cleanup-local.md):
+  migración de la key de tamaños del chart a `volume` únicamente, manteniendo fijo el Volume Profile.
+- [UI color tokenization verification](verification/2026-08-30-ui-color-tokenization-local.md):
+  colores ejecutables de la interfaz encapsulados en tokens semánticos sin cambio visual.
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 

@@ -12,6 +12,27 @@
   --pro-accent: #d68b54;
   --pro-buy: #2fb67c;
   --pro-sell: #e15b64;
+  --pro-popover-surface: rgb(24 32 39 / 0.98);
+  --pro-popover-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+  --pro-profile-bid: #223e63;
+  --pro-profile-ask: #315f76;
+  --pro-profile-value: #7297ad;
+  --pro-footprint-bid: #17445a;
+  --pro-footprint-ask: #743842;
+  --pro-footprint-divider: rgb(11 15 18 / 0.9);
+  --pro-footprint-text: #e4edf1;
+  --pro-footprint-bid-imbalance: #71dcb1;
+  --pro-footprint-ask-imbalance: #ff8e97;
+  --pro-price-axis: #11171c;
+  --pro-current-price-tag: #8e5b37;
+  --pro-dom-ask-volume: rgb(225 91 100 / 0.25);
+  --pro-dom-bid-volume: rgb(47 182 124 / 0.25);
+  --pro-action-buy: #226f55;
+  --pro-action-sell: #853946;
+  --pro-action-text: #fff;
+  --pro-quote-update: rgb(214 139 84 / 0.16);
+  --pro-tape-update: rgb(47 182 124 / 0.12);
+  --pro-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='m2 2 4 4 4-4' stroke='%2389959F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --pro-space-24: 24px;
   --pro-space-32: 32px;
   --pro-space-48: 48px;
@@ -380,7 +401,7 @@
   color: var(--pro-text);
   background: var(--pro-raised);
   border: 1px solid var(--pro-strong);
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+  box-shadow: var(--pro-popover-shadow);
 }
 
 .watch-settings-popover > strong {
@@ -541,9 +562,9 @@
   width: 250px;
   padding: 12px;
   color: var(--pro-text);
-  background: rgb(24 32 39 / 0.98);
+  background: var(--pro-popover-surface);
   border: 1px solid var(--pro-strong);
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+  box-shadow: var(--pro-popover-shadow);
 }
 
 .chart-settings-popover > strong {
@@ -732,11 +753,11 @@
 }
 
 .session-profile-bar--bid {
-  fill: #223e63;
+  fill: var(--pro-profile-bid);
 }
 
 .session-profile-bar--ask {
-  fill: #315f76;
+  fill: var(--pro-profile-ask);
 }
 
 .session-profile-marker {
@@ -759,7 +780,7 @@
 }
 
 .session-profile-marker--value-area {
-  color: #7297ad;
+  color: var(--pro-profile-value);
 }
 
 .profile-spine {
@@ -802,30 +823,30 @@
 }
 
 .footprint-bid-bg {
-  fill: #17445a;
+  fill: var(--pro-footprint-bid);
 }
 
 .footprint-ask-bg {
-  fill: #743842;
+  fill: var(--pro-footprint-ask);
 }
 
 .footprint-divider {
-  stroke: rgb(11 15 18 / 0.9);
+  stroke: var(--pro-footprint-divider);
   stroke-width: 1;
 }
 
 .footprint-cell-value {
-  fill: #e4edf1;
+  fill: var(--pro-footprint-text);
   font: 700 10px 'Roboto Mono', monospace;
   pointer-events: none;
 }
 
 .footprint-cell-value.bid.is-imbalance {
-  fill: #71dcb1;
+  fill: var(--pro-footprint-bid-imbalance);
 }
 
 .footprint-cell-value.ask.is-imbalance {
-  fill: #ff8e97;
+  fill: var(--pro-footprint-ask-imbalance);
 }
 
 .footprint-poc-outline {
@@ -863,7 +884,7 @@
 }
 
 .value-line {
-  stroke: #7297ad;
+  stroke: var(--pro-profile-value);
   stroke-dasharray: 1 5;
   stroke-linecap: round;
   stroke-width: 1;
@@ -880,7 +901,7 @@
 }
 
 .price-axis-bg {
-  fill: #11171c;
+  fill: var(--pro-price-axis);
   stroke: var(--pro-border);
   stroke-width: 1;
 }
@@ -916,7 +937,7 @@
 }
 
 .current-price-tag {
-  fill: #8e5b37;
+  fill: var(--pro-current-price-tag);
 }
 
 .current-price-countdown {
@@ -954,9 +975,9 @@
   width: calc(100% - 12px);
   padding: 12px;
   color: var(--pro-text);
-  background: rgb(24 32 39 / 0.98);
+  background: var(--pro-popover-surface);
   border: 1px solid var(--pro-strong);
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+  box-shadow: var(--pro-popover-shadow);
 }
 
 .dom-settings-popover > strong {
@@ -1074,12 +1095,12 @@
 }
 
 .dom-row span:nth-child(3) {
-  background-image: linear-gradient(90deg, rgb(225 91 100 / 0.25), rgb(225 91 100 / 0.25));
+  background-image: linear-gradient(90deg, var(--pro-dom-ask-volume), var(--pro-dom-ask-volume));
   background-repeat: no-repeat;
 }
 
 .dom-row.bid span:nth-child(3) {
-  background-image: linear-gradient(90deg, rgb(47 182 124 / 0.25), rgb(47 182 124 / 0.25));
+  background-image: linear-gradient(90deg, var(--pro-dom-bid-volume), var(--pro-dom-bid-volume));
 }
 
 .dom-spread-row {
@@ -1147,12 +1168,12 @@
 
 .side-tabs .active.buy,
 .submit.buy {
-  background: #226f55;
+  background: var(--pro-action-buy);
 }
 
 .side-tabs .active.sell,
 .submit.sell {
-  background: #853946;
+  background: var(--pro-action-sell);
 }
 
 .ticket label {
@@ -1197,7 +1218,7 @@
   width: 100%;
   height: 38px;
   margin-top: 2px;
-  color: #fff;
+  color: var(--pro-action-text);
   border: 0;
   border-radius: 3px;
   font: 700 11px inherit;
@@ -1241,9 +1262,9 @@
   width: calc(100% - 12px);
   padding: 12px;
   color: var(--pro-text);
-  background: rgb(24 32 39 / 0.98);
+  background: var(--pro-popover-surface);
   border: 1px solid var(--pro-strong);
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.55);
+  box-shadow: var(--pro-popover-shadow);
 }
 
 .tape-settings-popover > strong {
@@ -1558,7 +1579,7 @@
 .pro-terminal select:not([multiple]) {
   appearance: none;
   padding-inline-end: calc(12px + var(--space-2) + var(--space-2));
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='m2 2 4 4 4-4' stroke='%2389959F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: var(--pro-select-chevron);
   background-repeat: no-repeat;
   background-position: right var(--space-2) center;
   background-size: 12px 8px;
@@ -1566,7 +1587,7 @@
 
 @keyframes quote-update {
   from {
-    background-color: rgb(214 139 84 / 0.16);
+    background-color: var(--pro-quote-update);
   }
   to {
     background-color: var(--pro-panel);
@@ -1575,7 +1596,7 @@
 
 @keyframes tape-update {
   from {
-    background-color: rgb(47 182 124 / 0.12);
+    background-color: var(--pro-tape-update);
   }
   to {
     background-color: transparent;

@@ -85,9 +85,8 @@ export const chartDimensions = {
   volumeTop: 10
 }
 
-export const chartPanelSizeDefaults = { profile: 180, volume: 110 }
+export const chartPanelSizeDefaults = { volume: 110 }
 export const chartPanelSizeLimits = {
-  profile: [120, 280],
   volume: [72, 200]
 }
 export const chartPanelVisibilityDefaults = { profile: true, valueArea: true, volume: true }

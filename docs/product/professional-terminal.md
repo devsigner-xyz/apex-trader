@@ -80,7 +80,10 @@ El cálculo usa las velas agregadas actualmente visibles y se recalcula con pan,
 
 El profile ocupa 180 unidades SVG y se alinea a la derecha. Cada marcador es un chip sólido de 38 × 16 px, radio 2 px y texto centrado, anclado al borde derecho/base de las barras. La línea queda cubierta por el chip, no atraviesa el texto.
 
-Deuda: el tamaño persistido del profile es legado aunque la anchura renderizada sea fija.
+Su anchura no es redimensionable ni persistida: permanece fija en 180 unidades SVG. La key
+`apex-trader:chart-panel-sizes:v1` persiste únicamente la altura del panel inferior `volume`.
+Una lectura heredada con `profile` y `volume` conserva y limita `volume`; la siguiente escritura
+canónica elimina `profile`.
 
 ## Footer
 

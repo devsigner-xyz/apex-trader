@@ -40,7 +40,7 @@ export default function VolumePanel({
           role="img"
           viewBox={`0 0 ${chartWidth} ${volumeChartHeight}`}
         >
-          <rect width={chartWidth} height={volumeChartHeight} fill="#0b0f12" />
+          <rect width={chartWidth} height={volumeChartHeight} fill="var(--pro-canvas)" />
           <defs>
             <clipPath id="market-chart-volume-plot-clip">
               <rect height={volumeChartHeight} width={plotWidth} x={plotLeft} y="0" />

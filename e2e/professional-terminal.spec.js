@@ -1165,7 +1165,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   expect((await volumePanel.boundingBox()).height).toBeGreaterThan(initialVolumeHeight)
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-panel-sizes:v1')))
-  ).toEqual({ profile: 180, volume: 118 })
+  ).toEqual({ volume: 118 })
   await page.reload()
   await expect(profilePanel).toBeVisible()
   expect((await volumePanel.boundingBox()).height).toBeCloseTo(118, 0)
