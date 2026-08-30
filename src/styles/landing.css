@@ -440,6 +440,180 @@
   bottom: 75px;
 }
 
+.landing-primitives-section {
+  background: var(--pro-panel);
+}
+
+.landing-primitives-loader {
+  min-height: 260px;
+}
+
+.landing-primitives-fallback {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  padding: var(--pro-space-32);
+  color: var(--pro-muted);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-subtle);
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.landing-primitives {
+  display: grid;
+  gap: var(--pro-space-24);
+}
+
+.landing-primitive {
+  display: grid;
+  grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
+  gap: var(--pro-space-64);
+  align-items: center;
+  min-height: 324px;
+  padding: var(--pro-space-32);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-subtle);
+  border-radius: 3px;
+}
+
+.landing-primitive:nth-child(odd) {
+  background: var(--pro-raised);
+}
+
+.landing-primitive__visual {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 560 / 260;
+  place-items: center;
+  overflow: hidden;
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 3px;
+}
+
+.landing-primitive__visual > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-primitive__copy {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+}
+
+.landing-primitive__copy > p:first-child {
+  margin: 0;
+  color: var(--pro-accent);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.landing-primitive__copy h3 {
+  margin: 0;
+  color: var(--pro-text);
+  font-family: Inter, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.landing-primitive__copy > p:last-child {
+  max-width: 560px;
+  margin: 0;
+  color: var(--pro-muted);
+  font-family: Inter, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.landing-primitive-grid {
+  stroke: var(--pro-subtle);
+  stroke-width: 1;
+}
+
+.landing-primitive__visual .up line,
+.landing-primitive__visual .up rect {
+  fill: var(--pro-buy);
+  stroke: var(--pro-buy);
+}
+
+.landing-primitive__visual .down line,
+.landing-primitive__visual .down rect {
+  fill: var(--pro-sell);
+  stroke: var(--pro-sell);
+}
+
+.landing-current-candle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.landing-primitives[data-animation-state='running'] .landing-current-candle {
+  animation: landing-current-candle 1.4s ease-in-out infinite;
+}
+
+.landing-profile-marker text {
+  fill: var(--pro-muted);
+  font: 700 10px 'Roboto Mono', monospace;
+  letter-spacing: 0.08em;
+}
+
+.dom--compact,
+.tape--compact {
+  width: min(420px, calc(100% - 48px));
+  margin: auto;
+  background: var(--pro-panel);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+}
+
+.dom--compact {
+  height: auto;
+}
+
+.dom-compact-side {
+  display: grid;
+}
+
+.dom--compact .dom-row {
+  height: 28px;
+  min-height: 28px;
+}
+
+.tape--compact {
+  min-height: 168px;
+  justify-content: center;
+}
+
+.tape--compact .tape-row {
+  min-height: 54px;
+  flex: 0 0 54px;
+  padding-inline: 16px;
+  font-size: 12px;
+}
+
+@keyframes landing-current-candle {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 .landing-readings-frame {
   position: relative;
   padding: var(--pro-space-32);
@@ -499,63 +673,6 @@
   height: 1px;
   content: '';
   background: var(--pro-accent);
-}
-
-.landing-connected-system {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(160px, 0.9fr) minmax(220px, 1.25fr);
-  gap: 16px;
-  min-height: 480px;
-  padding-bottom: var(--pro-space-48);
-}
-
-.landing-connected-panel {
-  position: relative;
-  min-width: 0;
-  margin: 0;
-  overflow: hidden;
-  background: var(--pro-canvas);
-  border: 1px solid var(--pro-subtle);
-  border-radius: 3px;
-}
-
-.landing-connected-panel figcaption {
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  right: 0;
-  left: 0;
-  min-height: 40px;
-  padding: 12px 16px;
-  color: var(--pro-text);
-  background: var(--pro-top);
-  border-bottom: 1px solid var(--pro-subtle);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-}
-
-.landing-connected-panel img {
-  object-position: top center;
-}
-
-.landing-playhead {
-  position: absolute;
-  z-index: 3;
-  right: 0;
-  bottom: 72px;
-  left: 0;
-  height: 1px;
-  background: var(--pro-accent);
-}
-
-.landing-sync-status {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  margin: 0;
-  color: var(--pro-accent);
 }
 
 .landing-session-evidence {
@@ -694,22 +811,14 @@
     grid-column: 1 / -1;
   }
 
-  .landing-connected-system {
-    grid-template-columns: minmax(0, 2fr) minmax(150px, 0.8fr);
-  }
-
-  .landing-connected-panel--tape {
-    grid-column: 1 / -1;
-    min-height: 320px;
-  }
-
-  .landing-playhead,
-  .landing-sync-status {
-    display: none;
-  }
-
   .landing-callouts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .landing-primitive {
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr);
+    gap: var(--pro-space-24);
+    padding: var(--pro-space-24);
   }
 }
 
@@ -795,27 +904,28 @@
   }
 
   .landing-reading-grid,
-  .landing-connected-system,
   .landing-callouts {
     grid-template-columns: 1fr;
   }
 
-  .landing-reading:last-child,
-  .landing-connected-panel--tape {
+  .landing-primitive {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--pro-space-32);
+    min-height: 0;
+    padding: var(--pro-space-24);
+  }
+
+  .landing-primitive__copy h3 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .landing-reading:last-child {
     grid-column: auto;
   }
 
   .landing-reading p {
     min-height: 0;
-  }
-
-  .landing-connected-panel {
-    min-height: 280px;
-  }
-
-  .landing-connected-panel--dom,
-  .landing-connected-panel--tape {
-    min-height: 360px;
   }
 
   .landing-metrics {
@@ -855,5 +965,11 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-skip {
     transition: none;
+  }
+
+  .landing-current-candle,
+  .dom-row,
+  .tape-row {
+    animation: none;
   }
 }

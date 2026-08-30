@@ -44,12 +44,12 @@ test('landing renders its product thesis without loading historical data', async
   expect(errors).toEqual([])
 })
 
-test('every exported product image loads when its section enters the viewport', async ({
+test('every remaining exported product image loads when its section enters the viewport', async ({
   page
 }) => {
   await page.goto('/')
   const images = page.locator('main img')
-  await expect(images).toHaveCount(8)
+  await expect(images).toHaveCount(2)
 
   for (let index = 0; index < (await images.count()); index += 1) {
     const image = images.nth(index)
@@ -57,6 +57,59 @@ test('every exported product image loads when its section enters the viewport', 
     await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0)
     await expect(image).not.toHaveAttribute('alt', '')
   }
+})
+
+test('isolated market primitives load near the viewport without mounting the workstation', async ({
+  page
+}) => {
+  const consoleProblems = []
+  const historicalRequests = []
+  const showcaseRequests = []
+  page.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning')
+      consoleProblems.push(message.text())
+  })
+  page.on('pageerror', (error) => consoleProblems.push(error.message))
+  page.on('request', (request) => {
+    const url = request.url()
+    if (url.includes('/data/tardis/')) historicalRequests.push(url)
+    if (url.includes('/src/components/landing/MarketPrimitivesShowcase.jsx'))
+      showcaseRequests.push(url)
+  })
+
+  await page.goto('/')
+  expect(showcaseRequests).toEqual([])
+
+  const loader = page.locator('.landing-primitives-loader')
+  await loader.scrollIntoViewIfNeeded()
+  const showcase = page.locator('.landing-primitives')
+  await expect(showcase).toBeVisible()
+  expect(showcaseRequests).toHaveLength(1)
+
+  await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.market-chart')).toHaveCount(0)
+  await expect(showcase.getByRole('button')).toHaveCount(0)
+  await expect(
+    showcase.locator('[data-primitive="candles"] g.up, [data-primitive="candles"] g.down')
+  ).toHaveCount(5)
+  await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(1)
+  await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(1)
+  await expect(showcase.locator('.dom--compact .dom-row.ask')).toHaveCount(3)
+  await expect(showcase.locator('.dom--compact .dom-spread-row')).toHaveCount(1)
+  await expect(showcase.locator('.dom--compact .dom-row.bid')).toHaveCount(3)
+  await expect(showcase.locator('.tape--compact .tape-row')).toHaveCount(3)
+
+  const initialPhase = await showcase.getAttribute('data-phase')
+  const initialClose = await showcase.locator('.landing-current-candle').getAttribute('data-close')
+  await expect
+    .poll(() => showcase.getAttribute('data-phase'), { timeout: 4_000 })
+    .not.toBe(initialPhase)
+  await expect(showcase.locator('.landing-current-candle')).not.toHaveAttribute(
+    'data-close',
+    initialClose
+  )
+  expect(consoleProblems).toEqual([])
+  expect(historicalRequests).toEqual([])
 })
 
 test('primary landing CTA opens the canonical demo', async ({ page }) => {
@@ -94,4 +147,16 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Open demo' }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Modes', exact: true })).toBeHidden()
+
+  await page.locator('.landing-primitives-loader').scrollIntoViewIfNeeded()
+  const showcase = page.locator('.landing-primitives')
+  await expect(showcase).toHaveAttribute('data-animation-state', 'static')
+  await expect(showcase).toHaveAttribute('data-phase', '0')
+  await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await page.locator('.landing-footer').scrollIntoViewIfNeeded()
+  const finalDimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }))
+  expect(finalDimensions.scrollWidth).toBeLessThanOrEqual(finalDimensions.clientWidth)
 })

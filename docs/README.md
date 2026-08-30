@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-30
+last_verified: 2026-08-31
 owners: product-design-engineering
 ---
 
@@ -15,11 +15,20 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Landing and routing specification](product/landing-and-routing.md): narrativa pública, rutas canónicas, aliases y frontera de carga.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
 - [Marketing patterns](design-system/marketing-patterns.md): tokens, composición responsive y media de la landing.
+- [Interactive portfolio landing plan](plans/interactive-portfolio-landing.md): dirección planificada para presentar Apex como demo funcional de portfolio mediante componentes React animados y escenas de scroll.
 - [Panel patterns](design-system/panel-patterns.md): headers, settings, tablas, overlays y accesibilidad.
 - [Chart patterns](design-system/chart-patterns.md): significado de Candles/OHLC, Footprint, Step Profile y Volume Profile.
 - [Figma contract](figma/README.md): archivo maestro, masters, variantes, anotaciones y trazabilidad.
 - [Decisions](decisions/README.md): decisiones duraderas y consecuencias.
 - [Verification](verification/2026-08-28-landing-direction-b-local.md): última verificación local de la landing y el routing de demo.
+- [Interactive portfolio landing baseline](verification/2026-08-30-interactive-portfolio-landing-baseline.md):
+  checkout, requests, responsive, chunks y contrato Figma antes de la nueva exploración.
+- [Interactive portfolio landing Figma gate](verification/2026-08-30-interactive-portfolio-landing-figma.md):
+  propuesta desktop/mobile, storyboard, auditoría estructural y frontera de aprobación antes de React.
+- [Interactive portfolio landing phase 2](verification/2026-08-30-interactive-portfolio-landing-phase2-local.md):
+  snapshot histórico del prototipo R1 con `MarketChart` completo, sustituido por R2.
+- [Interactive portfolio landing isolated modules](verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md):
+  contrato R2, seis módulos React compactos, carga diferida, responsive y evidencia local.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
   timeframe inicial, ventana 16:30–24:00 UTC y regresión local del replay profesional.
 - [Future chart space verification](verification/2026-08-29-future-chart-space-local.md): drag
@@ -51,7 +60,11 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 
-Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md), [figma-implementation-inventory.md](figma-implementation-inventory.md) y `plans/` son snapshots históricos. Pueden aportar evidencia, pero no describen por sí solos el estado actual.
+Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
+[figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
+históricos son snapshots. El [plan de landing interactiva](plans/interactive-portfolio-landing.md)
+está en progreso: la revisión Figma R2 y sus seis módulos React están implementados localmente,
+pendientes de gates finales y publicación verificada.
 
 ## Jerarquía y estados
 

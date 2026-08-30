@@ -10,6 +10,54 @@ const tradeFilters = [
   { id: 'sell', label: 'Sells only', summary: 'Showing sells' }
 ]
 
+const tradeType = PropTypes.shape({
+  amount: PropTypes.number.isRequired,
+  price: PropTypes.number.isRequired,
+  side: PropTypes.string.isRequired,
+  timestamp: PropTypes.number.isRequired
+})
+
+function TradeRow({ interactive = true, trade }) {
+  const content = (
+    <>
+      <span>{clock(trade.timestamp, true)}</span>
+      <span>{fmt(trade.price)}</span>
+      <span>{fmt(trade.amount, 4)}</span>
+    </>
+  )
+  const label = `${trade.side} trade at ${fmt(trade.price)} for ${fmt(trade.amount, 4)}`
+
+  if (!interactive) {
+    return (
+      <div aria-label={label} className={`tape-row ${trade.side}`} role="listitem">
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <button aria-label={label} className={`tape-row ${trade.side}`} type="button">
+      {content}
+    </button>
+  )
+}
+
+export function CompactTimeSales({ trades }) {
+  const visibleTrades = trades.slice(0, 3)
+  return (
+    <section
+      aria-label="Compact Last Trades"
+      className="tape tape--compact"
+      data-trade-count={visibleTrades.length}
+      role="list"
+    >
+      {visibleTrades.map((trade, index) => (
+        <TradeRow interactive={false} key={`${trade.timestamp}-${index}`} trade={trade} />
+      ))}
+    </section>
+  )
+}
+
 export default function TimeSales({ initialFilter = 'all', initialSettingsOpen = false, trades }) {
   const [filter, setFilter] = useState(initialFilter)
   const [settingsOpen, setSettingsOpen] = useState(initialSettingsOpen)
@@ -77,16 +125,7 @@ export default function TimeSales({ initialFilter = 'all', initialSettingsOpen =
         <span>SIZE</span>
       </div>
       {visibleTrades.map((trade, index) => (
-        <button
-          aria-label={`${trade.side} trade at ${fmt(trade.price)} for ${fmt(trade.amount, 4)}`}
-          className={`tape-row ${trade.side}`}
-          key={`${trade.timestamp}-${index}`}
-          type="button"
-        >
-          <span>{clock(trade.timestamp, true)}</span>
-          <span>{fmt(trade.price)}</span>
-          <span>{fmt(trade.amount, 4)}</span>
-        </button>
+        <TradeRow key={`${trade.timestamp}-${index}`} trade={trade} />
       ))}
     </section>
   )
@@ -95,12 +134,14 @@ export default function TimeSales({ initialFilter = 'all', initialSettingsOpen =
 TimeSales.propTypes = {
   initialFilter: PropTypes.oneOf(tradeFilters.map(({ id }) => id)),
   initialSettingsOpen: PropTypes.bool,
-  trades: PropTypes.arrayOf(
-    PropTypes.shape({
-      amount: PropTypes.number.isRequired,
-      price: PropTypes.number.isRequired,
-      side: PropTypes.string.isRequired,
-      timestamp: PropTypes.number.isRequired
-    })
-  ).isRequired
+  trades: PropTypes.arrayOf(tradeType).isRequired
+}
+
+CompactTimeSales.propTypes = {
+  trades: PropTypes.arrayOf(tradeType).isRequired
+}
+
+TradeRow.propTypes = {
+  interactive: PropTypes.bool,
+  trade: tradeType.isRequired
 }

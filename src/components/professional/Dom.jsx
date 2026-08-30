@@ -9,6 +9,102 @@ import {
 } from '../../services/domPresentation.js'
 import { formatNumber as fmt } from './formatters.js'
 
+function DomLevelRow({ index, interactive = true, maximum, onPrice, row, side }) {
+  const content = (
+    <>
+      <span>{fmt(row.price)}</span>
+      <span>
+        {index % 3 === 0 ? `${side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}` : ''}
+      </span>
+      <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
+        {fmt(row.amount, 3)}
+      </span>
+      <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
+    </>
+  )
+
+  if (!interactive) {
+    return (
+      <div className={`dom-row ${side}`} data-price={row.price} role="listitem">
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      className={`dom-row ${side}`}
+      data-price={row.price}
+      onClick={() => onPrice(row.price)}
+      type="button"
+    >
+      {content}
+    </button>
+  )
+}
+
+export function CompactDom({ currentPrice, orderbook }) {
+  const asks = [...orderbook.asks.slice(0, 3)].reverse()
+  const bids = orderbook.bids.slice(0, 3)
+  const maximum = Math.max(
+    ...asks.map(({ amount }) => amount),
+    ...bids.map(({ amount }) => amount),
+    1
+  )
+  const bestAsk = Number(orderbook.asks[0]?.price)
+  const bestBid = Number(orderbook.bids[0]?.price)
+  const spread = Number.isFinite(bestAsk) && Number.isFinite(bestBid) ? bestAsk - bestBid : 0
+
+  return (
+    <section
+      aria-label="Compact Depth of Market"
+      className="dom dom--compact"
+      data-ask-count={asks.length}
+      data-bid-count={bids.length}
+    >
+      <div aria-label="Three ask price levels" className="dom-compact-side" role="list">
+        {asks.map((row, index) => (
+          <DomLevelRow
+            index={index}
+            interactive={false}
+            key={`compact-ask-${row.price}`}
+            maximum={maximum}
+            row={row}
+            side="ask"
+          />
+        ))}
+      </div>
+      <div
+        aria-label={`Last price ${fmt(currentPrice)}, spread ${fmt(spread)}`}
+        className="dom-spread-row"
+        data-price={currentPrice}
+        data-spread={spread}
+      >
+        <span>
+          <small>LAST</small>
+          <strong>{fmt(currentPrice)}</strong>
+        </span>
+        <span>
+          <small>SPREAD</small>
+          <strong>{fmt(spread)}</strong>
+        </span>
+      </div>
+      <div aria-label="Three bid price levels" className="dom-compact-side" role="list">
+        {bids.map((row, index) => (
+          <DomLevelRow
+            index={index}
+            interactive={false}
+            key={`compact-bid-${row.price}`}
+            maximum={maximum}
+            row={row}
+            side="bid"
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }) {
   const [priceGrouping, setPriceGrouping] = useState(sourceTickSize)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -64,25 +160,6 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
     }
     if (bidsElement) bidsElement.scrollTop = domScrollPosition.current.bidFromTop
   }, [groupedOrderbook, priceGrouping])
-
-  const renderRow = (row, side, index) => (
-    <button
-      className={`dom-row ${side}`}
-      data-price={row.price}
-      key={`${side}-${row.price}`}
-      onClick={() => onPrice(row.price)}
-      type="button"
-    >
-      <span>{fmt(row.price)}</span>
-      <span>
-        {index % 3 === 0 ? `${side === 'bid' ? '+' : '-'}${Math.round(row.amount * 10)}` : ''}
-      </span>
-      <span style={{ backgroundSize: `${Math.max(8, (row.amount / maximum) * 100)}% 90%` }}>
-        {fmt(row.amount, 3)}
-      </span>
-      <span>{index % 5 === 0 ? Math.round(row.amount * 3) : ''}</span>
-    </button>
-  )
 
   return (
     <section
@@ -155,7 +232,16 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
           ref={askLevelsRef}
           tabIndex={0}
         >
-          {asks.map((row, index) => renderRow(row, 'ask', index))}
+          {asks.map((row, index) => (
+            <DomLevelRow
+              index={index}
+              key={`ask-${row.price}`}
+              maximum={maximum}
+              onPrice={onPrice}
+              row={row}
+              side="ask"
+            />
+          ))}
         </div>
         <div
           aria-label={`Last price ${fmt(currentPrice)}, spread ${fmt(spread)}`}
@@ -182,7 +268,16 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
           ref={bidLevelsRef}
           tabIndex={0}
         >
-          {bids.map((row, index) => renderRow(row, 'bid', index))}
+          {bids.map((row, index) => (
+            <DomLevelRow
+              index={index}
+              key={`bid-${row.price}`}
+              maximum={maximum}
+              onPrice={onPrice}
+              row={row}
+              side="bid"
+            />
+          ))}
         </div>
       </div>
     </section>
@@ -203,4 +298,22 @@ Dom.propTypes = {
     groupsApplied: PropTypes.number.isRequired
   }).isRequired,
   sourceTickSize: PropTypes.number.isRequired
+}
+
+CompactDom.propTypes = {
+  currentPrice: PropTypes.number.isRequired,
+  orderbook: PropTypes.shape({
+    asks: PropTypes.arrayOf(orderbookLevelType).isRequired,
+    bids: PropTypes.arrayOf(orderbookLevelType).isRequired,
+    groupsApplied: PropTypes.number.isRequired
+  }).isRequired
+}
+
+DomLevelRow.propTypes = {
+  index: PropTypes.number.isRequired,
+  interactive: PropTypes.bool,
+  maximum: PropTypes.number.isRequired,
+  onPrice: PropTypes.func,
+  row: orderbookLevelType.isRequired,
+  side: PropTypes.oneOf(['ask', 'bid']).isRequired
 }

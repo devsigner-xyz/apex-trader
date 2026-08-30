@@ -1,29 +1,4 @@
-const readings = [
-  {
-    alt: 'Apex Trader Candles chart showing OHLC price structure and visible-range volume.',
-    body: 'Trace price structure, direction, volume and context across time.',
-    height: 719,
-    label: 'CANDLES',
-    src: '/media/reading-candles.png',
-    width: 1000
-  },
-  {
-    alt: 'Apex Trader Footprint chart showing executed bid and ask volume at each price level.',
-    body: 'Inspect executed bid and ask volume at each price level.',
-    height: 719,
-    label: 'FOOTPRINT',
-    src: '/media/reading-footprint.png',
-    width: 1000
-  },
-  {
-    alt: 'Apex Trader Step Profile chart comparing volume distribution inside each interval.',
-    body: 'Compare how volume formed inside each interval.',
-    height: 719,
-    label: 'STEP PROFILE',
-    src: '/media/reading-step-profile.png',
-    width: 1000
-  }
-]
+import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMarketPrimitivesShowcase.jsx'
 
 const evidence = [
   ['OHLC', 'VISIBLE'],
@@ -33,7 +8,7 @@ const evidence = [
 ]
 
 const metrics = [
-  ['3', 'CHART MODES'],
+  ['6', 'ISOLATED MARKET SURFACES'],
   ['1', 'SYNCHRONIZED CLOCK'],
   ['24 HOURS', 'BTCUSDT SESSION'],
   ['420,562', 'REAL TRADES']
@@ -162,43 +137,19 @@ export default function LandingPage() {
         </section>
 
         <section
-          className="landing-section landing-readings"
+          className="landing-section landing-primitives-section"
           id="modes"
           aria-labelledby="modes-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">02 / THREE READINGS</p>
-            <h2 id="modes-title">Read the same market event three ways.</h2>
-            <p className="landing-lede">Switch perspectives without leaving the shared session.</p>
+            <p className="landing-kicker">02 / MARKET PRIMITIVES</p>
+            <h2 id="modes-title">Read one signal at a time.</h2>
+            <p className="landing-lede">
+              Each scene isolates one chart or market surface. The values update deterministically,
+              but the terminal controls and surrounding panels stay out of the way.
+            </p>
           </div>
-
-          <div className="landing-readings-frame">
-            <div className="landing-reading-grid">
-              {readings.map((reading) => (
-                <article className="landing-reading" key={reading.label}>
-                  <div className="landing-reading__media">
-                    <img
-                      src={reading.src}
-                      alt={reading.alt}
-                      width={reading.width}
-                      height={reading.height}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <h3>{reading.label}</h3>
-                  <p>{reading.body}</p>
-                </article>
-              ))}
-            </div>
-            <div className="landing-session-rail" aria-label="All chart modes share one session">
-              <span>SHARED SESSION</span>
-            </div>
-          </div>
-
-          <a className="landing-button landing-button--secondary" href="/demo">
-            Explore all three modes
-          </a>
+          <DeferredMarketPrimitivesShowcase />
         </section>
 
         <section
@@ -209,44 +160,10 @@ export default function LandingPage() {
           <div className="landing-copy">
             <p className="landing-kicker">03 / ONE CLOCK</p>
             <h2 id="session-title">Every surface advances together.</h2>
-          </div>
-
-          <div className="landing-connected-system" aria-label="Synchronized market surfaces">
-            <figure className="landing-connected-panel landing-connected-panel--chart">
-              <figcaption>CHART</figcaption>
-              <img
-                src="/media/connected-chart.png"
-                alt="Apex Trader chart connected to the shared session clock."
-                width="900"
-                height="680"
-                loading="lazy"
-                decoding="async"
-              />
-            </figure>
-            <figure className="landing-connected-panel landing-connected-panel--dom">
-              <figcaption>DOM</figcaption>
-              <img
-                src="/media/connected-dom.png"
-                alt="Apex Trader depth of market aligned to the chart session."
-                width="300"
-                height="1377"
-                loading="lazy"
-                decoding="async"
-              />
-            </figure>
-            <figure className="landing-connected-panel landing-connected-panel--tape">
-              <figcaption>TIME &amp; SALES</figcaption>
-              <img
-                src="/media/connected-time-sales.png"
-                alt="Apex Trader Time and Sales aligned to the chart session."
-                width="500"
-                height="1163"
-                loading="lazy"
-                decoding="async"
-              />
-            </figure>
-            <div className="landing-playhead" aria-hidden="true" />
-            <p className="landing-sync-status">SYNCHRONIZED</p>
+            <p className="landing-lede">
+              Candles, order flow, visible-range volume, depth and recent executions all describe
+              the same deterministic moment rather than unrelated decorative examples.
+            </p>
           </div>
 
           <div className="landing-session-evidence" aria-labelledby="evidence-title">

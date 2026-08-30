@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-31
 owners: product-design-engineering
 ---
 
@@ -36,3 +36,27 @@ El orden contractual es Header, Opening thesis, The blind spot, Three readings, 
 - Mobile usa 24 px laterales y 64 px verticales; lecturas y paneles pasan a una columna y las métricas a 2 × 2.
 - La landing no depende de hover ni de movimiento para explicar contenido. `prefers-reduced-motion` conserva todo el contenido en estado estático.
 - Ningún breakpoint debe introducir overflow horizontal.
+
+## Patrón vigente: módulos de mercado aislados
+
+El contrato R2 evita reducir el terminal completo dentro de una sección editorial. Cada módulo usa
+una fila compacta con visual a la izquierda y explicación a la derecha:
+
+- El contenedor desktop tiene 324 px de altura mínima, padding de 32 px, gap de 64 px y un visual
+  máximo de 560 × 260.
+- Candles usa cinco barras; Footprint y Step Profile una barra cada uno. No se muestran headers,
+  tabs, settings, resizers ni chrome de chart.
+- Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
+  punteadas.
+- DOM limita su lectura a 3 asks + last + 3 bids. Last Trades limita su stream a tres impresiones.
+- Verde y rojo conservan significado de buy/bid y sell/ask. El naranja sigue reservado a acción y
+  POC; no se usa como decoración arbitraria.
+- Las escenas reutilizan capas, geometría, filas, formato y tokens profesionales; no copian una
+  captura del componente.
+- Un reloj determinista compartido actualiza cantidades cada 1,4 s. `IntersectionObserver` lo activa
+  cerca del viewport, `document.hidden` lo pausa y reduced motion fija un estado final legible.
+- En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
+  terminal de 1920 px ni overflow horizontal.
+
+Las únicas imágenes de producto permitidas en la composición vigente son contextos donde se enseña
+la UI completa: Opening thesis y The workspace.

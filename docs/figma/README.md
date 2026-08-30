@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-28
+last_verified: 2026-08-31
 owners: product-design
 ---
 
@@ -18,6 +18,42 @@ Archivo maestro: [Apex Trader](https://www.figma.com/design/Ze9eGnPaNDj8u0oB1iUt
 Direction B sustituye a Direction A como referencia de la landing. Los roots y exploraciones de Direction A se retiraron del área activa; no deben usarse para reconstruir copy, estructura o responsive.
 
 La implementación conserva el orden Header → Opening thesis → The blind spot → Three readings → One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los ocho media exports de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que rutas, lazy loading, semántica y accesibilidad se verifican en código y navegador.
+
+### Dirección interactiva y revisión R2
+
+La sección `656:7412` (`Interactive portfolio landing`) contiene dos generaciones. R1 fue aprobada
+el 30 de agosto de 2026 y se conserva como snapshot. Tras revisar el prototipo, el usuario pidió el
+31 de agosto que cada gráfico y superficie se explicase de forma aislada y compacta; ese feedback
+define R2 `688:21215`, contrato vigente de implementación.
+
+| Artefacto           | Node ID     | Estado                                  |
+| ------------------- | ----------- | --------------------------------------- |
+| Desktop 1440        | `656:7413`  | Approved direction                      |
+| Mobile 390          | `656:7414`  | Approved direction                      |
+| Motion storyboard   | `656:7415`  | Approved R1 snapshot · superseded by R2 |
+| Isolated modules R2 | `688:21215` | Current implementation contract         |
+
+R1 reutiliza botones, MarketChart, OrderBook/DOM y Time & Sales como instancias de masters locales y
+queda documentada en [Interactive portfolio landing — Figma approval
+gate](../verification/2026-08-30-interactive-portfolio-landing-figma.md). R2 no modifica esos masters
+ni Direction B: recorta instancias editables para definir el encuadre de cada primitivo y usa
+geometría vectorial ligada a variables para Volume Profile.
+
+El mapping R2 vigente es:
+
+| Contrato Figma           | Node ID     | Código React                                                                |
+| ------------------------ | ----------- | --------------------------------------------------------------------------- |
+| Candles · 5 bars         | `688:21217` | `CandlesLayer` dentro de `MarketPrimitivesShowcase.jsx`                     |
+| Footprint · 1 bar        | `688:21218` | `FootprintLayer` dentro de `MarketPrimitivesShowcase.jsx`                   |
+| Step Profile · 1 bar     | `688:21219` | `StepProfileLayer` dentro de `MarketPrimitivesShowcase.jsx`                 |
+| Volume Profile aislado   | `688:21220` | `deriveSessionProfileBarGeometry` en la escena de landing                   |
+| DOM · 3 + last + 3       | `688:21221` | `CompactDom` en `src/components/professional/Dom.jsx`                       |
+| Last Trades · 3          | `688:21222` | `CompactTimeSales` en `src/components/professional/execution/TimeSales.jsx` |
+| Carga y reloj compartido | `688:21215` | `DeferredMarketPrimitivesShowcase.jsx` + `marketPrimitiveFixtures.js`       |
+
+La captura local del contrato completo es
+`output/figma/interactive-landing-isolated-modules-r2.png`. Las imágenes bajo `output/` son evidencia
+ignorada por Git; el nodo y esta documentación son la referencia durable.
 
 ## Producción
 
