@@ -1,0 +1,241 @@
+.activity {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pro-panel);
+}
+
+.activity header {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 9px;
+  background: var(--pro-raised);
+  border-bottom: 1px solid var(--pro-subtle);
+}
+
+.activity header > div {
+  display: flex;
+  gap: 5px;
+}
+
+.activity header button {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  color: var(--pro-muted);
+  background: var(--pro-raised);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 500 10px inherit;
+}
+
+.activity header button[aria-selected='true'] {
+  color: var(--pro-text);
+  background: var(--pro-selected);
+}
+
+.activity-head,
+.activity-row {
+  display: grid;
+  grid-template-columns: var(--activity-columns);
+  align-items: center;
+  height: 28px;
+  padding: 0 8px;
+  gap: 4px;
+  border-bottom: 1px solid var(--pro-subtle);
+}
+
+.activity-head {
+  background: var(--pro-raised);
+  font-weight: 700;
+}
+
+.activity-row {
+  color: var(--pro-muted);
+  background: var(--pro-canvas);
+}
+
+.activity-row:nth-child(even) {
+  background: var(--pro-panel);
+}
+
+.activity-head span,
+.activity-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-row span:last-child {
+  color: var(--pro-text);
+}
+
+.activity-table--positions .activity-row span:nth-child(2),
+.activity-table--orders .activity-row span:nth-child(3),
+.activity-table--fills .activity-row span:nth-child(3) {
+  font-weight: 700;
+}
+
+.activity-table--positions .activity-row span:nth-child(6),
+.activity-row .positive {
+  color: var(--pro-buy);
+}
+
+.activity-row .negative,
+.activity-row .action-danger {
+  color: var(--pro-sell);
+}
+
+.activity-row .action-neutral {
+  color: var(--pro-text);
+}
+
+.account-risk-view {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.15fr) minmax(300px, 0.85fr);
+  min-height: 171px;
+  background: var(--pro-canvas);
+}
+
+.account-summary,
+.risk-summary {
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.account-summary {
+  border-right: 1px solid var(--pro-subtle);
+}
+
+.account-summary-heading,
+.risk-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--pro-muted);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.fixture-badge {
+  padding: 3px 6px;
+  color: var(--pro-accent);
+  background: var(--pro-raised);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font-size: 8px;
+}
+
+.account-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--pro-subtle);
+  border: 1px solid var(--pro-subtle);
+}
+
+.account-metric {
+  display: grid;
+  min-width: 0;
+  min-height: 70px;
+  align-content: center;
+  padding: 8px;
+  gap: 6px;
+  background: var(--pro-panel);
+}
+
+.account-metric > span {
+  overflow: hidden;
+  color: var(--pro-muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-metric strong {
+  color: var(--pro-text);
+  font: 700 12px 'Roboto Mono', monospace;
+}
+
+.risk-summary-heading strong {
+  color: var(--pro-buy);
+  font: 700 9px 'Roboto Mono', monospace;
+}
+
+.risk-limits {
+  display: grid;
+  gap: 9px;
+}
+
+.risk-limit {
+  display: grid;
+  gap: 5px;
+}
+
+.risk-limit > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--pro-muted);
+  font-size: 9px;
+}
+
+.risk-limit > div strong {
+  color: var(--pro-text);
+  font-weight: 500;
+}
+
+.risk-meter {
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: var(--pro-raised);
+  border-radius: 4px;
+}
+
+.risk-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--pro-buy);
+  border-radius: inherit;
+}
+
+.terminal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  padding: 0 16px;
+  color: var(--pro-muted);
+  background: var(--pro-top);
+  border-top: 1px solid var(--pro-border);
+  font-weight: 500;
+}
+
+.terminal-footer a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.terminal-footer a:hover {
+  color: var(--pro-text);
+}
+
+.terminal-footer a:focus-visible {
+  color: var(--pro-text);
+  outline: 2px solid var(--pro-accent);
+  outline-offset: 3px;
+}
+
+.pro-terminal select:not([multiple]) {
+  appearance: none;
+  padding-inline-end: calc(12px + var(--space-2) + var(--space-2));
+  background-image: var(--pro-select-chevron);
+  background-repeat: no-repeat;
+  background-position: right var(--space-2) center;
+  background-size: 12px 8px;
+}

@@ -1,0 +1,56 @@
+.pro-status {
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: var(--pro-canvas);
+  color: var(--pro-text);
+}
+
+.pro-terminal {
+  position: relative;
+  display: grid;
+  grid-template-rows: 44px minmax(0, 1fr) 36px;
+  width: 100vw;
+  height: 100dvh;
+  min-width: 1400px;
+  min-height: 760px;
+  overflow: hidden;
+  background: var(--pro-canvas);
+  color: var(--pro-text);
+  font-family: 'Roboto Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.market-header {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--pro-top);
+  border-bottom: 1px solid var(--pro-border);
+}
+
+.market-header strong:first-child {
+  font: 700 15px Inter, sans-serif;
+}
+
+.positive {
+  color: var(--pro-buy) !important;
+}
+
+.negative {
+  color: var(--pro-sell) !important;
+}
+
+.ticket select,
+.ticket input {
+  height: 30px;
+  padding: 0 9px;
+  color: var(--pro-text);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 3px;
+  font: 500 11px inherit;
+}

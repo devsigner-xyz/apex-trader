@@ -16,7 +16,10 @@
     "data:tardis:download": "node scripts/tardis-ingest-v2.mjs --download",
     "data:tardis:liquidity": "node scripts/tardis-liquidity-tiles.mjs",
     "test:unit": "node --test tests/*.test.js",
+    "test:coverage": "TMPDIR=/tmp node --test --experimental-test-coverage --test-coverage-include='src/services/**/*.js' --test-coverage-include='src/hooks/**/*.js' --test-coverage-include='src/components/professional/chart/marketChartPresentation.js' tests/*.test.js",
+    "test:coverage:chart": "TMPDIR=/tmp node --test --experimental-test-coverage --test-coverage-include='src/components/professional/chart/marketChartPresentation.js' --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 tests/marketChartPresentation.test.js",
     "test:e2e": "playwright test",
+    "test:visual": "TMPDIR=/tmp playwright test -c playwright.visual.config.js",
     "check:docs": "node scripts/check-docs.mjs",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs --ignore-path .gitignore",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"e2e/**/*.js\" \"tests/**/*.js\" .eslintrc.cjs index.html playwright.config.js vite.config.js package.json"

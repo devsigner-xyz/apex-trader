@@ -1,0 +1,90 @@
+.terminal-workspace {
+  display: grid;
+  grid-template-columns: var(--watch-width) 5px minmax(680px, 1fr) 5px var(--dom-width) 5px var(
+      --execution-width
+    );
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pro-watchlist {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.watch-resizer {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.chart-stack {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.dom-resizer {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.dom {
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.execution-resizer {
+  grid-column: 6;
+  grid-row: 1;
+}
+
+.execution {
+  grid-column: 7;
+  grid-row: 1;
+}
+
+.terminal-workspace > *:not(.panel-resizer) {
+  min-width: 0;
+  border-right: 1px solid var(--pro-border);
+}
+
+.panel-resizer {
+  position: relative;
+  z-index: 4;
+  width: 5px;
+  min-width: 5px;
+  padding: 0;
+  cursor: col-resize;
+  background: var(--pro-top);
+  border: 0;
+  border-inline: 1px solid var(--pro-border);
+  touch-action: none;
+}
+
+.panel-resizer::after {
+  position: absolute;
+  top: 50%;
+  left: 1px;
+  width: 2px;
+  height: 42px;
+  content: '';
+  transform: translateY(-50%);
+  background: var(--pro-strong);
+  border-radius: 2px;
+  opacity: 0.35;
+}
+
+.panel-resizer:hover,
+.panel-resizer:focus-visible {
+  background: color-mix(in srgb, var(--pro-accent) 25%, var(--pro-top));
+  outline: 1px solid var(--pro-accent);
+}
+
+.pro-watchlist {
+  position: relative;
+  display: grid;
+  grid-template-rows: 42px 30px minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pro-panel);
+}

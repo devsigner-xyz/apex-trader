@@ -1,0 +1,26 @@
+@media (max-width: 1500px) {
+  .pro-terminal {
+    overflow: auto;
+  }
+
+  .market-header,
+  .terminal-workspace {
+    width: 1920px;
+  }
+
+  .terminal-workspace {
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+  .dom-row,
+  .tape-row {
+    animation: none !important;
+  }
+}

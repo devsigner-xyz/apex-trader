@@ -1,0 +1,109 @@
+.watch-settings-button,
+.dom-settings-button,
+.tape-settings-button,
+.chart-settings-button {
+  display: grid;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  color: var(--pro-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.watch-settings-button:hover,
+.watch-settings-button:focus-visible,
+.watch-settings-button[aria-expanded='true'],
+.dom-settings-button:hover,
+.dom-settings-button:focus-visible,
+.dom-settings-button[aria-expanded='true'],
+.tape-settings-button:hover,
+.tape-settings-button:focus-visible,
+.tape-settings-button[aria-expanded='true'],
+.chart-settings-button:hover,
+.chart-settings-button:focus-visible,
+.chart-settings-button[aria-expanded='true'] {
+  color: var(--pro-accent);
+  background: var(--pro-canvas);
+  border-color: var(--pro-border);
+  outline: none;
+}
+
+.watch-settings-button svg,
+.dom-settings-button svg,
+.tape-settings-button svg,
+.chart-settings-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.watch-settings-popover {
+  position: absolute;
+  z-index: 8;
+  top: 38px;
+  right: 6px;
+  width: 210px;
+  padding: 12px;
+  color: var(--pro-text);
+  background: var(--pro-raised);
+  border: 1px solid var(--pro-strong);
+  box-shadow: var(--pro-popover-shadow);
+}
+
+.watch-settings-popover > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--pro-accent);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.watch-column-options {
+  display: grid;
+  gap: 2px;
+}
+
+.watch-column-options label {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 5px;
+  gap: 7px;
+  color: var(--pro-text);
+  font: 600 10px 'Roboto Mono', monospace;
+}
+
+.watch-column-options label:hover {
+  background: var(--pro-selected);
+}
+
+.watch-column-options input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--pro-accent);
+}
+
+.watch-column-options input:focus-visible {
+  outline: 1px solid var(--pro-accent);
+  outline-offset: 2px;
+}
+
+.watch-column-options input:disabled {
+  opacity: 0.65;
+}
+
+.watch-column-options small {
+  color: var(--pro-muted);
+  font: 700 8px Inter, sans-serif;
+  letter-spacing: 0.06em;
+}

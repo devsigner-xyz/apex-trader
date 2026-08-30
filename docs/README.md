@@ -36,6 +36,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   migración de la key de tamaños del chart a `volume` únicamente, manteniendo fijo el Volume Profile.
 - [UI color tokenization verification](verification/2026-08-30-ui-color-tokenization-local.md):
   colores ejecutables de la interfaz encapsulados en tokens semánticos sin cambio visual.
+- [Professional frontend maintainability verification](verification/2026-08-30-professional-maintainability-p1-local.md):
+  descomposición contractual del chart, E2E por contratos, cobertura y regresión visual local.
 - [Legacy terminal cleanup release verification](verification/2026-08-29-legacy-terminal-cleanup-production.md):
   commit funcional, despliegue Railway y comprobación directa de rutas, bundles, datos v3 y UI pública.
 

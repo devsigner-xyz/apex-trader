@@ -1,0 +1,203 @@
+.execution {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pro-panel);
+}
+
+.ticket {
+  padding: 14px;
+  border-bottom: 1px solid var(--pro-border);
+}
+
+.side-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 14px;
+}
+
+.side-tabs button {
+  height: 34px;
+  color: var(--pro-text);
+  background: transparent;
+  border: 1px solid var(--pro-border);
+  font: 700 11px inherit;
+}
+
+.side-tabs .active.buy,
+.submit.buy {
+  background: var(--pro-action-buy);
+}
+
+.side-tabs .active.sell,
+.submit.sell {
+  background: var(--pro-action-sell);
+}
+
+.ticket label {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 9px;
+  color: var(--pro-muted);
+}
+
+.ticket select,
+.ticket input {
+  width: 100%;
+  height: 30px;
+  color: var(--pro-text);
+}
+
+.field {
+  position: relative;
+}
+
+.field span {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  color: var(--pro-muted);
+  font: 700 9px 'Roboto Mono', monospace;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.field input {
+  padding-right: 48px;
+}
+
+.ticket select:disabled {
+  color: var(--pro-muted);
+  cursor: default;
+  opacity: 1;
+}
+
+.submit {
+  width: 100%;
+  height: 38px;
+  margin-top: 2px;
+  color: var(--pro-action-text);
+  border: 0;
+  border-radius: 3px;
+  font: 700 11px inherit;
+}
+
+.ticket small {
+  display: block;
+  margin-top: 11px;
+  color: var(--pro-muted);
+}
+
+.tape {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tape header {
+  min-height: 44px;
+  flex: 0 0 44px;
+  padding: 0 11px;
+  border-bottom: 1px solid var(--pro-border);
+}
+
+.tape header span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--pro-muted);
+  font: 10px 'Roboto Mono', monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tape-settings-popover {
+  position: absolute;
+  z-index: 8;
+  top: 38px;
+  right: 6px;
+  width: calc(100% - 12px);
+  padding: 12px;
+  color: var(--pro-text);
+  background: var(--pro-popover-surface);
+  border: 1px solid var(--pro-strong);
+  box-shadow: var(--pro-popover-shadow);
+}
+
+.tape-settings-popover > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--pro-accent);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.tape-filter-options {
+  display: grid;
+  gap: 2px;
+}
+
+.tape-filter-options label {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  min-height: 30px;
+  padding: 0 5px;
+  gap: 7px;
+  color: var(--pro-text);
+  font: 600 10px 'Roboto Mono', monospace;
+}
+
+.tape-filter-options label:hover {
+  background: var(--pro-selected);
+}
+
+.tape-filter-options input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--pro-accent);
+}
+
+.tape-head,
+.tape-row {
+  display: grid;
+  grid-template-columns: minmax(82px, 1.2fr) minmax(72px, 1fr) minmax(56px, 0.85fr);
+  align-items: center;
+  height: 26px;
+  padding: 0 9px;
+  text-align: right;
+}
+
+.tape-head {
+  color: var(--pro-muted);
+  border-bottom: 1px solid var(--pro-border);
+  font-weight: 700;
+}
+
+.tape-head span:first-child,
+.tape-row span:first-child {
+  text-align: left;
+}
+
+.tape-row {
+  min-height: 22px;
+  flex: 1 1 26px;
+  width: 100%;
+  color: var(--pro-muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--pro-subtle);
+  font: 500 10px inherit;
+  animation: tape-update 0.35s ease-out;
+}
+
+.tape-row.buy span:not(:first-child) {
+  color: var(--pro-buy);
+}
+
+.tape-row.sell span:not(:first-child) {
+  color: var(--pro-sell);
+}

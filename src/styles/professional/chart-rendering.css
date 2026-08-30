@@ -1,0 +1,321 @@
+.market-chart-panels {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  grid-template-areas:
+    'price'
+    'volume-resizer'
+    'volume';
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) var(--volume-resizer-height) var(--volume-panel-height);
+  overflow: hidden;
+  background: var(--pro-canvas);
+}
+
+.price-chart-panel,
+.volume-chart-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pro-canvas);
+}
+
+.price-chart-panel {
+  position: relative;
+  grid-area: price;
+}
+
+.liquidity-heatmap-canvas {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto 0 0;
+  width: calc(100% * 1048 / 1128);
+  height: 100%;
+  pointer-events: none;
+  image-rendering: auto;
+}
+
+.volume-chart-panel {
+  grid-area: volume;
+}
+
+.market-chart-panels svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.price-chart-panel > svg {
+  position: relative;
+  z-index: 1;
+  cursor: crosshair;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+}
+
+.price-chart-panel > svg.dragging {
+  cursor: grabbing;
+}
+
+.chart-pan-surface {
+  cursor: crosshair;
+}
+
+.price-chart-panel > svg.dragging .chart-pan-surface {
+  cursor: grabbing;
+}
+
+.price-chart-panel > svg:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--pro-accent);
+}
+
+.chart-volume-resizer {
+  grid-area: volume-resizer;
+  width: 100%;
+  min-width: 0;
+  height: 7px;
+  min-height: 7px;
+  cursor: row-resize;
+  border: 0;
+  border-block: 1px solid var(--pro-border);
+}
+
+.chart-volume-resizer::after {
+  top: 2px;
+  left: 50%;
+  width: 42px;
+  height: 2px;
+  transform: translateX(-50%);
+}
+
+.market-chart .gridline {
+  stroke: var(--pro-subtle);
+  stroke-width: 1;
+  opacity: 0.72;
+}
+
+.market-chart .faint {
+  opacity: 0.42;
+}
+
+.time-tick {
+  fill: var(--pro-muted);
+  font: 10px 'Roboto Mono', monospace;
+}
+
+.market-chart .up line,
+.market-chart .up rect {
+  fill: var(--pro-buy);
+  stroke: var(--pro-buy);
+}
+
+.market-chart .down line,
+.market-chart .down rect {
+  fill: var(--pro-sell);
+  stroke: var(--pro-sell);
+}
+
+.session-profile-overlay {
+  pointer-events: none;
+}
+
+.session-profile-bars {
+  opacity: 0.48;
+}
+
+.session-profile-bar--bid {
+  fill: var(--pro-profile-bid);
+}
+
+.session-profile-bar--ask {
+  fill: var(--pro-profile-ask);
+}
+
+.session-profile-marker {
+  pointer-events: none;
+}
+
+.session-profile-marker rect {
+  fill: currentColor;
+  stroke: none;
+}
+
+.session-profile-marker text {
+  fill: var(--pro-canvas);
+  font: 700 9px 'Roboto Mono', monospace;
+  letter-spacing: 0.04em;
+}
+
+.session-profile-marker--poc {
+  color: var(--pro-accent);
+}
+
+.session-profile-marker--value-area {
+  color: var(--pro-profile-value);
+}
+
+.profile-spine {
+  stroke: var(--pro-strong);
+  stroke-width: 1.3;
+  opacity: 0.55;
+}
+
+.step-profile-bid {
+  fill: var(--pro-buy);
+}
+
+.step-profile-ask {
+  fill: var(--pro-sell);
+}
+
+.step-profile-cell-bg {
+  fill: var(--pro-raised);
+  stroke: var(--pro-subtle);
+  stroke-width: 0.75;
+}
+
+.step-profile-cell-bg.is-poc {
+  fill: var(--pro-accent);
+  fill-opacity: 0.62;
+  stroke: var(--pro-accent);
+}
+
+.step-profile-value {
+  fill: var(--pro-text);
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.step-profile-poc-outline {
+  fill: none;
+  stroke: var(--pro-accent);
+  stroke-width: 1;
+}
+
+.footprint-bid-bg {
+  fill: var(--pro-footprint-bid);
+}
+
+.footprint-ask-bg {
+  fill: var(--pro-footprint-ask);
+}
+
+.footprint-divider {
+  stroke: var(--pro-footprint-divider);
+  stroke-width: 1;
+}
+
+.footprint-cell-value {
+  fill: var(--pro-footprint-text);
+  font: 700 10px 'Roboto Mono', monospace;
+  pointer-events: none;
+}
+
+.footprint-cell-value.bid.is-imbalance {
+  fill: var(--pro-footprint-bid-imbalance);
+}
+
+.footprint-cell-value.ask.is-imbalance {
+  fill: var(--pro-footprint-ask-imbalance);
+}
+
+.footprint-poc-outline {
+  fill: none;
+  stroke: var(--pro-accent);
+  stroke-width: 1.4;
+}
+
+.bar-delta {
+  font: 700 11px 'Roboto Mono', monospace;
+}
+
+.positive-fill {
+  fill: var(--pro-buy);
+}
+
+.negative-fill {
+  fill: var(--pro-sell);
+}
+
+.volume-up {
+  fill: var(--pro-buy);
+}
+
+.volume-down {
+  fill: var(--pro-sell);
+}
+
+.poc-line {
+  stroke: var(--pro-accent);
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+  stroke-width: 1;
+  opacity: 0.72;
+}
+
+.value-line {
+  stroke: var(--pro-profile-value);
+  stroke-dasharray: 1 5;
+  stroke-linecap: round;
+  stroke-width: 1;
+  opacity: 0.62;
+}
+
+.chart-crosshair-line {
+  stroke: var(--pro-muted);
+  stroke-dasharray: 1 4;
+  stroke-linecap: round;
+  stroke-width: 1;
+  opacity: 0.82;
+  vector-effect: non-scaling-stroke;
+}
+
+.price-axis-bg {
+  fill: var(--pro-price-axis);
+  stroke: var(--pro-border);
+  stroke-width: 1;
+}
+
+.price-axis-resizer {
+  cursor: ns-resize;
+  outline: none;
+}
+
+.price-axis-resizer:focus-visible {
+  stroke: var(--pro-accent);
+  stroke-width: 2;
+}
+
+.price-chart-panel > svg.resizing-price-scale {
+  cursor: ns-resize;
+}
+
+.price-tick-mark {
+  stroke: var(--pro-strong);
+  stroke-width: 1;
+}
+
+.price-tick,
+.current-price-text {
+  fill: var(--pro-text);
+  font: 700 11px 'Roboto Mono', monospace;
+}
+
+.current-price-line {
+  stroke: var(--pro-accent);
+  stroke-width: 1;
+}
+
+.current-price-tag {
+  fill: var(--pro-current-price-tag);
+}
+
+.current-price-countdown {
+  fill: var(--pro-text);
+  font: 700 8px 'Roboto Mono', monospace;
+  letter-spacing: 0.02em;
+  opacity: 0.82;
+}

@@ -26,13 +26,34 @@ const tokenValues = {
   '--pro-tape-update': 'rgb(47 182 124 / 0.12)'
 }
 
-test('UI color literals remain confined to semantic token definitions', async () => {
-  const professionalStyles = await readFile('src/styles/professional.css', 'utf8')
-  const rootEnd = professionalStyles.indexOf('\n}\n')
-  const tokenDefinitions = professionalStyles.slice(0, rootEnd)
-  const styleRules = professionalStyles.slice(rootEnd + 3)
+async function readComposedCss(file, ancestors = []) {
+  const resolvedFile = new URL(file)
+  assert.ok(!ancestors.includes(resolvedFile.href), `Circular CSS import: ${resolvedFile.pathname}`)
 
-  assert.notEqual(rootEnd, -1)
+  const css = await readFile(resolvedFile, 'utf8')
+  const importPattern = /@import\s+['"]([^'"]+)['"];?/g
+  const nextAncestors = [...ancestors, resolvedFile.href]
+  let composed = ''
+  let cursor = 0
+  let match
+
+  while ((match = importPattern.exec(css))) {
+    composed += css.slice(cursor, match.index)
+    composed += await readComposedCss(new URL(match[1], resolvedFile), nextAncestors)
+    cursor = importPattern.lastIndex
+  }
+
+  return composed + css.slice(cursor)
+}
+
+test('UI color literals remain confined to semantic token definitions', async () => {
+  const professionalStyles = await readComposedCss(
+    new URL('../src/styles/professional.css', import.meta.url)
+  )
+  const tokenDefinitions = professionalStyles.match(/:root\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+  const styleRules = professionalStyles.replace(tokenDefinitions, '')
+
+  assert.notEqual(tokenDefinitions, '')
   for (const [token, value] of Object.entries(tokenValues)) {
     assert.ok(tokenDefinitions.includes(`${token}: ${value};`))
   }
@@ -40,7 +61,11 @@ test('UI color literals remain confined to semantic token definitions', async ()
   assert.doesNotMatch(styleRules, colorLiteral)
 
   const uiFiles = (await readdir('src', { recursive: true })).filter(
-    (file) => /\.(css|js|jsx)$/.test(file) && file !== 'styles/professional.css' && file !== 'styles/tokens.css'
+    (file) =>
+      /\.(css|js|jsx)$/.test(file) &&
+      file !== 'styles/professional.css' &&
+      file !== 'styles/tokens.css' &&
+      !file.startsWith('styles/professional/')
   )
   const contents = await Promise.all(uiFiles.map((file) => readFile(`src/${file}`, 'utf8')))
 

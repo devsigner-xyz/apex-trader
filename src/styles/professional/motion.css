@@ -1,0 +1,17 @@
+@keyframes quote-update {
+  from {
+    background-color: var(--pro-quote-update);
+  }
+  to {
+    background-color: var(--pro-panel);
+  }
+}
+
+@keyframes tape-update {
+  from {
+    background-color: var(--pro-tape-update);
+  }
+  to {
+    background-color: transparent;
+  }
+}

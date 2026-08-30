@@ -1,0 +1,99 @@
+.chart-stack {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 210px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--pro-panel);
+}
+
+.market-chart {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.market-chart > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  padding: 0 10px;
+  gap: 12px;
+  color: var(--pro-muted);
+  background: var(--pro-raised);
+  border-bottom: 1px solid var(--pro-subtle);
+}
+
+.chart-summary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  color: var(--pro-text);
+  white-space: nowrap;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-controls select {
+  height: 28px;
+  padding: 0 8px;
+  color: var(--pro-text);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 500 11px inherit;
+}
+
+.chart-controls select:hover,
+.chart-controls select:focus-visible {
+  border-color: var(--pro-accent);
+}
+
+.chart-timeframe-select {
+  width: 90px;
+}
+
+.chart-mode-select {
+  width: 126px;
+}
+
+.chart-controls button {
+  display: grid;
+  min-width: 30px;
+  height: 28px;
+  place-items: center;
+  padding: 0 8px;
+  color: var(--pro-text);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 700 11px inherit;
+}
+
+.chart-controls button:hover,
+.chart-controls button:focus-visible {
+  border-color: var(--pro-accent);
+}
+
+.chart-controls .chart-settings-button {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+}
+
+.chart-controls .chart-settings-button:hover,
+.chart-controls .chart-settings-button:focus-visible,
+.chart-controls .chart-settings-button[aria-expanded='true'] {
+  color: var(--pro-accent);
+  background: var(--pro-canvas);
+  border-color: var(--pro-border);
+}

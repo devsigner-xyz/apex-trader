@@ -1,0 +1,70 @@
+.chart-settings-popover {
+  position: absolute;
+  z-index: 8;
+  top: 40px;
+  right: 10px;
+  width: 250px;
+  padding: 12px;
+  color: var(--pro-text);
+  background: var(--pro-popover-surface);
+  border: 1px solid var(--pro-strong);
+  box-shadow: var(--pro-popover-shadow);
+}
+
+.chart-settings-popover > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--pro-accent);
+  font: 700 10px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.chart-panel-options {
+  display: grid;
+  gap: 2px;
+}
+
+.chart-panel-options label {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  min-height: 30px;
+  padding: 0 5px;
+  gap: 7px;
+  color: var(--pro-text);
+  font: 600 10px 'Roboto Mono', monospace;
+}
+
+.chart-panel-options label:hover {
+  background: var(--pro-selected);
+}
+
+.chart-panel-options input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--pro-accent);
+}
+
+.chart-panel-options input:focus-visible {
+  outline: 1px solid var(--pro-accent);
+  outline-offset: 2px;
+}
+
+.chart-liquidity-intensity {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 92px 34px;
+  gap: 8px;
+}
+
+.chart-liquidity-intensity input[type='range'] {
+  width: 92px;
+  margin: 0;
+  accent-color: var(--pro-accent);
+}
+
+.chart-liquidity-intensity output {
+  color: var(--pro-muted);
+  font: 10px 'Roboto Mono', monospace;
+  text-align: right;
+}
