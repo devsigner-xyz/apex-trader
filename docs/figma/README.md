@@ -72,6 +72,8 @@ eliminan el tratamiento de card en la fila y en el visual. R6 retira `The blind 
 publicado, extiende el tratamiento unframed a los seis módulos y presenta DOM/Time & Sales con sus
 context headers y settings funcionales; el DOM usa 500 px máximos y cifras sin elipsis. R6/R7
 siguen pendientes de sincronización y no alteran los masters `103:59`, `144:1810` ni `328:10006`.
+R8 añade en código la escala de precio del Volume Profile aislado, alineada con sus nueve niveles;
+también permanece pendiente de sincronización con el nodo `688:21220`.
 
 ## Producción
 

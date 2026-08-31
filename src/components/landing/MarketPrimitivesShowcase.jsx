@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { CompactDom } from '../professional/Dom.jsx'
+import { formatNumber as fmt } from '../professional/formatters.js'
 import CandlesLayer from '../professional/chart/CandlesLayer.jsx'
 import FootprintLayer from '../professional/chart/FootprintLayer.jsx'
 import StepProfileLayer from '../professional/chart/StepProfileLayer.jsx'
@@ -197,12 +198,25 @@ function StepProfileScene({ bars }) {
 
 function VolumeProfileScene({ profile }) {
   const maximumVolume = Math.max(...profile.map((level) => level.ask + level.bid), 1)
+  const priceAxisX = 456
+  const plotRight = 448
   return (
-    <svg aria-label="Updating visible-range Volume Profile" role="img" viewBox="0 0 560 260">
-      <title>Volume Profile with point of control and value area</title>
-      <g className="session-profile-bars" transform="translate(72 0)">
+    <svg
+      aria-label="Updating visible-range Volume Profile with price scale"
+      role="img"
+      viewBox="0 0 560 260"
+    >
+      <title>Volume Profile with point of control, value area and aligned price scale</title>
+      <rect
+        className="price-axis-bg landing-profile-price-axis-bg"
+        height="260"
+        width="80"
+        x={priceAxisX}
+        y="0"
+      />
+      <g className="session-profile-bars" transform="translate(64 0)">
         {profile.map((level, index) => {
-          const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, 416)
+          const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, 384)
           return (
             <g data-price={level.price} key={level.price}>
               <rect
@@ -229,12 +243,36 @@ function VolumeProfileScene({ profile }) {
         ['VAL', 202, 'value-line']
       ].map(([label, y, className]) => (
         <g className="landing-profile-marker" key={label}>
-          <line className={className} x1="24" x2="536" y1={y} y2={y} />
+          <line className={className} x1="24" x2={plotRight} y1={y} y2={y} />
           <text x="24" y={y - 8}>
             {label}
           </text>
         </g>
       ))}
+      <g aria-label="Price scale" className="landing-profile-price-axis">
+        {profile.map((level, index) => {
+          const y = 29.5 + index * 24
+          return (
+            <g key={level.price}>
+              <line
+                className="price-tick-mark"
+                x1={plotRight}
+                x2={priceAxisX}
+                y1={y}
+                y2={y}
+              />
+              <text
+                className="price-tick landing-profile-price-tick"
+                data-price={level.price}
+                x={priceAxisX + 8}
+                y={y + 4}
+              >
+                {fmt(level.price)}
+              </text>
+            </g>
+          )
+        })}
+      </g>
     </svg>
   )
 }

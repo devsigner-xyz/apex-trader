@@ -62,6 +62,10 @@ Agrega volumen ejecutado por precio usando las velas actualmente visibles:
 
 Se recalcula después de pan, zoom o cambio de timeframe. Las barras y los niveles VAH/POC/VAL son capas de visibilidad independientes.
 
+La representación aislada de marketing mantiene una escala de precio a la derecha. Sus ticks
+comparten formato y tratamiento con el eje del chart, y cada etiqueta coincide verticalmente con el
+centro del nivel de perfil correspondiente; el eje pertenece a la lectura, no a una card exterior.
+
 ## Historical liquidity heatmap
 
 Candles puede incorporar una capa Canvas bajo el SVG con liquidez limit resting agregada por

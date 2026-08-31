@@ -104,6 +104,15 @@ de producto completo.
 - Los popovers son funcionales y conservan el contrato de foco: Escape cierra y devuelve el foco al
   trigger; pointer fuera cierra sin bloquear el destino.
 
+## Escala de precio del Volume Profile R8
+
+- El perfil aislado reserva un eje derecho equivalente al del chart profesional, con surface y
+  borde propios del eje pero sin recuperar el wrapper exterior de la fila.
+- Los nueve precios se formatean con el formatter compartido y se alinean con el centro de sus nueve
+  niveles bid/ask.
+- VAH, POC y VAL conservan sus labels a la izquierda y sus líneas punteadas terminan en el límite del
+  plot antes del eje.
+
 ## Arquitectura React vigente
 
 ```text
@@ -193,6 +202,8 @@ IDs y masters.
 | 13 · Simplificación narrativa R6    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md`; 21/21 E2E   | Publicar solo con permiso  |
 | 14 · Paneles compactos unframed R7  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md`; 21/21 + 2/2 | Publicar con R6            |
 | 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | —                          |
+| 16 · Price scale R8 local           | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r8-volume-profile-price-scale-local.md`; 21/21 E2E | Publicar solo con permiso  |
+| 17 · Release R8                     | pending  | Sin commit ni despliegue                                                                                       | Requiere permiso explícito |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -205,6 +216,8 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
   válidos.
 - Footprint y Step Profile contienen una vela pasada estable y una actual.
 - Volume Profile no muestra candles ni el resto del chart.
+- Volume Profile muestra nueve precios en un eje derecho, alineados con sus nueve niveles, sin card
+  exterior.
 - DOM contiene exactamente 3 asks + last + 3 bids al abrir, queda centrado y no trunca cifras.
 - DOM y Last Trades muestran su context header y settings funcionales con foco restaurado al cerrar.
 - Last Trades contiene exactamente tres ejecuciones con el filtro All trades.

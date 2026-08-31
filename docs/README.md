@@ -45,6 +45,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   DOM ampliado, settings funcionales en DOM/Trades y seis módulos sin card exterior.
 - [Interactive portfolio landing R6/R7 production](verification/2026-08-31-interactive-portfolio-landing-r7-production.md):
   commit funcional, Railway, rutas, bundles y comprobación pública desktop/mobile.
+- [Interactive portfolio landing R8 Volume Profile price scale](verification/2026-08-31-interactive-portfolio-landing-r8-volume-profile-price-scale-local.md):
+  eje derecho, alineación de nueve precios, responsive y evidencia local.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
@@ -81,7 +83,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. En el [plan de landing interactiva](plans/interactive-portfolio-landing.md),
-R2–R7 están publicados y verificados. R4–R7 permanecen pendientes de sincronización con Figma.
+R2–R7 están publicados y verificados. R8 está implementado y verificado solo en local. R4–R8
+permanecen pendientes de sincronización con Figma.
 
 ## Jerarquía y estados
 

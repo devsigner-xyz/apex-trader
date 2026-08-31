@@ -504,6 +504,14 @@
   letter-spacing: 0.08em;
 }
 
+.landing-profile-price-axis-bg {
+  vector-effect: non-scaling-stroke;
+}
+
+.landing-profile-price-axis .price-tick-mark {
+  vector-effect: non-scaling-stroke;
+}
+
 .dom--compact,
 .tape--compact {
   width: min(500px, 100%);
@@ -905,6 +913,10 @@
   .landing-primitive__copy h3 {
     font-size: 22px;
     line-height: 30px;
+  }
+
+  .landing-profile-price-tick {
+    font-size: 12px;
   }
 
   .landing-reading:last-child {

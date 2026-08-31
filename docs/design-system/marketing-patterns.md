@@ -59,7 +59,8 @@ siguientes alternan ese orden:
 - Las seis filas son unframed: tanto la fila como el área visual eliminan surface, borde, radio y
   shadow. DOM y Last Trades mantienen únicamente el panel real que contiene sus datos y controles.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
-  punteadas.
+  punteadas. Su eje derecho reutiliza surface, borde, ticks y formato del price axis profesional;
+  cada precio queda alineado con el centro de su nivel, sin reintroducir un wrapper exterior.
 - DOM limita su lectura a 3 asks + last + 3 bids y ocupa hasta 500 px, centrado, con columnas sin
   elipsis. Last Trades limita su stream a tres impresiones.
 - DOM y Last Trades conservan su context header, cabeceras y trigger de settings. El price grouping

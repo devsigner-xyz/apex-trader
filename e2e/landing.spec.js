@@ -134,6 +134,36 @@ test('isolated market primitives load near the viewport without mounting the wor
   ).toHaveCount(5)
   await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
   await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
+  const volumeProfile = showcase.locator('[data-primitive="volume-profile"]')
+  const volumeProfileTicks = volumeProfile.locator('.landing-profile-price-tick')
+  await expect(volumeProfile.locator('.landing-profile-price-axis-bg')).toHaveCount(1)
+  await expect(volumeProfileTicks).toHaveCount(9)
+  await expect(volumeProfileTicks).toHaveText([
+    '21,843.00',
+    '21,842.75',
+    '21,842.50',
+    '21,842.25',
+    '21,842.00',
+    '21,841.75',
+    '21,841.50',
+    '21,841.25',
+    '21,841.00'
+  ])
+  const profileAlignment = await volumeProfile.evaluate((node) => {
+    const levels = [...node.querySelectorAll('.session-profile-bars > g')]
+    const ticks = [...node.querySelectorAll('.landing-profile-price-tick')]
+    return levels.map((level, index) => {
+      const bar = level.querySelector('rect')
+      const tick = ticks[index]
+      return {
+        baselineOffset: Number(tick.getAttribute('y')) - (Number(bar.getAttribute('y')) + 7.5),
+        samePrice: level.getAttribute('data-price') === tick.getAttribute('data-price')
+      }
+    })
+  })
+  expect(profileAlignment).toEqual(
+    Array.from({ length: 9 }, () => ({ baselineOffset: 4, samePrice: true }))
+  )
   for (const primitive of [
     'candles',
     'footprint',

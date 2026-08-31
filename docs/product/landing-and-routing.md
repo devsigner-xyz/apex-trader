@@ -83,7 +83,8 @@ Candles estático, mantiene los tres selectores manuales y elimina la transició
   segunda actualiza su distribución, delta y volumen finitos 6 px por encima.
 - Ninguna de las seis filas usa surface, borde, radio ni sombra de card en la fila o en el marco del
   visual; conservan únicamente la retícula editorial y el componente aislado.
-- Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo.
+- Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo. Una escala de precio
+  a la derecha reproduce el eje del chart profesional y alinea cada etiqueta con su nivel.
 - DOM: panel centrado de hasta 500 px con context header, cabeceras de columna, exactamente tres
   asks, last price y tres bids. Ninguna cifra usa elipsis. Settings cambia el price grouping de
   forma transitoria y actualiza metadata, filas y cantidades agregadas.
