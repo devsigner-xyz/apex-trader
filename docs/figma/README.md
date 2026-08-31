@@ -18,9 +18,9 @@ Archivo maestro: [Apex Trader](https://www.figma.com/design/Ze9eGnPaNDj8u0oB1iUt
 Direction B sustituye a Direction A como referencia de la landing. Los roots y exploraciones de Direction A se retiraron del área activa; no deben usarse para reconstruir copy, estructura o responsive.
 
 La implementación conserva el orden Header → Opening thesis → The blind spot → Market primitives
-→ One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los ocho media
-exports de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que
-rutas, lazy loading, semántica y accesibilidad se verifican en código y navegador.
+→ One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los media exports
+de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que rutas,
+lazy loading, semántica y accesibilidad se verifican en código y navegador.
 
 ### Dirección interactiva, revisión R2 y ajuste R3
 
@@ -62,8 +62,11 @@ La captura local del contrato completo es
 ignorada por Git; el nodo y esta documentación son la referencia durable.
 
 Gap explícito: el código R3 no debe presentarse como sincronizado con Figma hasta actualizar el root
-R2 o crear una revisión R3 preservando esos IDs. Esta diferencia no altera masters de producto ni
-las variantes de producción.
+R2 o crear una revisión preservando esos IDs. El ajuste R4 local cambia además el carrusel para usar
+tres capturas del workstation completo con encuadre idéntico y sin cartela superpuesta. Esta
+diferencia no altera masters de producto ni las variantes de producción. R5 permanece también solo
+en código: Footprint y Step Profile separan verticalmente sus dos barras y eliminan el tratamiento
+de card en la fila y en el visual.
 
 ## Producción
 

@@ -2,22 +2,22 @@ import { useEffect, useRef, useState } from 'react'
 
 const modeSlides = [
   {
-    alt: 'Apex Trader Candles chart with OHLC bars, volume and visible-range profile.',
+    alt: 'Complete Apex Trader workstation with the Candles chart active.',
     id: 'candles',
     label: 'Candles',
-    src: '/media/reading-candles.png'
+    src: '/media/hero-terminal-candles.png'
   },
   {
-    alt: 'Apex Trader Footprint chart showing bid and ask executions at each price.',
+    alt: 'Complete Apex Trader workstation with the Footprint chart active.',
     id: 'footprint',
     label: 'Footprint',
-    src: '/media/reading-footprint.png'
+    src: '/media/hero-terminal-footprint.png'
   },
   {
-    alt: 'Apex Trader Step Profile chart showing the distribution traded inside each interval.',
+    alt: 'Complete Apex Trader workstation with the Step Profile chart active.',
     id: 'step-profile',
     label: 'Step Profile',
-    src: '/media/reading-step-profile.png'
+    src: '/media/hero-terminal-step-profile.png'
   }
 ]
 
@@ -106,17 +106,13 @@ export default function HeroModeCarousel() {
             <img
               alt={slide.alt}
               decoding="async"
-              height="719"
+              height="900"
               loading="eager"
               src={slide.src}
-              width="1000"
+              width="1600"
             />
           </figure>
         ))}
-        <div className="landing-mode-carousel__caption" aria-live="off">
-          <span>ACTIVE VIEW</span>
-          <strong>{activeSlide.label}</strong>
-        </div>
       </div>
 
       <div className="landing-mode-carousel__controls">

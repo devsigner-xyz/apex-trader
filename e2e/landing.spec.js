@@ -57,6 +57,20 @@ test('every remaining exported product image loads when its section enters the v
     await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0)
     await expect(image).not.toHaveAttribute('alt', '')
   }
+
+  const carouselImages = page.locator('.landing-mode-slide img')
+  await expect(carouselImages).toHaveCount(3)
+  for (let index = 0; index < (await carouselImages.count()); index += 1) {
+    await expect
+      .poll(() =>
+        carouselImages.nth(index).evaluate((node) => ({
+          height: node.naturalHeight,
+          width: node.naturalWidth
+        }))
+      )
+      .toEqual({ height: 900, width: 1600 })
+    await expect(carouselImages.nth(index)).toHaveCSS('object-fit', 'contain')
+  }
 })
 
 test('hero carousel rotates through the three chart modes and supports manual control', async ({
@@ -114,6 +128,21 @@ test('isolated market primitives load near the viewport without mounting the wor
   ).toHaveCount(5)
   await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
   await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
+  for (const primitive of ['footprint', 'step-profile']) {
+    const row = showcase.locator(`[data-primitive="${primitive}"]`)
+    await expect(row.locator('.landing-completed-order-flow')).toHaveAttribute(
+      'transform',
+      'translate(0 6)'
+    )
+    await expect(row.locator('.landing-current-order-flow')).toHaveAttribute(
+      'transform',
+      'translate(0 -6)'
+    )
+    await expect(row).toHaveCSS('box-shadow', 'none')
+    await expect(row).toHaveCSS('border-top-width', '0px')
+    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('box-shadow', 'none')
+    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('border-top-width', '0px')
+  }
   await expect(showcase.locator('.dom--compact .dom-row.ask')).toHaveCount(3)
   await expect(showcase.locator('.dom--compact .dom-spread-row')).toHaveCount(1)
   await expect(showcase.locator('.dom--compact .dom-row.bid')).toHaveCount(3)

@@ -28,8 +28,10 @@ pierde al leer solo OHLC.
 
 - Header sólido y sticky, sin blur ni transparencia.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
-- El carrusel de apertura usa exports reales de Candles, Footprint y Step Profile con un crossfade
-  ligero, controles manuales y pausa explícita; no se recrean charts promocionales.
+- El carrusel de apertura usa tres exports 16:9 del workstation real con el mismo encuadre. Solo
+  cambia el modo activo entre Candles, Footprint y Step Profile; el crossfade es ligero y conserva
+  controles manuales y pausa explícita. Las imágenes usan `contain`, no `cover`, para mantener
+  visibles watchlist, chart, DOM, ejecución, tape y activity en cada estado.
 - Las acciones primarias enlazan con elementos `<a href="/demo">` reales.
 - Foco visible, skip link y heading hierarchy son obligatorios.
 
@@ -52,6 +54,9 @@ siguientes alternan ese orden:
 - Candles usa cinco barras próximas entre sí y mantiene high/low estables mientras cambia el close
   de la última. Footprint y Step Profile usan dos barras: una cerrada estable y una actual. No se
   muestran headers, tabs, settings, resizers ni chrome de chart.
+- En Footprint y Step Profile la barra cerrada baja 6 px y la actual sube 6 px para distinguir sus
+  siluetas sin convertir el desplazamiento en protagonista. Estas dos filas son unframed: tanto la
+  fila como el área visual eliminan surface, borde, radio y shadow.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
   punteadas.
 - DOM limita su lectura a 3 asks + last + 3 bids. Last Trades limita su stream a tres impresiones.

@@ -122,7 +122,7 @@ function FootprintScene({ bars }) {
   return (
     <svg aria-label="Completed and updating Footprint candles" role="img" viewBox="0 0 560 260">
       <title>One completed footprint candle followed by one updating candle</title>
-      <g className="landing-completed-order-flow">
+      <g className="landing-completed-order-flow" transform="translate(0 6)">
         <FootprintLayer
           bars={[completed]}
           centers={[200]}
@@ -137,7 +137,7 @@ function FootprintScene({ bars }) {
           zoomScale={2}
         />
       </g>
-      <g className="landing-current-order-flow">
+      <g className="landing-current-order-flow" transform="translate(0 -6)">
         <FootprintLayer
           bars={[current]}
           centers={[360]}
@@ -163,7 +163,7 @@ function StepProfileScene({ bars }) {
   return (
     <svg aria-label="Completed and updating Step Profile candles" role="img" viewBox="0 0 560 260">
       <title>One completed Step Profile candle followed by one updating candle</title>
-      <g className="landing-completed-order-flow">
+      <g className="landing-completed-order-flow" transform="translate(0 6)">
         <StepProfileLayer
           bars={[completed]}
           centers={[180]}
@@ -177,7 +177,7 @@ function StepProfileScene({ bars }) {
           zoomScale={2}
         />
       </g>
-      <g className="landing-current-order-flow">
+      <g className="landing-current-order-flow" transform="translate(0 -6)">
         <StepProfileLayer
           bars={[current]}
           centers={[380]}
@@ -239,11 +239,11 @@ function VolumeProfileScene({ profile }) {
   )
 }
 
-function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
+function PrimitiveRow({ body, children, eyebrow, heading, id, sequence, unframed = false }) {
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className="landing-primitive"
+      className={`landing-primitive${unframed ? ' landing-primitive--unframed' : ''}`}
       data-primitive={id}
       data-sequence={sequence}
     >
@@ -282,7 +282,8 @@ PrimitiveRow.propTypes = {
   eyebrow: PropTypes.string.isRequired,
   heading: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  sequence: PropTypes.string.isRequired
+  sequence: PropTypes.string.isRequired,
+  unframed: PropTypes.bool
 }
 
 export default function MarketPrimitivesShowcase() {
@@ -312,6 +313,7 @@ export default function MarketPrimitivesShowcase() {
         heading="Executed volume at price"
         id="footprint"
         sequence="02"
+        unframed
       >
         <FootprintScene bars={snapshot.footprintBars} />
       </PrimitiveRow>
@@ -321,6 +323,7 @@ export default function MarketPrimitivesShowcase() {
         heading="Distribution inside one interval"
         id="step-profile"
         sequence="03"
+        unframed
       >
         <StepProfileScene bars={snapshot.stepProfileBars} />
       </PrimitiveRow>

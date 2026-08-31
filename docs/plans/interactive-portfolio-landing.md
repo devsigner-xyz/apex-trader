@@ -22,6 +22,10 @@ La publicación R2 autorizada ya está cerrada. El feedback posterior define una
 no se reutiliza automáticamente aquella autorización para publicar este nuevo alcance. No autoriza
 una release parcial ni operaciones destructivas.
 
+El feedback posterior a R3 define R4: el carrusel de apertura no debe mostrar recortes del chart,
+sino el workstation completo con encuadre idéntico en los tres estados y únicamente el modo del
+gráfico como variación. R4 es un cambio local hasta recibir una autorización de publicación propia.
+
 ## Resultado buscado
 
 - Presentar Apex como una interfaz de trading avanzada, no como una replay workstation.
@@ -62,6 +66,23 @@ función es mostrar contexto de producto completo.
   `delta` y `volume` finitos derivados de sus niveles.
 - Elevación, numeración y marcos desplazados aportan profundidad con tokens de Apex, sin gradientes,
   glass, neón ni colores de mercado usados como decoración.
+
+## Ajuste visual R4
+
+- Los tres slides de Opening thesis son capturas 1600 × 900 del workstation completo.
+- Watchlist, DOM, ticket, Time & Sales, activity y chrome mantienen posición y escala entre slides;
+  cambia únicamente Candles, Footprint o Step Profile dentro del chart.
+- La escena conserva proporción 16:9 y `object-fit: contain` para no cortar paneles en desktop,
+  tablet ni mobile.
+- Se elimina la cartela superpuesta sobre la captura: toolbar, contador y selectores externos ya
+  comunican el estado sin tapar el producto.
+
+## Ajuste visual R5
+
+- Footprint y Step Profile separan 12 px la posición vertical total de sus dos barras: la cerrada
+  baja 6 px y la actual sube 6 px.
+- Las dos filas eliminan wrapper visual de card, surface, borde, radio y sombra tanto en el
+  contenedor editorial como en el área SVG; los otros cuatro primitivos conservan su tratamiento.
 
 ## Arquitectura React vigente
 
@@ -127,8 +148,9 @@ representa como geometría vectorial aislada ligada a las variables locales. Dir
 masters permanecen intactos.
 
 R3 está implementado en código y verificado en navegador, pero todavía no se ha sincronizado con
-Figma. R2 se conserva como referencia aprobada; no debe declararse paridad Figma/código hasta crear
-o actualizar una revisión preservando IDs y masters.
+Figma. R4 ajusta además el encuadre del carrusel únicamente en código. R2 se conserva como referencia
+aprobada; no debe declararse paridad Figma/código hasta crear o actualizar una revisión preservando
+IDs y masters.
 
 ## Fases y ledger reanudable
 
@@ -143,7 +165,9 @@ o actualizar una revisión preservando IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3        | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R3                                              | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3/R4     | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R3 y el checkout local incorpora R4             | Requiere trabajo Figma     |
+| 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | Publicar solo con permiso  |
+| 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | Publicar solo con permiso  |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
