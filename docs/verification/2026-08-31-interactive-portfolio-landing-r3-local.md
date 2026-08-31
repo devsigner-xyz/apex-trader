@@ -68,5 +68,9 @@ eliminaron después de revisarlas y no forman parte del checkout.
 
 ## Gate
 
-Los gates locales están aprobados. Figma R2 `688:21215` aún no refleja R3 y la publicación requiere
-autorización nueva; esta evidencia no debe citarse como prueba de producción.
+En el momento de esta verificación, los gates locales estaban aprobados, Figma R2 `688:21215` aún no
+reflejaba R3 y la publicación requería autorización nueva; esta evidencia aislada no debe citarse
+como prueba de producción.
+
+La autorización y publicación posteriores se documentan por separado en
+[Interactive portfolio landing R3 · production verification](2026-08-31-interactive-portfolio-landing-r3-production.md).

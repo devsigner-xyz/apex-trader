@@ -28,9 +28,9 @@ La sección `656:7412` (`Interactive portfolio landing`) contiene dos generacion
 el 30 de agosto de 2026 y se conserva como snapshot. Tras revisar el prototipo, el usuario pidió el
 31 de agosto que cada gráfico y superficie se explicase de forma aislada y compacta; ese feedback
 define R2 `688:21215`, contrato Figma vigente. La revisión directa del runtime del 31 de agosto
-define un ajuste R3 local: carrusel de modos en la apertura, filas alternas, Candles con extremos
+define un ajuste R3 publicado: carrusel de modos en la apertura, filas alternas, Candles con extremos
 estables y dos barras en Footprint/Step Profile. R3 todavía no se ha sincronizado en Figma, por lo
-que R2 queda como referencia aprobada y no como paridad exacta del checkout local.
+que R2 queda como referencia aprobada y no como paridad exacta del runtime público.
 
 | Artefacto           | Node ID     | Estado                                  |
 | ------------------- | ----------- | --------------------------------------- |

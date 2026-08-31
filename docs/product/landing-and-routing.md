@@ -85,5 +85,9 @@ funcional `23879f6e6c669b4dae471d46add8c4eadaa05300`; rutas, assets, desktop, mo
 Footprint/Step Profile se comprobaron directamente. La evidencia está en
 [Interactive portfolio landing · production verification](../verification/2026-08-31-interactive-portfolio-landing-production.md).
 
-La revisión R3 descrita arriba está implementada y verificada localmente, pero todavía no se ha
-publicado. Hasta una nueva autorización de release, producción continúa sirviendo el contrato R2.
+La revisión R3 está publicada en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit
+funcional `874648af51d5af496a3fde26d634dff84ba91bcc` mediante el deployment
+`59df0562-4a17-4109-a226-e8a76c13113a`. Se comprobaron rutas, assets, carrusel, alternancia,
+Candles, dos barras Footprint/Step Profile, mobile, reduced motion, consola y ausencia de requests
+históricos. La evidencia está en
+[Interactive portfolio landing R3 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r3-production.md).

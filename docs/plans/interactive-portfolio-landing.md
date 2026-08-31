@@ -142,7 +142,8 @@ o actualizar una revisión preservando IDs y masters.
 | 5 · Contratos, documentación y QA  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright    | —                          |
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
-| 8 · Figma R3 y release             | pending  | R2 permanece como referencia aprobada; R3 aún no publicado                                                     | Requiere autorización      |
+| 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
+| 9 · Sincronización Figma R3        | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R3                                              | Requiere trabajo Figma     |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -160,7 +161,8 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Figma, código y documentación describen el mismo contrato R2.
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R3; hasta entonces el
+  gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 
 ## Gates obligatorios
