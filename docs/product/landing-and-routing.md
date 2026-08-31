@@ -129,3 +129,9 @@ R8 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el c
 `a62124bc-c704-4444-a57b-5e98c6ae6263`. Se comprobaron las rutas públicas, los nueve precios del
 Volume Profile, su alineación, el responsive 390 × 844 y la consola. La evidencia está en
 [Interactive portfolio landing R8 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r8-production.md).
+
+R9 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit funcional
+`2169d902015a4b449d13f71f59e5d38e73d73243` mediante el deployment
+`f38993ff-91e7-49f6-bb74-ff5aec1f6768`. Se comprobaron seis ejecuciones en Last Trades, los seis
+fondos ambientales, settings, desktop/mobile, rutas y consola. La evidencia está en
+[Interactive portfolio landing R9 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r9-production.md).

@@ -74,9 +74,9 @@ context headers y settings funcionales; el DOM usa 500 px máximos y cifras sin 
 siguen pendientes de sincronización y no alteran los masters `103:59`, `144:1810` ni `328:10006`.
 R8 añade en código la escala de precio del Volume Profile aislado, alineada con sus nueve niveles;
 también permanece pendiente de sincronización con el nodo `688:21220`.
-R9 amplía Last Trades de tres a seis filas e introduce seis backdrops SVG ambientales distintos en
-el runtime. El nodo R2 `688:21222` continúa mostrando tres filas y ninguno de los backdrops está aún
-representado en Figma, por lo que el gap R3–R9 permanece abierto.
+R9, ya publicado en el runtime, amplía Last Trades de tres a seis filas e introduce seis backdrops
+SVG ambientales distintos. El nodo R2 `688:21222` continúa mostrando tres filas y ninguno de los
+backdrops está aún representado en Figma, por lo que el gap R3–R9 permanece abierto.
 
 ## Producción
 

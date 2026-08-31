@@ -51,6 +51,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   commit funcional, Railway, rutas y comprobación visual pública desktop/mobile.
 - [Interactive portfolio landing R9 ambient depth](verification/2026-08-31-interactive-portfolio-landing-r9-ambient-depth-local.md):
   seis trades, backdrops vectoriales diferenciados, motion reducido y evidencia local.
+- [Interactive portfolio landing R9 production](verification/2026-08-31-interactive-portfolio-landing-r9-production.md):
+  commit funcional, Railway, rutas y comprobación visual pública desktop/mobile.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
@@ -87,8 +89,7 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. En el [plan de landing interactiva](plans/interactive-portfolio-landing.md),
-R2–R8 están publicados y verificados. R9 está implementado y verificado solo en local. R4–R9
-permanecen pendientes de sincronización con Figma.
+R2–R9 están publicados y verificados. R4–R9 permanecen pendientes de sincronización con Figma.
 
 ## Jerarquía y estados
 
