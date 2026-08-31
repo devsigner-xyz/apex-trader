@@ -77,9 +77,9 @@ también permanece pendiente de sincronización con el nodo `688:21220`.
 R9, ya publicado en el runtime, amplía Last Trades de tres a seis filas e introduce seis backdrops
 SVG ambientales distintos. El nodo R2 `688:21222` continúa mostrando tres filas y ninguno de los
 backdrops está aún representado en Figma, por lo que el gap R3–R9 permanece abierto.
-R10 sustituye localmente esos backdrops animados por una única retícula CSS estática y desvanecida
-en los seis visuales. Figma tampoco representa este reemplazo, por lo que el gap vigente pasa a ser
-R3–R10.
+R10, ya publicado, sustituye esos backdrops animados por una única retícula CSS estática y
+desvanecida en los seis visuales. Figma tampoco representa este reemplazo, por lo que el gap vigente
+pasa a ser R3–R10.
 
 ## Producción
 

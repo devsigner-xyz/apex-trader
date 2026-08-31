@@ -215,7 +215,7 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R10    | pending  | R2 permanece como referencia aprobada; runtime local ejecuta R10                                               | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R10    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R10                                           | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
@@ -226,8 +226,8 @@ IDs y masters.
 | 17 · Release R8                     | complete | `c6d941e…`; Railway `a62124bc…`; UI pública desktop/mobile verificada                                          | —                          |
 | 18 · Ambient depth R9 local         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r9-ambient-depth-local.md`; 21/21 E2E              | —                          |
 | 19 · Release R9                     | complete | `2169d902…`; Railway `f38993ff…`; UI pública desktop/mobile verificada                                         | —                          |
-| 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | Publicar solo con permiso  |
-| 21 · Release R10                    | pending  | Sin commit ni despliegue                                                                                       | Requiere permiso explícito |
+| 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | —                          |
+| 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 

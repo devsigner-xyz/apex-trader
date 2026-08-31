@@ -135,3 +135,9 @@ R9 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el c
 `f38993ff-91e7-49f6-bb74-ff5aec1f6768`. Se comprobaron seis ejecuciones en Last Trades, los seis
 fondos ambientales, settings, desktop/mobile, rutas y consola. La evidencia está en
 [Interactive portfolio landing R9 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r9-production.md).
+
+R10 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit funcional
+`91da3addf94fafe528ed79242690233cebc7e6f0` mediante el deployment
+`3aa05fe2-6570-48cb-baf2-76df8a91d4b8`. Se comprobaron la retícula estática y desvanecida en los
+seis módulos, ausencia de motion decorativo, seis trades, desktop/mobile, rutas y consola. La
+evidencia está en [Interactive portfolio landing R10 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r10-production.md).
