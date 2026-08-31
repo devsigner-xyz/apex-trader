@@ -91,9 +91,9 @@ Candles estático, mantiene los tres selectores manuales y elimina la transició
 - Last Trades: panel centrado de hasta 500 px con context header, cabeceras de columna y exactamente
   seis ejecuciones en `All trades`. Settings filtra transitoriamente por all, buy o sell y actualiza
   tanto el resumen del header como las filas visibles.
-- Los seis visuales incluyen una capa SVG ambiental no semántica detrás del dato principal. Cada
-  capa tiene geometría propia y animación lenta, comparte tokens neutrales y se detiene con el mismo
-  estado de visibilidad, documento y reduced motion que el reloj de datos.
+- Los seis visuales incluyen una retícula CSS no semántica detrás del dato principal. Dos gradientes
+  lineales forman el grid y una máscara radial lo desvanece hacia los bordes. La capa comparte tokens
+  neutrales, no se anima y no depende del estado del reloj de datos.
 - Un reloj de cuatro fases, activo solo cerca del viewport y con el documento visible, coordina los
   seis módulos. `prefers-reduced-motion` conserva la fase 0 completa.
 

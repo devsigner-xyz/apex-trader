@@ -411,81 +411,34 @@
   height: 100%;
 }
 
-.landing-primitive__visual > :not(.landing-primitive-backdrop) {
+.landing-primitive__visual > :not(.landing-primitive-grid-backdrop) {
   position: relative;
   z-index: 1;
 }
 
-.landing-primitive-backdrop {
+.landing-primitive-grid-backdrop {
   position: absolute;
   z-index: 0;
-  inset: 0;
-  overflow: visible;
+  inset: -16px;
   pointer-events: none;
-}
-
-.landing-primitive-backdrop__primary,
-.landing-primitive-backdrop__secondary {
-  fill: none;
-  stroke: var(--pro-strong);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1;
-  opacity: 0.16;
-  transform-box: fill-box;
-  transform-origin: center;
-  vector-effect: non-scaling-stroke;
-}
-
-.landing-primitive-backdrop__secondary {
-  stroke: var(--pro-subtle);
-  stroke-dasharray: 1 7;
-  opacity: 0.24;
-}
-
-.landing-primitive-backdrop--footprint rect {
-  stroke-dasharray: 2 6;
-}
-
-.landing-primitive-backdrop--volume-profile .landing-primitive-backdrop__primary,
-.landing-primitive-backdrop--dom .landing-primitive-backdrop__primary {
-  stroke-width: 2;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--candles
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-candles 12s ease-in-out infinite;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--footprint
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-footprint 14s ease-in-out infinite;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--step-profile
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-step 13s ease-in-out infinite;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--volume-profile
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-volume 15s ease-in-out infinite;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--dom
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-dom 11s ease-in-out infinite;
-}
-
-.landing-primitives[data-animation-state='running']
-  .landing-primitive-backdrop--last-trades
-  .landing-primitive-backdrop__primary {
-  animation: landing-backdrop-trades 13.5s ease-in-out infinite;
+  background-image:
+    linear-gradient(to right, var(--pro-subtle) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--pro-subtle) 1px, transparent 1px);
+  background-position: center;
+  background-size: 36px 36px;
+  opacity: 0.26;
+  mask-image: radial-gradient(
+    ellipse 72% 76% at center,
+    var(--pro-text) 8%,
+    var(--pro-text) 46%,
+    transparent 86%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 72% 76% at center,
+    var(--pro-text) 8%,
+    var(--pro-text) 46%,
+    transparent 86%
+  );
 }
 
 .landing-primitive__copy {
@@ -649,84 +602,6 @@
 .landing-primitive[data-primitive='last-trades'] .landing-primitive__visual {
   min-height: 322px;
   aspect-ratio: auto;
-}
-
-@keyframes landing-backdrop-candles {
-  0%,
-  100% {
-    opacity: 0.72;
-    transform: translate3d(-5px, 5px, 0);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translate3d(6px, -5px, 0);
-  }
-}
-
-@keyframes landing-backdrop-footprint {
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: translateX(-7px);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translateX(7px);
-  }
-}
-
-@keyframes landing-backdrop-step {
-  0%,
-  100% {
-    opacity: 0.68;
-    transform: translate3d(-4px, 6px, 0);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translate3d(5px, -4px, 0);
-  }
-}
-
-@keyframes landing-backdrop-volume {
-  0%,
-  100% {
-    opacity: 0.66;
-    transform: scaleX(0.97);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scaleX(1.02);
-  }
-}
-
-@keyframes landing-backdrop-dom {
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: translateY(-6px);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translateY(6px);
-  }
-}
-
-@keyframes landing-backdrop-trades {
-  0%,
-  100% {
-    opacity: 0.68;
-    transform: translate3d(6px, -5px, 0);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translate3d(-6px, 5px, 0);
-  }
 }
 
 @keyframes landing-current-candle {
@@ -1124,8 +999,6 @@
   }
 
   .landing-mode-slide,
-  .landing-primitive-backdrop__primary,
-  .landing-primitive-backdrop__secondary,
   .landing-current-order-flow,
   .landing-current-candle,
   .dom-row,

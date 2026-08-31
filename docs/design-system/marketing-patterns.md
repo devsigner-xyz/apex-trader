@@ -73,11 +73,10 @@ siguientes alternan ese orden:
   captura del componente.
 - Un reloj determinista compartido actualiza cantidades cada 1,4 s. `IntersectionObserver` lo activa
   cerca del viewport, `document.hidden` lo pausa y reduced motion fija un estado final legible.
-- Cada visual incorpora un backdrop SVG neutral y `aria-hidden`, sin surface, gradiente ni sombra.
-  Los seis comparten línea fina, puntos, baja opacidad y movimiento lento, pero abstraen una
-  geometría propia: trayectoria, celdas, escalones, perfil, ladder o flujo de impresiones. Solo el
-  grupo primario se anima, con ciclos de 11–15 s; `prefers-reduced-motion` conserva la composición
-  estática.
+- Cada visual incorpora un fondo CSS neutral y `aria-hidden`, sin surface, borde ni sombra. Dos
+  `linear-gradient` forman una retícula de 36 px y una máscara radial la desvanece hacia los bordes.
+  La capa comparte `--pro-subtle`, usa opacidad 0.26 y permanece estática en todos los estados; el
+  motion se reserva para los datos que explican el producto.
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 

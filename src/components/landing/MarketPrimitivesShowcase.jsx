@@ -277,139 +277,6 @@ function VolumeProfileScene({ profile }) {
   )
 }
 
-function PrimitiveBackdrop({ variant }) {
-  let artwork
-
-  if (variant === 'candles') {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          {[96, 188, 280, 372, 464].map((x) => (
-            <line key={x} x1={x} x2={x} y1="24" y2="236" />
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          <path d="M28 210 L112 174 L196 190 L280 112 L364 138 L448 66 L532 88" />
-          {[
-            [112, 174],
-            [280, 112],
-            [448, 66]
-          ].map(([x, y]) => (
-            <circle cx={x} cy={y} key={`${x}-${y}`} r="4" />
-          ))}
-        </g>
-      </>
-    )
-  } else if (variant === 'footprint') {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          <line x1="280" x2="280" y1="18" y2="242" />
-          {[46, 82, 118, 154, 190, 226].map((y) => (
-            <line key={y} x1="72" x2="488" y1={y} y2={y} />
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          {[54, 90, 126, 162, 198].map((y, index) => (
-            <g key={y}>
-              <rect height="20" width={62 + index * 9} x={204 - index * 9} y={y} />
-              <rect height="20" width={48 + index * 12} x="288" y={y} />
-            </g>
-          ))}
-        </g>
-      </>
-    )
-  } else if (variant === 'step-profile') {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          {[44, 88, 132, 176, 220].map((y) => (
-            <line key={y} x1="52" x2="508" y1={y} y2={y} />
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          <path d="M68 218 H142 V184 H196 V146 H262 V110 H326 V74 H404 V42 H492" />
-          <path d="M68 232 H174 V202 H236 V166 H304 V128 H374 V94 H436 V58 H492" />
-        </g>
-      </>
-    )
-  } else if (variant === 'volume-profile') {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          <line x1="472" x2="472" y1="20" y2="240" />
-          {[40, 66, 92, 118, 144, 170, 196, 222].map((y) => (
-            <line key={y} x1="54" x2="506" y1={y} y2={y} />
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          {[112, 164, 228, 304, 366, 326, 254, 182].map((width, index) => (
-            <line key={width} x1={468 - width} x2="468" y1={40 + index * 26} y2={40 + index * 26} />
-          ))}
-        </g>
-      </>
-    )
-  } else if (variant === 'dom') {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          <line x1="18" x2="18" y1="18" y2="242" />
-          <line x1="542" x2="542" y1="18" y2="242" />
-          {[42, 72, 102, 132, 162, 192, 222].map((y) => (
-            <g key={y}>
-              <line x1="0" x2="82" y1={y} y2={y} />
-              <line x1="478" x2="560" y1={y} y2={y} />
-            </g>
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          {[42, 72, 102, 132, 162, 192, 222].map((y, index) => (
-            <circle cx={index % 2 === 0 ? 18 : 542} cy={y} key={y} r={index === 3 ? 6 : 3} />
-          ))}
-        </g>
-      </>
-    )
-  } else {
-    artwork = (
-      <>
-        <g className="landing-primitive-backdrop__secondary">
-          {[54, 102, 150, 198].map((y) => (
-            <g key={y}>
-              <line x1="0" x2="78" y1={y} y2={y} />
-              <line x1="482" x2="560" y1={y} y2={y} />
-            </g>
-          ))}
-        </g>
-        <g className="landing-primitive-backdrop__primary">
-          <path d="M8 30 L28 72 L12 112 L30 154 L16 202 L32 234" />
-          <path d="M552 24 L532 64 L548 106 L530 148 L544 192 L528 232" />
-          {[
-            [28, 72],
-            [30, 154],
-            [532, 64],
-            [530, 148]
-          ].map(([x, y]) => (
-            <circle cx={x} cy={y} key={`${x}-${y}`} r="4" />
-          ))}
-        </g>
-      </>
-    )
-  }
-
-  return (
-    <svg
-      aria-hidden="true"
-      className={`landing-primitive-backdrop landing-primitive-backdrop--${variant}`}
-      data-backdrop={variant}
-      focusable="false"
-      preserveAspectRatio="none"
-      viewBox="0 0 560 260"
-    >
-      {artwork}
-    </svg>
-  )
-}
-
 function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
   return (
     <section
@@ -419,7 +286,7 @@ function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
       data-sequence={sequence}
     >
       <div className="landing-primitive__visual">
-        <PrimitiveBackdrop variant={id} />
+        <span aria-hidden="true" className="landing-primitive-grid-backdrop" data-backdrop="grid" />
         {children}
       </div>
       <div className="landing-primitive__copy">
@@ -448,17 +315,6 @@ StepProfileScene.propTypes = {
 
 VolumeProfileScene.propTypes = {
   profile: PropTypes.arrayOf(levelType).isRequired
-}
-
-PrimitiveBackdrop.propTypes = {
-  variant: PropTypes.oneOf([
-    'candles',
-    'dom',
-    'footprint',
-    'last-trades',
-    'step-profile',
-    'volume-profile'
-  ]).isRequired
 }
 
 PrimitiveRow.propTypes = {
