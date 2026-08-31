@@ -83,10 +83,12 @@ function createTrades(phase) {
     { amount: 5.418, price: 21842.25, side: 'buy' },
     { amount: 5.361, price: 21842, side: 'sell' },
     { amount: 5.204, price: 21842.25, side: 'buy' },
-    { amount: 4.982, price: 21842.5, side: 'buy' }
+    { amount: 4.982, price: 21842.5, side: 'buy' },
+    { amount: 4.764, price: 21842, side: 'sell' },
+    { amount: 4.539, price: 21841.75, side: 'sell' }
   ]
 
-  return Array.from({ length: 3 }, (_, index) => {
+  return Array.from({ length: 6 }, (_, index) => {
     const trade = templates[(phase + index) % templates.length]
     return {
       ...trade,

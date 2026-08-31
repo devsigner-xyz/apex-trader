@@ -50,7 +50,7 @@ export function CompactTimeSales({ trades }) {
   const settingsTriggerRef = useRef(null)
   const selectedFilter = tradeFilters.find(({ id }) => id === filter)
   const visibleTrades = useMemo(
-    () => trades.filter((trade) => filter === 'all' || trade.side === filter).slice(0, 3),
+    () => trades.filter((trade) => filter === 'all' || trade.side === filter).slice(0, 6),
     [filter, trades]
   )
   const { handleTriggerClick } = useSettingsPopoverFocus({

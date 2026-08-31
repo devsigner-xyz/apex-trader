@@ -28,7 +28,7 @@ test('keeps every isolated market primitive intentionally compact', () => {
     assert.equal(snapshot.profile.length, 9)
     assert.equal(snapshot.orderbook.asks.length, 3)
     assert.equal(snapshot.orderbook.bids.length, 3)
-    assert.equal(snapshot.trades.length, 3)
+    assert.equal(snapshot.trades.length, 6)
     for (const bar of [...snapshot.footprintBars, ...snapshot.stepProfileBars]) {
       assert.equal(Number.isFinite(bar.delta), true)
       assert.equal(Number.isFinite(bar.volume), true)

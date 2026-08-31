@@ -127,6 +127,7 @@ test('isolated market primitives load near the viewport without mounting the wor
   expect(showcaseRequests).toHaveLength(1)
 
   await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive-backdrop')).toHaveCount(6)
   await expect(showcase.locator('.market-chart')).toHaveCount(0)
   await expect(showcase.getByRole('button')).toHaveCount(2)
   await expect(
@@ -173,6 +174,11 @@ test('isolated market primitives load near the viewport without mounting the wor
     'last-trades'
   ]) {
     const row = showcase.locator(`[data-primitive="${primitive}"]`)
+    await expect(row.locator('.landing-primitive-backdrop')).toHaveAttribute(
+      'data-backdrop',
+      primitive
+    )
+    await expect(row.locator('.landing-primitive-backdrop')).toHaveAttribute('aria-hidden', 'true')
     await expect(row).toHaveCSS('box-shadow', 'none')
     await expect(row).toHaveCSS('border-top-width', '0px')
     await expect(row).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
@@ -183,6 +189,13 @@ test('isolated market primitives load near the viewport without mounting the wor
       'rgba(0, 0, 0, 0)'
     )
   }
+  await expect(showcase).toHaveAttribute('data-animation-state', 'running')
+  const backdropAnimations = await showcase
+    .locator('.landing-primitive-backdrop__primary')
+    .evaluateAll((nodes) => nodes.map((node) => getComputedStyle(node).animationName))
+  expect(backdropAnimations).toHaveLength(6)
+  expect(backdropAnimations).not.toContain('none')
+  expect(new Set(backdropAnimations).size).toBe(6)
   for (const primitive of ['footprint', 'step-profile']) {
     const row = showcase.locator(`[data-primitive="${primitive}"]`)
     await expect(row.locator('.landing-completed-order-flow')).toHaveAttribute(
@@ -225,7 +238,7 @@ test('isolated market primitives load near the viewport without mounting the wor
   await expect(domSettingsButton).toBeFocused()
 
   const compactTape = showcase.locator('.tape--compact')
-  await expect(compactTape.locator('.tape-row')).toHaveCount(3)
+  await expect(compactTape.locator('.tape-row')).toHaveCount(6)
   const tapeSettingsButton = showcase.getByRole('button', {
     name: 'Compact Time and Sales settings'
   })
@@ -239,7 +252,7 @@ test('isolated market primitives load near the viewport without mounting the wor
   await expect(compactTape.locator('.tape-row.sell')).toHaveCount(0)
   await expect(compactTape.locator('.tape-row.buy')).not.toHaveCount(0)
   await tapeSettings.getByRole('radio', { name: 'All trades' }).check()
-  await expect(compactTape.locator('.tape-row')).toHaveCount(3)
+  await expect(compactTape.locator('.tape-row')).toHaveCount(6)
   await page.keyboard.press('Escape')
   await expect(tapeSettings).toBeHidden()
   await expect(tapeSettingsButton).toBeFocused()
@@ -310,6 +323,10 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   await expect(showcase).toHaveAttribute('data-animation-state', 'static')
   await expect(showcase).toHaveAttribute('data-phase', '0')
   await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive-backdrop__primary').first()).toHaveCSS(
+    'animation-name',
+    'none'
+  )
   await page.locator('.landing-footer').scrollIntoViewIfNeeded()
   const finalDimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

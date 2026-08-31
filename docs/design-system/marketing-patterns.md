@@ -62,7 +62,8 @@ siguientes alternan ese orden:
   punteadas. Su eje derecho reutiliza surface, borde, ticks y formato del price axis profesional;
   cada precio queda alineado con el centro de su nivel, sin reintroducir un wrapper exterior.
 - DOM limita su lectura a 3 asks + last + 3 bids y ocupa hasta 500 px, centrado, con columnas sin
-  elipsis. Last Trades limita su stream a tres impresiones.
+  elipsis. Last Trades muestra seis impresiones en filas de 42 px para ganar contexto sin duplicar
+  la altura del módulo.
 - DOM y Last Trades conservan su context header, cabeceras y trigger de settings. El price grouping
   del DOM y el filtro all/buy/sell de Trades son funcionales, transitorios y reutilizan el foco,
   cierre y tokens del producto.
@@ -72,6 +73,11 @@ siguientes alternan ese orden:
   captura del componente.
 - Un reloj determinista compartido actualiza cantidades cada 1,4 s. `IntersectionObserver` lo activa
   cerca del viewport, `document.hidden` lo pausa y reduced motion fija un estado final legible.
+- Cada visual incorpora un backdrop SVG neutral y `aria-hidden`, sin surface, gradiente ni sombra.
+  Los seis comparten línea fina, puntos, baja opacidad y movimiento lento, pero abstraen una
+  geometría propia: trayectoria, celdas, escalones, perfil, ladder o flujo de impresiones. Solo el
+  grupo primario se anima, con ciclos de 11–15 s; `prefers-reduced-motion` conserva la composición
+  estática.
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 

@@ -113,6 +113,18 @@ de producto completo.
 - VAH, POC y VAL conservan sus labels a la izquierda y sus líneas punteadas terminan en el límite del
   plot antes del eje.
 
+## Profundidad ambiental y Last Trades R9
+
+- Last Trades pasa de tres a seis ejecuciones y compacta cada fila a 42 px; conserva panel, context
+  header, settings y filtros compartidos.
+- Cada área visual recibe un backdrop SVG decorativo, neutral y no interactivo. Candles usa una
+  trayectoria, Footprint una matriz, Step Profile escalones, Volume Profile contornos horizontales,
+  DOM rails laterales y Trades dos flujos laterales.
+- Los seis backdrops comparten trazo, puntos, baja opacidad y movimiento lento, pero usan keyframes
+  distintos. Permanecen detrás de los datos y no recuperan surface, wrapper, gradiente o shadow.
+- `IntersectionObserver`, `document.hidden` y `prefers-reduced-motion` gobiernan también el motion
+  ambiental; el contenido y su profundidad siguen visibles en estado estático.
+
 ## Arquitectura React vigente
 
 ```text
@@ -145,7 +157,7 @@ src/components/landing/
 - Solo cambia el close de la quinta vela en Candles; las cuatro velas cerradas y los extremos de la
   actual conservan identidad y valores.
 - Footprint y Step Profile mantienen su primera barra estable y actualizan solo la segunda.
-- DOM contiene exactamente 3 asks + last + 3 bids y Last Trades exactamente 3 filas.
+- DOM contiene exactamente 3 asks + last + 3 bids y Last Trades exactamente 6 filas.
 
 ## Responsive y rendimiento
 
@@ -195,7 +207,7 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R7     | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R7                                              | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R9     | pending  | R2 permanece como referencia aprobada; runtime local ejecuta R9                                                | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
@@ -204,6 +216,8 @@ IDs y masters.
 | 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | —                          |
 | 16 · Price scale R8 local           | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r8-volume-profile-price-scale-local.md`; 21/21 E2E | Publicar solo con permiso  |
 | 17 · Release R8                     | complete | `c6d941e…`; Railway `a62124bc…`; UI pública desktop/mobile verificada                                          | —                          |
+| 18 · Ambient depth R9 local         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r9-ambient-depth-local.md`; 21/21 E2E              | Publicar solo con permiso  |
+| 19 · Release R9                     | pending  | Sin commit ni despliegue                                                                                       | Requiere permiso explícito |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -220,12 +234,15 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
   exterior.
 - DOM contiene exactamente 3 asks + last + 3 bids al abrir, queda centrado y no trunca cifras.
 - DOM y Last Trades muestran su context header y settings funcionales con foco restaurado al cerrar.
-- Last Trades contiene exactamente tres ejecuciones con el filtro All trades.
+- Last Trades contiene exactamente seis ejecuciones con el filtro All trades y mantiene una altura
+  compacta mediante filas de 42 px.
+- Cada primitivo incluye un backdrop SVG distinto, neutral y no semántico; los seis movimientos son
+  sutiles, no interfieren con datos o controles y quedan estáticos con reduced motion.
 - Las fases son deterministas, se pausan fuera de viewport/pestaña y respetan reduced motion.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R7; hasta entonces el
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R9; hasta entonces el
   gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 
