@@ -48,3 +48,8 @@ el build conserva únicamente los avisos conocidos de `eval` del runtime de Stor
 
 R5 no está representado todavía en el archivo maestro. R2 continúa siendo la referencia Figma
 aprobada y no se declara paridad Figma/código.
+
+## Seguimiento de publicación
+
+La publicación posterior se cerró mediante el commit funcional `db5effee…` y queda documentada en
+[Interactive portfolio landing R5 · production verification](2026-08-31-interactive-portfolio-landing-r5-production.md).

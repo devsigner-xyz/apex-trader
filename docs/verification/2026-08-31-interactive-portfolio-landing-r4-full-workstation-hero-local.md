@@ -62,3 +62,8 @@ requests `/data/tardis/**`, responsive y reduced motion.
 
 R4 todavía no está representado en el archivo maestro. R2 continúa como referencia Figma aprobada;
 la diferencia queda explícita y no se declara paridad Figma/código.
+
+## Seguimiento de publicación
+
+La publicación posterior se cerró mediante el commit funcional `db5effee…` y queda documentada en
+[Interactive portfolio landing R5 · production verification](2026-08-31-interactive-portfolio-landing-r5-production.md).

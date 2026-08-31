@@ -97,11 +97,9 @@ Candles, dos barras Footprint/Step Profile, mobile, reduced motion, consola y au
 históricos. La evidencia está en
 [Interactive portfolio landing R3 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r3-production.md).
 
-El ajuste R4 del carrusel con tres vistas completas del workstation está implementado y verificado
-solo en el checkout local. No se ha hecho commit, push ni despliegue para este alcance; producción
-continúa sirviendo R3 hasta una autorización explícita de publicación. La evidencia está en
-[Interactive portfolio landing R4 · full-workstation hero](../verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md).
-
-El refinamiento R5 de Footprint y Step Profile está igualmente verificado solo en local y comparte
-la misma frontera de publicación. La evidencia está en
-[Interactive portfolio landing R5 · order-flow unframed](../verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md).
+R4 y R5 están publicados en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit funcional
+`db5effee2f877486326e508f9cc44b64b05073b5` mediante el deployment
+`99f97679-f8e0-43fe-95b6-ff97c875b860`. Se comprobaron el hero completo en desktop/mobile, los tres
+assets 1600 × 900, las filas unframed y escalonadas de Footprint/Step Profile, las rutas de demo,
+Storybook y la consola. La evidencia está en
+[Interactive portfolio landing R5 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r5-production.md).

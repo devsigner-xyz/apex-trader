@@ -37,6 +37,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   tres capturas completas y coherentes del workstation, responsive, assets y evidencia local.
 - [Interactive portfolio landing R5 order-flow refinement](verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md):
   separación vertical sutil y tratamiento unframed de Footprint y Step Profile.
+- [Interactive portfolio landing R5 production](verification/2026-08-31-interactive-portfolio-landing-r5-production.md):
+  commit funcional, Railway, assets y comprobación visual pública de R4/R5.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
@@ -73,8 +75,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. En el [plan de landing interactiva](plans/interactive-portfolio-landing.md),
-R2 y R3 están publicados y verificados. R4 y R5 están verificados solo en local y permanecen
-pendientes de publicación y sincronización con Figma.
+R2, R3, R4 y R5 están publicados y verificados. R4/R5 permanecen pendientes únicamente de
+sincronización con Figma.
 
 ## Jerarquía y estados
 

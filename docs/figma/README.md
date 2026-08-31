@@ -64,9 +64,9 @@ ignorada por Git; el nodo y esta documentación son la referencia durable.
 Gap explícito: el código R3 no debe presentarse como sincronizado con Figma hasta actualizar el root
 R2 o crear una revisión preservando esos IDs. El ajuste R4 local cambia además el carrusel para usar
 tres capturas del workstation completo con encuadre idéntico y sin cartela superpuesta. Esta
-diferencia no altera masters de producto ni las variantes de producción. R5 permanece también solo
-en código: Footprint y Step Profile separan verticalmente sus dos barras y eliminan el tratamiento
-de card en la fila y en el visual.
+diferencia no altera masters de producto ni las variantes de producción. R5 está publicado en el
+runtime, pero todavía no en Figma: Footprint y Step Profile separan verticalmente sus dos barras y
+eliminan el tratamiento de card en la fila y en el visual.
 
 ## Producción
 

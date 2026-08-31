@@ -165,9 +165,10 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3/R4     | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R3 y el checkout local incorpora R4             | Requiere trabajo Figma     |
-| 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | Publicar solo con permiso  |
-| 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | Publicar solo con permiso  |
+| 9 · Sincronización Figma R3/R4/R5  | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R5                                              | Requiere trabajo Figma     |
+| 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
+| 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
+| 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -185,7 +186,7 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R3; hasta entonces el
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R5; hasta entonces el
   gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 
