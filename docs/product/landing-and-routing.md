@@ -16,6 +16,11 @@ completo. Opening thesis usa un carrusel de tres exports reales del workstation 
 el mismo encuadre y con Candles, Footprint o Step Profile como única variación. The workspace
 mantiene una imagen optimizada adicional porque también muestra la composición completa.
 
+La antigua sección `The blind spot` y su comparación OHLC/Volume at Price se retiran en R6 porque
+repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario enlaza directamente a
+`#modes` y las secciones visibles se numeran Market primitives 01, One clock 02, Session evidence 03
+y The workspace 04.
+
 El copy público está en inglés y presenta cada lectura por su función. Los valores de los módulos
 son fixtures deterministas de interfaz; no se afirman como replay histórico, ni Apex se presenta
 como broker o plataforma de trading conectada.
@@ -52,7 +57,8 @@ no debe solicitar ningún asset bajo `/data/tardis/**`.
 solicitarlo solo cuando la sección se aproxima al viewport; sus fixtures compactos son locales y no
 activan manifest, book, trades ni tiles del replay. Reutiliza las capas SVG reales de Candles,
 Footprint y Step Profile, la geometría del Volume Profile y filas compartidas de DOM/Time & Sales,
-pero no monta `.market-chart`, settings, resizers ni controles profesionales.
+pero no monta `.market-chart`, resizers ni paneles vecinos. DOM y Time & Sales sí conservan su
+context header y su settings popover real porque ambos controles modifican el módulo aislado.
 
 El runtime de la landing referencia cuatro PNG de `public/media/`: Opening thesis precarga
 `hero-terminal-candles.png`, `hero-terminal-footprint.png` y `hero-terminal-step-profile.png` para
@@ -75,11 +81,15 @@ Candles estático, mantiene los tres selectores manuales y elimina la transició
   segunda actualiza niveles, delta y volumen finitos 6 px por encima.
 - Step Profile: dos barras de nueve niveles; la primera permanece cerrada 6 px por debajo y la
   segunda actualiza su distribución, delta y volumen finitos 6 px por encima.
-- Las filas Footprint y Step Profile no usan surface, borde, radio ni sombra de card en la fila o
-  en el marco del visual; conservan únicamente la retícula editorial y el área SVG.
+- Ninguna de las seis filas usa surface, borde, radio ni sombra de card en la fila o en el marco del
+  visual; conservan únicamente la retícula editorial y el componente aislado.
 - Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo.
-- DOM: exactamente tres asks, last price y tres bids.
-- Last Trades: exactamente tres ejecuciones.
+- DOM: panel centrado de hasta 500 px con context header, cabeceras de columna, exactamente tres
+  asks, last price y tres bids. Ninguna cifra usa elipsis. Settings cambia el price grouping de
+  forma transitoria y actualiza metadata, filas y cantidades agregadas.
+- Last Trades: panel centrado de hasta 500 px con context header, cabeceras de columna y exactamente
+  tres ejecuciones en `All trades`. Settings filtra transitoriamente por all, buy o sell y actualiza
+  tanto el resumen del header como las filas visibles.
 - Un reloj de cuatro fases, activo solo cerca del viewport y con el documento visible, coordina los
   seis módulos. `prefers-reduced-motion` conserva la fase 0 completa.
 
@@ -103,3 +113,8 @@ R4 y R5 están publicados en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` pa
 assets 1600 × 900, las filas unframed y escalonadas de Footprint/Step Profile, las rutas de demo,
 Storybook y la consola. La evidencia está en
 [Interactive portfolio landing R5 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r5-production.md).
+
+R6 y R7 están implementados en el checkout local y autorizados para publicación conjunta. Producción
+continúa sirviendo R5 hasta verificar el nuevo commit exacto y `SUCCESS` en Railway. La evidencia
+local está en [Interactive portfolio landing R6 · narrative simplification](../verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md)
+y [Interactive portfolio landing R7 · panel settings and unframed modules](../verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md).

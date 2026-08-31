@@ -43,17 +43,82 @@ function TradeRow({ interactive = true, trade }) {
 }
 
 export function CompactTimeSales({ trades }) {
-  const visibleTrades = trades.slice(0, 3)
+  const [filter, setFilter] = useState('all')
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const tapeRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
+  const selectedFilter = tradeFilters.find(({ id }) => id === filter)
+  const visibleTrades = useMemo(
+    () => trades.filter((trade) => filter === 'all' || trade.side === filter).slice(0, 3),
+    [filter, trades]
+  )
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: tapeRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
+
   return (
     <section
       aria-label="Compact Last Trades"
       className="tape tape--compact"
       data-trade-count={visibleTrades.length}
-      role="list"
+      data-trade-filter={filter}
+      ref={tapeRef}
     >
-      {visibleTrades.map((trade, index) => (
-        <TradeRow interactive={false} key={`${trade.timestamp}-${index}`} trade={trade} />
-      ))}
+      <header>
+        <span>BTC · {selectedFilter.summary}</span>
+        <button
+          aria-controls="compact-tape-settings-panel"
+          aria-expanded={settingsOpen}
+          aria-label="Compact Time and Sales settings"
+          className="tape-settings-button"
+          onClick={handleTriggerClick}
+          ref={settingsTriggerRef}
+          title="Time and Sales settings"
+          type="button"
+        >
+          <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
+        </button>
+      </header>
+      {settingsOpen && (
+        <aside
+          aria-label="Compact Time and Sales settings"
+          className="tape-settings-popover"
+          id="compact-tape-settings-panel"
+          ref={settingsPopoverRef}
+          role="dialog"
+        >
+          <strong>SHOW TRADES</strong>
+          <div className="tape-filter-options">
+            {tradeFilters.map(({ id, label }) => (
+              <label key={id}>
+                <input
+                  checked={filter === id}
+                  name="compact-time-sales-filter"
+                  onChange={() => setFilter(id)}
+                  type="radio"
+                  value={id}
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </aside>
+      )}
+      <div className="tape-head">
+        <span>TIME</span>
+        <span>PRICE</span>
+        <span>SIZE</span>
+      </div>
+      <div className="tape-compact-list" role="list">
+        {visibleTrades.map((trade, index) => (
+          <TradeRow interactive={false} key={`${trade.timestamp}-${index}`} trade={trade} />
+        ))}
+      </div>
     </section>
   )
 }

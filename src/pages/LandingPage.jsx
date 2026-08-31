@@ -1,13 +1,6 @@
 import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMarketPrimitivesShowcase.jsx'
 import HeroModeCarousel from '../components/landing/HeroModeCarousel.jsx'
 
-const evidence = [
-  ['OHLC', 'VISIBLE'],
-  ['EXECUTED VOLUME BY PRICE', 'HIDDEN'],
-  ['BID / ASK ACTIVITY', 'HIDDEN'],
-  ['TRADE SEQUENCE', 'HIDDEN']
-]
-
 const metrics = [
   ['6', 'ISOLATED MARKET SURFACES'],
   ['1', 'SYNCHRONIZED CLOCK'],
@@ -60,8 +53,8 @@ export default function LandingPage() {
               <a className="landing-button landing-button--primary" href="/demo">
                 Launch demo
               </a>
-              <a className="landing-button landing-button--secondary" href="#blind-spot">
-                See what candles miss
+              <a className="landing-button landing-button--secondary" href="#modes">
+                Explore market primitives
               </a>
             </div>
           </div>
@@ -70,50 +63,12 @@ export default function LandingPage() {
         </section>
 
         <section
-          className="landing-section landing-section--panel landing-blind-spot"
-          id="blind-spot"
-          aria-labelledby="blind-spot-title"
-        >
-          <div className="landing-copy">
-            <p className="landing-kicker">01 / THE BLIND SPOT</p>
-            <h2 id="blind-spot-title">Four prices are not the whole interval.</h2>
-            <p className="landing-lede">
-              Open, high, low and close describe the shape of a bar. They do not show where volume
-              traded, which side was aggressive, or how activity formed across price.
-            </p>
-          </div>
-
-          <div className="landing-evidence-system">
-            <dl className="landing-evidence-ledger">
-              {evidence.map(([term, state]) => (
-                <div key={term}>
-                  <dt>{term}</dt>
-                  <dd className={state === 'VISIBLE' ? 'is-visible' : undefined}>{state}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="landing-volume-diagram" aria-label="OHLC candle beside volume at price">
-              <div className="landing-volume-diagram__candle" aria-hidden="true" />
-              <div className="landing-volume-diagram__profile" aria-hidden="true">
-                {[42, 62, 88, 100, 76, 50].map((width) => (
-                  <span key={width} style={{ '--volume-width': `${width}%` }} />
-                ))}
-              </div>
-              <span className="landing-volume-diagram__label">OHLC</span>
-              <span className="landing-volume-diagram__label">VOLUME AT PRICE</span>
-              <span className="landing-volume-diagram__high">HIGH</span>
-              <span className="landing-volume-diagram__low">LOW</span>
-            </div>
-          </div>
-        </section>
-
-        <section
           className="landing-section landing-primitives-section"
           id="modes"
           aria-labelledby="modes-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">02 / MARKET PRIMITIVES</p>
+            <p className="landing-kicker">01 / MARKET PRIMITIVES</p>
             <h2 id="modes-title">Read one signal at a time.</h2>
             <p className="landing-lede">
               Each scene isolates one chart or market surface. The values update deterministically,
@@ -129,7 +84,7 @@ export default function LandingPage() {
           aria-labelledby="session-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">03 / ONE CLOCK</p>
+            <p className="landing-kicker">02 / ONE CLOCK</p>
             <h2 id="session-title">Every surface advances together.</h2>
             <p className="landing-lede">
               Candles, order flow, visible-range volume, depth and recent executions all describe
@@ -139,7 +94,7 @@ export default function LandingPage() {
 
           <div className="landing-session-evidence" aria-labelledby="evidence-title">
             <div className="landing-copy">
-              <p className="landing-kicker">04 / SESSION EVIDENCE</p>
+              <p className="landing-kicker">03 / SESSION EVIDENCE</p>
               <h3 id="evidence-title">A complete day, kept in context.</h3>
               <p className="landing-lede">
                 Explore one 24-hour BTCUSDT session across every mode and synchronized surface.
@@ -162,7 +117,7 @@ export default function LandingPage() {
           aria-labelledby="workspace-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">05 / THE WORKSPACE</p>
+            <p className="landing-kicker">04 / THE WORKSPACE</p>
             <h2 id="workspace-title">Move from summary to market structure.</h2>
             <p className="landing-lede">
               Pan, zoom, change timeframe, inspect depth, follow the tape and compare chart modes

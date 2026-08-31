@@ -239,11 +239,11 @@ function VolumeProfileScene({ profile }) {
   )
 }
 
-function PrimitiveRow({ body, children, eyebrow, heading, id, sequence, unframed = false }) {
+function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className={`landing-primitive${unframed ? ' landing-primitive--unframed' : ''}`}
+      className="landing-primitive"
       data-primitive={id}
       data-sequence={sequence}
     >
@@ -282,8 +282,7 @@ PrimitiveRow.propTypes = {
   eyebrow: PropTypes.string.isRequired,
   heading: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  sequence: PropTypes.string.isRequired,
-  unframed: PropTypes.bool
+  sequence: PropTypes.string.isRequired
 }
 
 export default function MarketPrimitivesShowcase() {
@@ -313,7 +312,6 @@ export default function MarketPrimitivesShowcase() {
         heading="Executed volume at price"
         id="footprint"
         sequence="02"
-        unframed
       >
         <FootprintScene bars={snapshot.footprintBars} />
       </PrimitiveRow>
@@ -323,7 +321,6 @@ export default function MarketPrimitivesShowcase() {
         heading="Distribution inside one interval"
         id="step-profile"
         sequence="03"
-        unframed
       >
         <StepProfileScene bars={snapshot.stepProfileBars} />
       </PrimitiveRow>
@@ -343,7 +340,11 @@ export default function MarketPrimitivesShowcase() {
         id="dom"
         sequence="05"
       >
-        <CompactDom currentPrice={snapshot.currentPrice} orderbook={snapshot.orderbook} />
+        <CompactDom
+          currentPrice={snapshot.currentPrice}
+          orderbook={snapshot.orderbook}
+          sourceTickSize={marketPrimitiveTickSize}
+        />
       </PrimitiveRow>
       <PrimitiveRow
         body="Three recent prints communicate pace and aggressor side without a full table. New trades enter at the top while price, size and time remain tied to the same market clock."

@@ -18,6 +18,12 @@ test('landing renders its product thesis without loading historical data', async
   )
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   await expect(page.getByRole('link', { name: 'Launch demo' })).toHaveAttribute('href', '/demo')
+  await expect(page.getByRole('link', { name: 'Explore market primitives' })).toHaveAttribute(
+    'href',
+    '#modes'
+  )
+  await expect(page.getByText('Four prices are not the whole interval.')).toHaveCount(0)
+  await expect(page.locator('#blind-spot')).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Modes', exact: true })).toHaveAttribute(
     'href',
     '#modes'
@@ -122,12 +128,31 @@ test('isolated market primitives load near the viewport without mounting the wor
 
   await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
   await expect(showcase.locator('.market-chart')).toHaveCount(0)
-  await expect(showcase.getByRole('button')).toHaveCount(0)
+  await expect(showcase.getByRole('button')).toHaveCount(2)
   await expect(
     showcase.locator('[data-primitive="candles"] g.up, [data-primitive="candles"] g.down')
   ).toHaveCount(5)
   await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
   await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
+  for (const primitive of [
+    'candles',
+    'footprint',
+    'step-profile',
+    'volume-profile',
+    'dom',
+    'last-trades'
+  ]) {
+    const row = showcase.locator(`[data-primitive="${primitive}"]`)
+    await expect(row).toHaveCSS('box-shadow', 'none')
+    await expect(row).toHaveCSS('border-top-width', '0px')
+    await expect(row).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)')
+    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('box-shadow', 'none')
+    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('border-top-width', '0px')
+    await expect(row.locator('.landing-primitive__visual')).toHaveCSS(
+      'background-color',
+      'rgba(0, 0, 0, 0)'
+    )
+  }
   for (const primitive of ['footprint', 'step-profile']) {
     const row = showcase.locator(`[data-primitive="${primitive}"]`)
     await expect(row.locator('.landing-completed-order-flow')).toHaveAttribute(
@@ -138,15 +163,56 @@ test('isolated market primitives load near the viewport without mounting the wor
       'transform',
       'translate(0 -6)'
     )
-    await expect(row).toHaveCSS('box-shadow', 'none')
-    await expect(row).toHaveCSS('border-top-width', '0px')
-    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('box-shadow', 'none')
-    await expect(row.locator('.landing-primitive__visual')).toHaveCSS('border-top-width', '0px')
   }
-  await expect(showcase.locator('.dom--compact .dom-row.ask')).toHaveCount(3)
-  await expect(showcase.locator('.dom--compact .dom-spread-row')).toHaveCount(1)
-  await expect(showcase.locator('.dom--compact .dom-row.bid')).toHaveCount(3)
-  await expect(showcase.locator('.tape--compact .tape-row')).toHaveCount(3)
+  const compactDom = showcase.locator('.dom--compact')
+  await expect(compactDom.locator(':scope > header')).toContainText('BTC · 0.25 · x1')
+  await expect(compactDom.locator('.dom-row.ask')).toHaveCount(3)
+  await expect(compactDom.locator('.dom-spread-row')).toHaveCount(1)
+  await expect(compactDom.locator('.dom-row.bid')).toHaveCount(3)
+  await expect(compactDom).toHaveCSS('width', '500px')
+  const domAlignment = await compactDom.evaluate((node) => {
+    const parent = node.parentElement.getBoundingClientRect()
+    const panel = node.getBoundingClientRect()
+    return {
+      centerDelta: Math.abs(panel.left + panel.width / 2 - (parent.left + parent.width / 2)),
+      truncatedValues: [...node.querySelectorAll('.dom-row span, .dom-spread-row strong')].filter(
+        (cell) => cell.scrollWidth > cell.clientWidth
+      ).length
+    }
+  })
+  expect(domAlignment.centerDelta).toBeLessThanOrEqual(1)
+  expect(domAlignment.truncatedValues).toBe(0)
+
+  const domSettingsButton = showcase.getByRole('button', { name: 'Compact DOM settings' })
+  await domSettingsButton.click()
+  const domSettings = showcase.getByRole('dialog', { name: 'Compact DOM settings' })
+  await expect(domSettings).toBeVisible()
+  await showcase.getByLabel('Compact DOM price grouping').selectOption('0.5')
+  await expect(compactDom).toHaveAttribute('data-price-grouping', '0.5')
+  await expect(compactDom.locator(':scope > header')).toContainText('BTC · 0.50 · x2')
+  await page.keyboard.press('Escape')
+  await expect(domSettings).toBeHidden()
+  await expect(domSettingsButton).toBeFocused()
+
+  const compactTape = showcase.locator('.tape--compact')
+  await expect(compactTape.locator('.tape-row')).toHaveCount(3)
+  const tapeSettingsButton = showcase.getByRole('button', {
+    name: 'Compact Time and Sales settings'
+  })
+  await tapeSettingsButton.click()
+  const tapeSettings = showcase.getByRole('dialog', {
+    name: 'Compact Time and Sales settings'
+  })
+  await expect(tapeSettings).toBeVisible()
+  await tapeSettings.getByRole('radio', { name: 'Buys only' }).check()
+  await expect(compactTape).toHaveAttribute('data-trade-filter', 'buy')
+  await expect(compactTape.locator('.tape-row.sell')).toHaveCount(0)
+  await expect(compactTape.locator('.tape-row.buy')).not.toHaveCount(0)
+  await tapeSettings.getByRole('radio', { name: 'All trades' }).check()
+  await expect(compactTape.locator('.tape-row')).toHaveCount(3)
+  await page.keyboard.press('Escape')
+  await expect(tapeSettings).toBeHidden()
+  await expect(tapeSettingsButton).toBeFocused()
   await expect(showcase).not.toContainText('NaN')
 
   const primitiveRows = showcase.locator('.landing-primitive')

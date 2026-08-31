@@ -21,10 +21,10 @@ Estos valores viven en `src/styles/professional.css`; `src/styles/landing.css` s
 
 ## Composición Direction B
 
-El orden contractual es Header, Opening thesis, The blind spot, Market primitives, One clock,
-Session evidence, The workspace, Case study endorsement y Footer. La revelación del terminal
-completo se retrasa hasta `The workspace`: las secciones anteriores explican progresivamente qué se
-pierde al leer solo OHLC.
+El orden contractual R6 es Header, Opening thesis, Market primitives, One clock, Session evidence,
+The workspace, Case study endorsement y Footer. Opening thesis ya muestra el terminal completo en
+su carrusel; `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o una
+lectura adicional. El CTA secundario del hero salta directamente a Market primitives.
 
 - Header sólido y sticky, sin blur ni transparencia.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
@@ -49,17 +49,22 @@ El ajuste R3 evita reducir el terminal completo dentro de una sección editorial
 fila compacta de dos columnas. La primera coloca visual a la izquierda y copy a la derecha; las
 siguientes alternan ese orden:
 
-- El contenedor desktop tiene 360 px de altura mínima, padding de 48 px, gap de 64 px y un visual
-  máximo de 560 × 260.
+- El contenedor desktop tiene 360 px de altura mínima, padding vertical de 48 px, gap de 64 px y un
+  visual máximo de 560 px de ancho.
 - Candles usa cinco barras próximas entre sí y mantiene high/low estables mientras cambia el close
   de la última. Footprint y Step Profile usan dos barras: una cerrada estable y una actual. No se
   muestran headers, tabs, settings, resizers ni chrome de chart.
 - En Footprint y Step Profile la barra cerrada baja 6 px y la actual sube 6 px para distinguir sus
-  siluetas sin convertir el desplazamiento en protagonista. Estas dos filas son unframed: tanto la
-  fila como el área visual eliminan surface, borde, radio y shadow.
+  siluetas sin convertir el desplazamiento en protagonista.
+- Las seis filas son unframed: tanto la fila como el área visual eliminan surface, borde, radio y
+  shadow. DOM y Last Trades mantienen únicamente el panel real que contiene sus datos y controles.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
   punteadas.
-- DOM limita su lectura a 3 asks + last + 3 bids. Last Trades limita su stream a tres impresiones.
+- DOM limita su lectura a 3 asks + last + 3 bids y ocupa hasta 500 px, centrado, con columnas sin
+  elipsis. Last Trades limita su stream a tres impresiones.
+- DOM y Last Trades conservan su context header, cabeceras y trigger de settings. El price grouping
+  del DOM y el filtro all/buy/sell de Trades son funcionales, transitorios y reutilizan el foco,
+  cierre y tokens del producto.
 - Verde y rojo conservan significado de buy/bid y sell/ask. El naranja sigue reservado a acción y
   POC; no se usa como decoración arbitraria.
 - Las escenas reutilizan capas, geometría, filas, formato y tokens profesionales; no copian una

@@ -49,9 +49,10 @@ y explicación a la derecha. En mobile se apilan visual y copy sin escalar un te
 | DOM            | Tres asks, last price y tres bids; cambian cantidades y barras de profundidad. |
 | Last Trades    | Tres ejecuciones recientes; entra una nueva impresión en cada fase.            |
 
-No se muestran headers del chart, tabs, settings, resizers, watchlist, ticket, activity ni paneles
-vecinos en estas filas. La apertura y `The workspace` pueden usar imágenes optimizadas porque su
-función es mostrar contexto de producto completo.
+No se muestran headers del chart, tabs, resizers, watchlist, ticket, activity ni paneles vecinos en
+estas filas. La excepción intencional es el context header y settings de DOM/Time & Sales. La
+apertura y `The workspace` pueden usar imágenes optimizadas porque su función es mostrar contexto
+de producto completo.
 
 ## Ajuste visual R3
 
@@ -84,6 +85,25 @@ función es mostrar contexto de producto completo.
 - Las dos filas eliminan wrapper visual de card, surface, borde, radio y sombra tanto en el
   contenedor editorial como en el área SVG; los otros cuatro primitivos conservan su tratamiento.
 
+## Simplificación narrativa R6
+
+- Se elimina por completo `The blind spot`, incluido su ledger y el diagrama OHLC/Volume at Price.
+- El CTA secundario del hero pasa de `#blind-spot` a `#modes` y se renombra `Explore market
+  primitives`.
+- Market primitives, One clock, Session evidence y The workspace se renumeran 01–04.
+- El CSS específico de la sección retirada se elimina; no quedan wrappers ni selectores huérfanos.
+
+## Paneles compactos y composición R7
+
+- El tratamiento unframed de R5 se extiende a Candles, Volume Profile, DOM y Last Trades: las seis
+  filas y sus marcos visuales quedan sin surface, borde, radio ni sombra.
+- Compact DOM crece de 420 a 500 px máximos, queda centrado y deja de aplicar elipsis a valores de
+  ladder. Añade el context header, las cabeceras PRICE/Δ/SIZE/LAST y settings de price grouping.
+- Compact Time & Sales añade el context header, las cabeceras TIME/PRICE/SIZE y settings para All
+  trades, Buys only y Sells only.
+- Los popovers son funcionales y conservan el contrato de foco: Escape cierra y devuelve el foco al
+  trigger; pointer fuera cierra sin bloquear el destino.
+
 ## Arquitectura React vigente
 
 ```text
@@ -98,7 +118,8 @@ src/components/landing/
 - `MarketPrimitivesShowcase` comparte un único reloj de cuatro fases entre las seis escenas.
 - `CandlesLayer`, `FootprintLayer` y `StepProfileLayer` siguen siendo las capas reales del producto.
 - `CompactDom` y `CompactTimeSales` viven junto a los componentes profesionales y reutilizan sus
-  filas, formato y tokens sin modificar el API ni el comportamiento por defecto de `/demo`.
+  filas, formato, headers, settings y tokens sin modificar el comportamiento por defecto de
+  `/demo`.
 - Volume Profile reutiliza `deriveSessionProfileBarGeometry` y los mismos roles visuales del chart.
 - `marketPrimitiveFixtures` es puro, pequeño, determinista y cubierto por unit tests.
 - El prototipo R1 `ScrollScene` + `ChartModesShowcase` y el modo memory-only de `MarketChart` se
@@ -165,28 +186,33 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3/R4/R5  | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R5                                              | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R7     | pending  | R2 permanece como referencia aprobada; R6/R7 todavía son locales                                               | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
+| 13 · Simplificación narrativa R6    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md`; 21/21 E2E   | Publicar solo con permiso  |
+| 14 · Paneles compactos unframed R7  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md`; 21/21 + 2/2 | Publicar con R6            |
+| 15 · Release R6/R7                  | pending  | Autorización explícita del 2026-08-31                                                                    | Commit, Railway y QA pública |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
 ## Criterios de aceptación
 
 - `/` presenta Apex como demo funcional de una UI de trading avanzada.
-- Hay seis filas visuales aisladas y ninguna monta `.market-chart` ni controles de terminal.
+- Hay seis filas visuales aisladas, todas unframed, y ninguna monta `.market-chart` ni paneles
+  vecinos.
 - Candles contiene cinco velas próximas y solo cambia el close de la última dentro de extremos
   válidos.
 - Footprint y Step Profile contienen una vela pasada estable y una actual.
 - Volume Profile no muestra candles ni el resto del chart.
-- DOM contiene exactamente 3 asks + last + 3 bids.
-- Last Trades contiene exactamente tres ejecuciones.
+- DOM contiene exactamente 3 asks + last + 3 bids al abrir, queda centrado y no trunca cifras.
+- DOM y Last Trades muestran su context header y settings funcionales con foco restaurado al cerrar.
+- Last Trades contiene exactamente tres ejecuciones con el filtro All trades.
 - Las fases son deterministas, se pausan fuera de viewport/pestaña y respetan reduced motion.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R5; hasta entonces el
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R7; hasta entonces el
   gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 

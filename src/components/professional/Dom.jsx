@@ -43,9 +43,26 @@ function DomLevelRow({ index, interactive = true, maximum, onPrice, row, side })
   )
 }
 
-export function CompactDom({ currentPrice, orderbook }) {
-  const asks = [...orderbook.asks.slice(0, 3)].reverse()
-  const bids = orderbook.bids.slice(0, 3)
+function getGroupingOptions(sourceTickSize) {
+  return [...new Set([sourceTickSize, ...domPriceGroupings])].filter((grouping) => {
+    const multiple = grouping / sourceTickSize
+    return grouping >= sourceTickSize && Math.abs(multiple - Math.round(multiple)) < 1e-8
+  })
+}
+
+export function CompactDom({ currentPrice, orderbook, sourceTickSize = 0.25 }) {
+  const [priceGrouping, setPriceGrouping] = useState(sourceTickSize)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const domRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
+  const groupingOptions = useMemo(() => getGroupingOptions(sourceTickSize), [sourceTickSize])
+  const groupedOrderbook = useMemo(
+    () => aggregateDomOrderbook(orderbook, priceGrouping),
+    [orderbook, priceGrouping]
+  )
+  const asks = [...groupedOrderbook.asks.slice(0, 3)].reverse()
+  const bids = groupedOrderbook.bids.slice(0, 3)
   const maximum = Math.max(
     ...asks.map(({ amount }) => amount),
     ...bids.map(({ amount }) => amount),
@@ -54,6 +71,14 @@ export function CompactDom({ currentPrice, orderbook }) {
   const bestAsk = Number(orderbook.asks[0]?.price)
   const bestBid = Number(orderbook.bids[0]?.price)
   const spread = Number.isFinite(bestAsk) && Number.isFinite(bestBid) ? bestAsk - bestBid : 0
+  const groupingMultiple = Math.round(priceGrouping / sourceTickSize)
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: domRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
 
   return (
     <section
@@ -61,7 +86,57 @@ export function CompactDom({ currentPrice, orderbook }) {
       className="dom dom--compact"
       data-ask-count={asks.length}
       data-bid-count={bids.length}
+      data-price-grouping={priceGrouping}
+      ref={domRef}
     >
+      <header>
+        <span>
+          BTC · {formatDomGrouping(priceGrouping)} · x{groupingMultiple}
+        </span>
+        <button
+          aria-controls="compact-dom-settings-panel"
+          aria-expanded={settingsOpen}
+          aria-label="Compact DOM settings"
+          className="dom-settings-button"
+          onClick={handleTriggerClick}
+          ref={settingsTriggerRef}
+          title="DOM settings"
+          type="button"
+        >
+          <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
+        </button>
+      </header>
+      {settingsOpen && (
+        <aside
+          aria-label="Compact DOM settings"
+          className="dom-settings-popover"
+          id="compact-dom-settings-panel"
+          ref={settingsPopoverRef}
+          role="dialog"
+        >
+          <strong>DOM SETTINGS</strong>
+          <label>
+            PRICE GROUPING
+            <select
+              aria-label="Compact DOM price grouping"
+              onChange={(event) => setPriceGrouping(Number(event.target.value))}
+              value={priceGrouping}
+            >
+              {groupingOptions.map((grouping) => (
+                <option key={grouping} value={grouping}>
+                  {formatDomGrouping(grouping)} USDT · x{Math.round(grouping / sourceTickSize)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </aside>
+      )}
+      <div className="dom-head">
+        <span>PRICE</span>
+        <span>Δ</span>
+        <span>SIZE</span>
+        <span>LAST</span>
+      </div>
       <div aria-label="Three ask price levels" className="dom-compact-side" role="list">
         {asks.map((row, index) => (
           <DomLevelRow
@@ -115,14 +190,7 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
   const bidLevelsRef = useRef(null)
   const domScrollPosition = useRef({ askFromBottom: 0, bidFromTop: 0 })
   const previousDomGrouping = useRef(null)
-  const groupingOptions = useMemo(
-    () =>
-      domPriceGroupings.filter((grouping) => {
-        const multiple = grouping / sourceTickSize
-        return grouping >= sourceTickSize && Math.abs(multiple - Math.round(multiple)) < 1e-8
-      }),
-    [sourceTickSize]
-  )
+  const groupingOptions = useMemo(() => getGroupingOptions(sourceTickSize), [sourceTickSize])
   const groupedOrderbook = useMemo(
     () => aggregateDomOrderbook(orderbook, priceGrouping),
     [orderbook, priceGrouping]
@@ -306,7 +374,8 @@ CompactDom.propTypes = {
     asks: PropTypes.arrayOf(orderbookLevelType).isRequired,
     bids: PropTypes.arrayOf(orderbookLevelType).isRequired,
     groupsApplied: PropTypes.number.isRequired
-  }).isRequired
+  }).isRequired,
+  sourceTickSize: PropTypes.number
 }
 
 DomLevelRow.propTypes = {
