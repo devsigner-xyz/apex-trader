@@ -227,7 +227,7 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R11    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R10 y R11 está local                          | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R11    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R11                                           | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
@@ -240,8 +240,8 @@ IDs y masters.
 | 19 · Release R9                     | complete | `2169d902…`; Railway `f38993ff…`; UI pública desktop/mobile verificada                                         | —                          |
 | 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | —                          |
 | 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | —                          |
-| 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | Publicar solo con permiso  |
-| 23 · Release R11                    | pending  | Sin commit, push ni despliegue                                                                                  | Requiere autorización      |
+| 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | —                          |
+| 23 · Release R11                    | complete | `0b399ec…`; Railway `e3d07c19…`; copy, rutas, assets y UI pública verificados                                  | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
