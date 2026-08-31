@@ -114,7 +114,8 @@ assets 1600 × 900, las filas unframed y escalonadas de Footprint/Step Profile, 
 Storybook y la consola. La evidencia está en
 [Interactive portfolio landing R5 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r5-production.md).
 
-R6 y R7 están implementados en el checkout local y autorizados para publicación conjunta. Producción
-continúa sirviendo R5 hasta verificar el nuevo commit exacto y `SUCCESS` en Railway. La evidencia
-local está en [Interactive portfolio landing R6 · narrative simplification](../verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md)
-y [Interactive portfolio landing R7 · panel settings and unframed modules](../verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md).
+R6 y R7 están publicados en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit funcional
+`3b625f9095bdfddfd4b242692f5724756ad5418b` mediante el deployment
+`966c184c-cd6c-45cf-8d9c-269b734853df`. Se comprobaron rutas, bundles, retirada de The blind spot,
+seis filas unframed, DOM centrado y sin truncado, settings de DOM/Trades, mobile y consola. La
+evidencia está en [Interactive portfolio landing R6/R7 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r7-production.md).

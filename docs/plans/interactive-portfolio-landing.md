@@ -186,13 +186,13 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R7     | pending  | R2 permanece como referencia aprobada; R6/R7 todavía son locales                                               | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R7     | pending  | R2 permanece como referencia aprobada; runtime público ejecuta R7                                              | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
 | 13 · Simplificación narrativa R6    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md`; 21/21 E2E   | Publicar solo con permiso  |
 | 14 · Paneles compactos unframed R7  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md`; 21/21 + 2/2 | Publicar con R6            |
-| 15 · Release R6/R7                  | pending  | Autorización explícita del 2026-08-31                                                                    | Commit, Railway y QA pública |
+| 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
