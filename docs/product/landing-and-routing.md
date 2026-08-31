@@ -120,3 +120,9 @@ R6 y R7 están publicados en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` pa
 `966c184c-cd6c-45cf-8d9c-269b734853df`. Se comprobaron rutas, bundles, retirada de The blind spot,
 seis filas unframed, DOM centrado y sin truncado, settings de DOM/Trades, mobile y consola. La
 evidencia está en [Interactive portfolio landing R6/R7 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r7-production.md).
+
+R8 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCESS` para el commit funcional
+`c6d941e8e2b39d68dfac8878cd3605e45671a4bc` mediante el deployment
+`a62124bc-c704-4444-a57b-5e98c6ae6263`. Se comprobaron las rutas públicas, los nueve precios del
+Volume Profile, su alineación, el responsive 390 × 844 y la consola. La evidencia está en
+[Interactive portfolio landing R8 · production verification](../verification/2026-08-31-interactive-portfolio-landing-r8-production.md).

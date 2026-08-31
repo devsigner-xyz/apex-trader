@@ -203,7 +203,7 @@ IDs y masters.
 | 14 · Paneles compactos unframed R7  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md`; 21/21 + 2/2 | Publicar con R6            |
 | 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | —                          |
 | 16 · Price scale R8 local           | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r8-volume-profile-price-scale-local.md`; 21/21 E2E | Publicar solo con permiso  |
-| 17 · Release R8                     | pending  | Sin commit ni despliegue                                                                                       | Requiere permiso explícito |
+| 17 · Release R8                     | complete | `c6d941e…`; Railway `a62124bc…`; UI pública desktop/mobile verificada                                          | —                          |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
