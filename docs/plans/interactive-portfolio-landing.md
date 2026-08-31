@@ -1,5 +1,5 @@
 ---
-status: complete
+status: in_progress
 last_verified: 2026-08-31
 owners: product-design-engineering
 ---
@@ -18,9 +18,9 @@ contrato R2 de módulos aislados: los gráficos, DOM, Last Trades y Volume Profi
 mostrar el resto del terminal. R1 y su verificación se conservan como snapshot histórico; no son el
 contrato vigente.
 
-La instrucción `publica los cambios al finalizar` autoriza commit, push, despliegue y verificación
-pública únicamente cuando Figma, código, documentación y todos los gates de este plan estén
-completos. No autoriza una release parcial ni operaciones destructivas.
+La publicación R2 autorizada ya está cerrada. El feedback posterior define una revisión R3 local;
+no se reutiliza automáticamente aquella autorización para publicar este nuevo alcance. No autoriza
+una release parcial ni operaciones destructivas.
 
 ## Resultado buscado
 
@@ -49,11 +49,26 @@ No se muestran headers del chart, tabs, settings, resizers, watchlist, ticket, a
 vecinos en estas filas. La apertura y `The workspace` pueden usar imágenes optimizadas porque su
 función es mostrar contexto de producto completo.
 
+## Ajuste visual R3
+
+- Opening thesis sustituye la captura única y la deconstrucción OHLC por un carrusel de exports
+  reales: Candles → Footprint → Step Profile, crossfade de 420 ms y ciclo de 4,2 s.
+- El carrusel expone selección manual y pause/resume; se detiene fuera de viewport, con la pestaña
+  oculta y bajo `prefers-reduced-motion`.
+- Las seis filas alternan visual/copy en desktop y recuperan siempre visual → copy en mobile.
+- Candles acerca sus cinco barras. La quinta conserva open/high/low válidos y mueve solo el close
+  dentro del rango durante el bucle.
+- Footprint y Step Profile pasan de una a dos barras: una cerrada estable y otra actual. Ambas tienen
+  `delta` y `volume` finitos derivados de sus niveles.
+- Elevación, numeración y marcos desplazados aportan profundidad con tokens de Apex, sin gradientes,
+  glass, neón ni colores de mercado usados como decoración.
+
 ## Arquitectura React vigente
 
 ```text
 src/components/landing/
   DeferredMarketPrimitivesShowcase.jsx
+  HeroModeCarousel.jsx
   MarketPrimitivesShowcase.jsx
   marketPrimitiveFixtures.js
 ```
@@ -76,7 +91,9 @@ src/components/landing/
 - `document.hidden` pausa el reloj.
 - `prefers-reduced-motion` fija la fase 0 completa; ninguna explicación depende del movimiento.
 - No se usan números aleatorios ni un render React por píxel de scroll.
-- Solo cambia la quinta vela en Candles; las cuatro velas cerradas conservan identidad y valores.
+- Solo cambia el close de la quinta vela en Candles; las cuatro velas cerradas y los extremos de la
+  actual conservan identidad y valores.
+- Footprint y Step Profile mantienen su primera barra estable y actualizan solo la segunda.
 - DOM contiene exactamente 3 asks + last + 3 bids y Last Trades exactamente 3 filas.
 
 ## Responsive y rendimiento
@@ -109,6 +126,10 @@ R2 reutiliza instancias de los masters Candles `132:3266`, Footprint `132:867`, 
 representa como geometría vectorial aislada ligada a las variables locales. Direction B y todos los
 masters permanecen intactos.
 
+R3 está implementado en código y verificado en navegador, pero todavía no se ha sincronizado con
+Figma. R2 se conserva como referencia aprobada; no debe declararse paridad Figma/código hasta crear
+o actualizar una revisión preservando IDs y masters.
+
 ## Fases y ledger reanudable
 
 | Fase                               | Estado   | Evidencia / artefactos                                                                                         | Siguiente acción           |
@@ -120,6 +141,8 @@ masters permanecen intactos.
 | 4 · Módulos React y composición    | complete | Seis escenas aisladas, carga lazy, fixture compartido, imágenes de UI completa limitadas a contexto            | Cerrar docs y QA           |
 | 5 · Contratos, documentación y QA  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright    | —                          |
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
+| 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
+| 8 · Figma R3 y release             | pending  | R2 permanece como referencia aprobada; R3 aún no publicado                                                     | Requiere autorización      |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -127,8 +150,9 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
 - `/` presenta Apex como demo funcional de una UI de trading avanzada.
 - Hay seis filas visuales aisladas y ninguna monta `.market-chart` ni controles de terminal.
-- Candles contiene cinco velas y solo cambia la última.
-- Footprint y Step Profile contienen una vela cada uno.
+- Candles contiene cinco velas próximas y solo cambia el close de la última dentro de extremos
+  válidos.
+- Footprint y Step Profile contienen una vela pasada estable y una actual.
 - Volume Profile no muestra candles ni el resto del chart.
 - DOM contiene exactamente 3 asks + last + 3 bids.
 - Last Trades contiene exactamente tres ejecuciones.

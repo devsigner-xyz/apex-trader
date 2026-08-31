@@ -1,4 +1,5 @@
 import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMarketPrimitivesShowcase.jsx'
+import HeroModeCarousel from '../components/landing/HeroModeCarousel.jsx'
 
 const evidence = [
   ['OHLC', 'VISIBLE'],
@@ -65,37 +66,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="landing-analysis-card">
-            <figure className="landing-opening-media">
-              <img
-                src="/media/opening-thesis.png"
-                alt="Apex Trader Candles chart with OHLC, volume profile and volume bars."
-                width="1400"
-                height="1006"
-                loading="eager"
-                decoding="async"
-              />
-            </figure>
-
-            <div className="landing-deconstruction" aria-label="What a candle shows and hides">
-              <div className="landing-candle" aria-label="Candle with open, high, low and close">
-                <span className="landing-candle__wick" aria-hidden="true" />
-                <span className="landing-candle__body" aria-hidden="true" />
-                <span className="landing-candle__label landing-candle__label--high">HIGH</span>
-                <span className="landing-candle__label landing-candle__label--open">OPEN</span>
-                <span className="landing-candle__label landing-candle__label--close">CLOSE</span>
-                <span className="landing-candle__label landing-candle__label--low">LOW</span>
-              </div>
-              <ul className="landing-latent-list">
-                {['VOLUME AT PRICE', 'BID / ASK', 'TRADE SEQUENCE'].map((item) => (
-                  <li key={item}>
-                    <span>{item}</span>
-                    <span aria-hidden="true" />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <HeroModeCarousel />
         </section>
 
         <section

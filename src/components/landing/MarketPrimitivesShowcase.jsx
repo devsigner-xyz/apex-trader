@@ -97,7 +97,7 @@ function priceScale(low, high, top = 24, bottom = 236) {
 
 function CandlesScene({ bars }) {
   const scale = priceScale(21830, 21857, 28, 232)
-  const centers = [58, 168, 278, 388, 498]
+  const centers = [196, 238, 280, 322, 364]
   const completed = bars.slice(0, -1)
   const current = bars.at(-1)
 
@@ -115,47 +115,82 @@ function CandlesScene({ bars }) {
   )
 }
 
-function FootprintScene({ bar }) {
+function FootprintScene({ bars }) {
   const domain = { high: 21842.5, low: 21839.75, range: 2.75 }
   const scale = priceScale(domain.low, domain.high, 26, 236)
+  const [completed, current] = bars
   return (
-    <svg aria-label="Single updating Footprint candle" role="img" viewBox="0 0 560 260">
-      <title>One footprint candle with bid and ask volume at price</title>
-      <FootprintLayer
-        bars={[bar]}
-        centers={[280]}
-        deltaFontSize={13}
-        domain={domain}
-        fontSize={12}
-        plotBounds={{ bottom: 236, top: 26 }}
-        priceScale={scale}
-        settings={footprintSettings}
-        step={196}
-        tickSize={marketPrimitiveTickSize}
-        zoomScale={2}
-      />
+    <svg aria-label="Completed and updating Footprint candles" role="img" viewBox="0 0 560 260">
+      <title>One completed footprint candle followed by one updating candle</title>
+      <g className="landing-completed-order-flow">
+        <FootprintLayer
+          bars={[completed]}
+          centers={[200]}
+          deltaFontSize={13}
+          domain={domain}
+          fontSize={12}
+          plotBounds={{ bottom: 236, top: 26 }}
+          priceScale={scale}
+          settings={footprintSettings}
+          step={150}
+          tickSize={marketPrimitiveTickSize}
+          zoomScale={2}
+        />
+      </g>
+      <g className="landing-current-order-flow">
+        <FootprintLayer
+          bars={[current]}
+          centers={[360]}
+          deltaFontSize={13}
+          domain={domain}
+          fontSize={12}
+          plotBounds={{ bottom: 236, top: 26 }}
+          priceScale={scale}
+          settings={footprintSettings}
+          step={150}
+          tickSize={marketPrimitiveTickSize}
+          zoomScale={2}
+        />
+      </g>
     </svg>
   )
 }
 
-function StepProfileScene({ bar }) {
+function StepProfileScene({ bars }) {
   const domain = { high: 21842.5, low: 21839.75, range: 2.75 }
   const scale = priceScale(domain.low, domain.high, 26, 236)
+  const [completed, current] = bars
   return (
-    <svg aria-label="Single updating Step Profile candle" role="img" viewBox="0 0 560 260">
-      <title>One Step Profile candle with an updating distribution</title>
-      <StepProfileLayer
-        bars={[bar]}
-        centers={[280]}
-        deltaFontSize={13}
-        domain={domain}
-        plotBounds={{ bottom: 236, top: 26 }}
-        priceScale={scale}
-        settings={footprintSettings}
-        step={310}
-        tickSize={marketPrimitiveTickSize}
-        zoomScale={2}
-      />
+    <svg aria-label="Completed and updating Step Profile candles" role="img" viewBox="0 0 560 260">
+      <title>One completed Step Profile candle followed by one updating candle</title>
+      <g className="landing-completed-order-flow">
+        <StepProfileLayer
+          bars={[completed]}
+          centers={[180]}
+          deltaFontSize={13}
+          domain={domain}
+          plotBounds={{ bottom: 236, top: 26 }}
+          priceScale={scale}
+          settings={footprintSettings}
+          step={190}
+          tickSize={marketPrimitiveTickSize}
+          zoomScale={2}
+        />
+      </g>
+      <g className="landing-current-order-flow">
+        <StepProfileLayer
+          bars={[current]}
+          centers={[380]}
+          deltaFontSize={13}
+          domain={domain}
+          plotBounds={{ bottom: 236, top: 26 }}
+          priceScale={scale}
+          settings={footprintSettings}
+          step={190}
+          tickSize={marketPrimitiveTickSize}
+          zoomScale={2}
+        />
+      </g>
     </svg>
   )
 }
@@ -204,11 +239,19 @@ function VolumeProfileScene({ profile }) {
   )
 }
 
-function PrimitiveRow({ body, children, eyebrow, heading, id }) {
+function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
   return (
-    <section aria-labelledby={`${id}-title`} className="landing-primitive" data-primitive={id}>
+    <section
+      aria-labelledby={`${id}-title`}
+      className="landing-primitive"
+      data-primitive={id}
+      data-sequence={sequence}
+    >
       <div className="landing-primitive__visual">{children}</div>
       <div className="landing-primitive__copy">
+        <span aria-hidden="true" className="landing-primitive__sequence">
+          {sequence}
+        </span>
         <p>{eyebrow}</p>
         <h3 id={`${id}-title`}>{heading}</h3>
         <p>{body}</p>
@@ -222,11 +265,11 @@ CandlesScene.propTypes = {
 }
 
 FootprintScene.propTypes = {
-  bar: barType.isRequired
+  bars: PropTypes.arrayOf(barType).isRequired
 }
 
 StepProfileScene.propTypes = {
-  bar: barType.isRequired
+  bars: PropTypes.arrayOf(barType).isRequired
 }
 
 VolumeProfileScene.propTypes = {
@@ -238,7 +281,8 @@ PrimitiveRow.propTypes = {
   children: PropTypes.node.isRequired,
   eyebrow: PropTypes.string.isRequired,
   heading: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
+  sequence: PropTypes.string.isRequired
 }
 
 export default function MarketPrimitivesShowcase() {
@@ -254,34 +298,38 @@ export default function MarketPrimitivesShowcase() {
       ref={rootRef}
     >
       <PrimitiveRow
-        body="Four completed candles establish direction. Only the latest candle updates its high, low and close, making the current interval legible without surrounding terminal controls."
+        body="Four completed candles establish direction. The latest candle keeps a valid open, high and low while its close moves inside that traded range, making the live interval easy to read."
         eyebrow="CANDLES · 5 BARS · LATEST BAR UPDATES"
         heading="Price over time"
         id="candles"
+        sequence="01"
       >
         <CandlesScene bars={snapshot.candles} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="One Footprint candle exposes bid volume on the left and ask volume on the right. Updating figures reveal where aggressive buying and selling meet inside the interval."
-        eyebrow="FOOTPRINT · 1 BAR · VALUES UPDATE"
+        body="A completed candle preserves the last interval while the current Footprint updates beside it. Bid volume stays on the left, ask volume on the right and finite delta makes the imbalance explicit."
+        eyebrow="FOOTPRINT · 2 BARS · CURRENT VALUES UPDATE"
         heading="Executed volume at price"
         id="footprint"
+        sequence="02"
       >
-        <FootprintScene bar={snapshot.footprintBar} />
+        <FootprintScene bars={snapshot.footprintBars} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="A single Step Profile candle turns traded volume into a stepped silhouette. As values refresh, the shape makes concentration, imbalance and rejection immediately visible."
-        eyebrow="STEP PROFILE · 1 BAR · DISTRIBUTION UPDATES"
+        body="The previous profile remains fixed while the current interval reshapes beside it. Comparing both silhouettes makes concentration, imbalance and rejection easier to read."
+        eyebrow="STEP PROFILE · 2 BARS · CURRENT DISTRIBUTION UPDATES"
         heading="Distribution inside one interval"
         id="step-profile"
+        sequence="03"
       >
-        <StepProfileScene bar={snapshot.stepProfileBar} />
+        <StepProfileScene bars={snapshot.stepProfileBars} />
       </PrimitiveRow>
       <PrimitiveRow
         body="Horizontal bars show participation at each price. The profile updates as the visible session evolves, while POC, VAH and VAL keep the dominant area easy to read."
         eyebrow="VOLUME PROFILE · POC / VAH / VAL · BARS UPDATE"
         heading="Where the session traded"
         id="volume-profile"
+        sequence="04"
       >
         <VolumeProfileScene profile={snapshot.profile} />
       </PrimitiveRow>
@@ -290,6 +338,7 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="DOM · 3 ASKS + LAST + 3 BIDS · DEPTH UPDATES"
         heading="Liquidity around the last price"
         id="dom"
+        sequence="05"
       >
         <CompactDom currentPrice={snapshot.currentPrice} orderbook={snapshot.orderbook} />
       </PrimitiveRow>
@@ -298,6 +347,7 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="LAST TRADES · 3 EXECUTIONS · STREAM UPDATES"
         heading="The latest executions"
         id="last-trades"
+        sequence="06"
       >
         <CompactTimeSales trades={snapshot.trades} />
       </PrimitiveRow>

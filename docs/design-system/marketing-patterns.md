@@ -21,31 +21,37 @@ Estos valores viven en `src/styles/professional.css`; `src/styles/landing.css` s
 
 ## Composición Direction B
 
-El orden contractual es Header, Opening thesis, The blind spot, Three readings, One clock, Session evidence, The workspace, Case study endorsement y Footer. La revelación del terminal completo se retrasa hasta `The workspace`: las secciones anteriores explican progresivamente qué se pierde al leer solo OHLC.
+El orden contractual es Header, Opening thesis, The blind spot, Market primitives, One clock,
+Session evidence, The workspace, Case study endorsement y Footer. La revelación del terminal
+completo se retrasa hasta `The workspace`: las secciones anteriores explican progresivamente qué se
+pierde al leer solo OHLC.
 
 - Header sólido y sticky, sin blur ni transparencia.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
-- Las imágenes son exports exactos del archivo maestro; no se recrean charts promocionales.
+- El carrusel de apertura usa exports reales de Candles, Footprint y Step Profile con un crossfade
+  ligero, controles manuales y pausa explícita; no se recrean charts promocionales.
 - Las acciones primarias enlazan con elementos `<a href="/demo">` reales.
 - Foco visible, skip link y heading hierarchy son obligatorios.
 
 ## Responsive y motion
 
 - Desktop conserva padding lateral de 80 px dentro de una referencia de 1440 px.
-- Tablet reduce el padding y reorganiza deconstrucción, evidence y paneles conectados sin reducir texto hasta hacerlo ilegible.
+- Tablet reduce el padding y reorganiza carrusel, evidence y módulos alternos sin reducir texto hasta hacerlo ilegible.
 - Mobile usa 24 px laterales y 64 px verticales; lecturas y paneles pasan a una columna y las métricas a 2 × 2.
 - La landing no depende de hover ni de movimiento para explicar contenido. `prefers-reduced-motion` conserva todo el contenido en estado estático.
 - Ningún breakpoint debe introducir overflow horizontal.
 
 ## Patrón vigente: módulos de mercado aislados
 
-El contrato R2 evita reducir el terminal completo dentro de una sección editorial. Cada módulo usa
-una fila compacta con visual a la izquierda y explicación a la derecha:
+El ajuste R3 evita reducir el terminal completo dentro de una sección editorial. Cada módulo usa una
+fila compacta de dos columnas. La primera coloca visual a la izquierda y copy a la derecha; las
+siguientes alternan ese orden:
 
-- El contenedor desktop tiene 324 px de altura mínima, padding de 32 px, gap de 64 px y un visual
+- El contenedor desktop tiene 360 px de altura mínima, padding de 48 px, gap de 64 px y un visual
   máximo de 560 × 260.
-- Candles usa cinco barras; Footprint y Step Profile una barra cada uno. No se muestran headers,
-  tabs, settings, resizers ni chrome de chart.
+- Candles usa cinco barras próximas entre sí y mantiene high/low estables mientras cambia el close
+  de la última. Footprint y Step Profile usan dos barras: una cerrada estable y una actual. No se
+  muestran headers, tabs, settings, resizers ni chrome de chart.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
   punteadas.
 - DOM limita su lectura a 3 asks + last + 3 bids. Last Trades limita su stream a tres impresiones.
@@ -58,5 +64,5 @@ una fila compacta con visual a la izquierda y explicación a la derecha:
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 
-Las únicas imágenes de producto permitidas en la composición vigente son contextos donde se enseña
-la UI completa: Opening thesis y The workspace.
+Las imágenes de producto se limitan al carrusel de modos en Opening thesis y al contexto completo de
+The workspace. Las seis explicaciones de Market primitives siguen siendo componentes React reales.

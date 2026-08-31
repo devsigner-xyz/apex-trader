@@ -49,7 +49,7 @@ test('every remaining exported product image loads when its section enters the v
 }) => {
   await page.goto('/')
   const images = page.locator('main img')
-  await expect(images).toHaveCount(2)
+  await expect(images).toHaveCount(4)
 
   for (let index = 0; index < (await images.count()); index += 1) {
     const image = images.nth(index)
@@ -57,6 +57,26 @@ test('every remaining exported product image loads when its section enters the v
     await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0)
     await expect(image).not.toHaveAttribute('alt', '')
   }
+})
+
+test('hero carousel rotates through the three chart modes and supports manual control', async ({
+  page
+}) => {
+  await page.goto('/')
+  const carousel = page.getByRole('region', { name: 'Apex Trader chart modes' })
+  await expect(carousel).toHaveAttribute('data-active-mode', 'candles')
+  await expect(carousel).toHaveAttribute('data-rotation-state', 'playing')
+
+  await carousel.getByRole('button', { name: 'Step Profile' }).click()
+  await expect(carousel).toHaveAttribute('data-active-mode', 'step-profile')
+  await expect(carousel).toHaveAttribute('data-rotation-state', 'paused')
+  await expect(carousel.getByRole('button', { name: 'Step Profile' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  )
+
+  await carousel.getByRole('button', { name: 'Resume rotation' }).click()
+  await expect(carousel).toHaveAttribute('data-rotation-state', 'playing')
 })
 
 test('isolated market primitives load near the viewport without mounting the workstation', async ({
@@ -92,12 +112,20 @@ test('isolated market primitives load near the viewport without mounting the wor
   await expect(
     showcase.locator('[data-primitive="candles"] g.up, [data-primitive="candles"] g.down')
   ).toHaveCount(5)
-  await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(1)
-  await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(1)
+  await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
+  await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
   await expect(showcase.locator('.dom--compact .dom-row.ask')).toHaveCount(3)
   await expect(showcase.locator('.dom--compact .dom-spread-row')).toHaveCount(1)
   await expect(showcase.locator('.dom--compact .dom-row.bid')).toHaveCount(3)
   await expect(showcase.locator('.tape--compact .tape-row')).toHaveCount(3)
+  await expect(showcase).not.toContainText('NaN')
+
+  const primitiveRows = showcase.locator('.landing-primitive')
+  await expect(primitiveRows.nth(0).locator('.landing-primitive__visual')).toHaveCSS(
+    'grid-area',
+    'visual'
+  )
+  await expect(primitiveRows.nth(1)).toHaveCSS('grid-template-areas', '"copy visual"')
 
   const initialPhase = await showcase.getAttribute('data-phase')
   const initialClose = await showcase.locator('.landing-current-candle').getAttribute('data-close')
@@ -138,6 +166,10 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   await page.setViewportSize({ height: 844, width: 390 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
+
+  const carousel = page.getByRole('region', { name: 'Apex Trader chart modes' })
+  await expect(carousel).toHaveAttribute('data-rotation-state', 'static')
+  await expect(carousel).toHaveAttribute('data-active-mode', 'candles')
 
   const dimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,

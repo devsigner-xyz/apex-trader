@@ -16,10 +16,10 @@ const completedCandles = [
 }))
 
 const currentCandleStates = [
-  { close: 21848, high: 21850, low: 21843 },
-  { close: 21852, high: 21854, low: 21844 },
-  { close: 21846, high: 21855, low: 21842 },
-  { close: 21850, high: 21853, low: 21843 }
+  { close: 21846, high: 21854, low: 21842 },
+  { close: 21849, high: 21854, low: 21842 },
+  { close: 21852, high: 21854, low: 21842 },
+  { close: 21848, high: 21854, low: 21842 }
 ]
 
 const bidVolumes = [24, 38, 61, 156, 344, 682, 1120, 1340, 934]
@@ -52,6 +52,15 @@ function createProfile(phase) {
     ...level,
     price: Number((21843 - index * tickSize).toFixed(2))
   }))
+}
+
+function createOrderFlowBar({ levels, ...bar }) {
+  return {
+    ...bar,
+    delta: levels.reduce((sum, level) => sum + level.ask - level.bid, 0),
+    levels,
+    volume: levels.reduce((sum, level) => sum + level.ask + level.bid, 0)
+  }
 }
 
 function createOrderbook(phase) {
@@ -90,6 +99,8 @@ function createTrades(phase) {
 export function createMarketPrimitiveSnapshot(value) {
   const phase = normalizeMarketPrimitivePhase(value)
   const levels = createLevels(phase)
+  const completedFootprintLevels = createLevels(0, 0.74)
+  const completedStepProfileLevels = createLevels(0, 0.82)
   const currentState = currentCandleStates[phase]
   const currentCandle = {
     ...currentState,
@@ -102,25 +113,45 @@ export function createMarketPrimitiveSnapshot(value) {
   return {
     candles: [...completedCandles, currentCandle],
     currentPrice: 21842.25,
-    footprintBar: {
-      close: 21841.75,
-      high: 21842.25,
-      levels,
-      low: 21840,
-      open: 21840.5,
-      timestamp: baseTimestamp
-    },
+    footprintBars: [
+      createOrderFlowBar({
+        close: 21840.75,
+        high: 21842,
+        levels: completedFootprintLevels,
+        low: 21840,
+        open: 21841.5,
+        timestamp: baseTimestamp - 60_000
+      }),
+      createOrderFlowBar({
+        close: 21841.75,
+        high: 21842.25,
+        levels,
+        low: 21840,
+        open: 21840.5,
+        timestamp: baseTimestamp
+      })
+    ],
     orderbook: createOrderbook(phase),
     phase,
     profile: createProfile(phase),
-    stepProfileBar: {
-      close: 21841.5,
-      high: 21842.25,
-      levels: createLevels(phase, 1.1),
-      low: 21840,
-      open: 21840.25,
-      timestamp: baseTimestamp + 60_000
-    },
+    stepProfileBars: [
+      createOrderFlowBar({
+        close: 21840.5,
+        high: 21842,
+        levels: completedStepProfileLevels,
+        low: 21840,
+        open: 21841.25,
+        timestamp: baseTimestamp
+      }),
+      createOrderFlowBar({
+        close: 21841.5,
+        high: 21842.25,
+        levels: createLevels(phase, 1.1),
+        low: 21840,
+        open: 21840.25,
+        timestamp: baseTimestamp + 60_000
+      })
+    ],
     trades: createTrades(phase)
   }
 }

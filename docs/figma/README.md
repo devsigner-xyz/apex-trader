@@ -17,21 +17,27 @@ Archivo maestro: [Apex Trader](https://www.figma.com/design/Ze9eGnPaNDj8u0oB1iUt
 
 Direction B sustituye a Direction A como referencia de la landing. Los roots y exploraciones de Direction A se retiraron del área activa; no deben usarse para reconstruir copy, estructura o responsive.
 
-La implementación conserva el orden Header → Opening thesis → The blind spot → Three readings → One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los ocho media exports de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que rutas, lazy loading, semántica y accesibilidad se verifican en código y navegador.
+La implementación conserva el orden Header → Opening thesis → The blind spot → Market primitives
+→ One clock + Session evidence → Product reveal → Case study endorsement → Footer. Los ocho media
+exports de producto se versionan bajo `public/media/`; una captura verifica apariencia, mientras que
+rutas, lazy loading, semántica y accesibilidad se verifican en código y navegador.
 
-### Dirección interactiva y revisión R2
+### Dirección interactiva, revisión R2 y ajuste R3
 
 La sección `656:7412` (`Interactive portfolio landing`) contiene dos generaciones. R1 fue aprobada
 el 30 de agosto de 2026 y se conserva como snapshot. Tras revisar el prototipo, el usuario pidió el
 31 de agosto que cada gráfico y superficie se explicase de forma aislada y compacta; ese feedback
-define R2 `688:21215`, contrato vigente de implementación.
+define R2 `688:21215`, contrato Figma vigente. La revisión directa del runtime del 31 de agosto
+define un ajuste R3 local: carrusel de modos en la apertura, filas alternas, Candles con extremos
+estables y dos barras en Footprint/Step Profile. R3 todavía no se ha sincronizado en Figma, por lo
+que R2 queda como referencia aprobada y no como paridad exacta del checkout local.
 
 | Artefacto           | Node ID     | Estado                                  |
 | ------------------- | ----------- | --------------------------------------- |
 | Desktop 1440        | `656:7413`  | Approved direction                      |
 | Mobile 390          | `656:7414`  | Approved direction                      |
 | Motion storyboard   | `656:7415`  | Approved R1 snapshot · superseded by R2 |
-| Isolated modules R2 | `688:21215` | Current implementation contract         |
+| Isolated modules R2 | `688:21215` | Approved Figma reference · R3 pending   |
 
 R1 reutiliza botones, MarketChart, OrderBook/DOM y Time & Sales como instancias de masters locales y
 queda documentada en [Interactive portfolio landing — Figma approval
@@ -39,7 +45,7 @@ gate](../verification/2026-08-30-interactive-portfolio-landing-figma.md). R2 no 
 ni Direction B: recorta instancias editables para definir el encuadre de cada primitivo y usa
 geometría vectorial ligada a variables para Volume Profile.
 
-El mapping R2 vigente es:
+El mapping R2 conservado es:
 
 | Contrato Figma           | Node ID     | Código React                                                                |
 | ------------------------ | ----------- | --------------------------------------------------------------------------- |
@@ -54,6 +60,10 @@ El mapping R2 vigente es:
 La captura local del contrato completo es
 `output/figma/interactive-landing-isolated-modules-r2.png`. Las imágenes bajo `output/` son evidencia
 ignorada por Git; el nodo y esta documentación son la referencia durable.
+
+Gap explícito: el código R3 no debe presentarse como sincronizado con Figma hasta actualizar el root
+R2 o crear una revisión R3 preservando esos IDs. Esta diferencia no altera masters de producto ni
+las variantes de producción.
 
 ## Producción
 

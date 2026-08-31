@@ -10,9 +10,10 @@ owners: product-design-engineering
 
 `/` conserva la narrativa Beyond the candle y sustituye las antiguas lecturas raster por el contrato
 R2 de módulos aislados `688:21215`. La sección `Market primitives` contiene Candles, Footprint, Step
-Profile, Volume Profile, DOM y Last Trades como escenas React compactas de dos columnas. No monta la
-terminal ni un `MarketChart` completo. Opening thesis y The workspace mantienen imágenes optimizadas
-porque muestran el producto completo y una composición real sería ilegible a esa escala.
+Profile, Volume Profile, DOM y Last Trades como escenas React compactas de dos columnas. Las filas
+alternan visual y copy para crear ritmo editorial sin montar la terminal ni un `MarketChart`
+completo. Opening thesis usa un carrusel de tres exports reales de la UI y The workspace mantiene
+una imagen optimizada porque muestra la composición completa.
 
 El copy público está en inglés y presenta cada lectura por su función. Los valores de los módulos
 son fixtures deterministas de interfaz; no se afirman como replay histórico, ni Apex se presenta
@@ -52,15 +53,25 @@ activan manifest, book, trades ni tiles del replay. Reutiliza las capas SVG real
 Footprint y Step Profile, la geometría del Volume Profile y filas compartidas de DOM/Time & Sales,
 pero no monta `.market-chart`, settings, resizers ni controles profesionales.
 
-El runtime de la landing referencia dos PNG de `public/media/`: Opening thesis usa carga eager y el
-terminal completo de The workspace usa lazy loading. Los exports históricos no referenciados
-permanecen físicamente en `public/media/`; esta iniciativa no autoriza borrarlos.
+El runtime de la landing referencia cuatro PNG de `public/media/`: Opening thesis precarga
+`reading-candles.png`, `reading-footprint.png` y `reading-step-profile.png` para que el crossfade no
+muestre estados vacíos. El terminal completo de The workspace usa lazy loading. Los exports
+históricos no referenciados permanecen físicamente en `public/media/`; esta iniciativa no autoriza
+borrarlos.
+
+El carrusel empieza siempre en Candles y avanza Candles → Footprint → Step Profile cada 4,2 s con
+un crossfade de 420 ms. Se pausa fuera de viewport, con la pestaña oculta o mediante su control
+visible; elegir manualmente un modo también pausa la rotación. `prefers-reduced-motion` conserva
+Candles estático, mantiene los tres selectores manuales y elimina la transición.
 
 ## Contrato de los módulos aislados
 
-- Candles: cinco barras; solo la quinta actualiza high, low y close.
-- Footprint: una barra y nueve niveles bid/ask.
-- Step Profile: una barra y nueve niveles de distribución.
+- Candles: cinco barras cercanas; las cuatro cerradas son estables y la quinta mueve solo el close
+  dentro de un open/high/low válido y estable durante el bucle.
+- Footprint: dos barras de nueve niveles bid/ask; la primera permanece cerrada y la segunda actualiza
+  niveles, delta y volumen finitos.
+- Step Profile: dos barras de nueve niveles; la primera permanece cerrada y la segunda actualiza su
+  distribución, delta y volumen finitos.
 - Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo.
 - DOM: exactamente tres asks, last price y tres bids.
 - Last Trades: exactamente tres ejecuciones.
@@ -73,3 +84,6 @@ El contrato R2 está publicado en `apex.devsigner.xyz`. Railway alcanzó `SUCCES
 funcional `23879f6e6c669b4dae471d46add8c4eadaa05300`; rutas, assets, desktop, mobile, consola y los modos
 Footprint/Step Profile se comprobaron directamente. La evidencia está en
 [Interactive portfolio landing · production verification](../verification/2026-08-31-interactive-portfolio-landing-production.md).
+
+La revisión R3 descrita arriba está implementada y verificada localmente, pero todavía no se ha
+publicado. Hasta una nueva autorización de release, producción continúa sirviendo el contrato R2.
