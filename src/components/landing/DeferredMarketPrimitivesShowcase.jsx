@@ -32,7 +32,7 @@ export default function DeferredMarketPrimitivesShowcase() {
         <Suspense
           fallback={
             <div className="landing-primitives-fallback" role="status">
-              Preparing the market primitives…
+              Preparing the interactive market views…
             </div>
           }
         >
@@ -40,7 +40,7 @@ export default function DeferredMarketPrimitivesShowcase() {
         </Suspense>
       ) : (
         <div className="landing-primitives-fallback" role="status">
-          Interactive market primitives load as they approach the viewport.
+          Preparing the interactive market views…
         </div>
       )}
     </div>

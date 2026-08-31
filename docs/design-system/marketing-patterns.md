@@ -43,6 +43,21 @@ lectura adicional. El CTA secundario del hero salta directamente a Market primit
 - La landing no depende de hover ni de movimiento para explicar contenido. `prefers-reduced-motion` conserva todo el contenido en estado estático.
 - Ningún breakpoint debe introducir overflow horizontal.
 
+## Copy orientado a producto
+
+- El copy público explica qué puede entender o hacer el usuario. No presenta cantidades de filas,
+  estados de animación, detalles de fixtures ni notas de implementación como argumentos de valor.
+- Los eyebrows de los módulos anticipan una lectura concreta: dirección, presión, concentración,
+  aceptación, liquidez o ritmo de ejecución. El heading desarrolla esa lectura y el body explica
+  cuándo resulta útil.
+- Los términos del producto —Candles, Footprint, Step Profile, Volume Profile, DOM y Time & Sales—
+  se conservan cuando ayudan a reconocer la herramienta, pero siempre acompañados de una
+  explicación comprensible.
+- La navegación usa `Market views`, `Session`, `Workspace` y `Component library`. Las acciones
+  principales usan `Open workspace`; la acción secundaria del hero usa `Compare market views`.
+- La promesa debe ser verificable por el producto mostrado. No se afirma conexión a broker,
+  operativa en vivo ni funcionalidad que la demo no exponga.
+
 ## Patrón vigente: módulos de mercado aislados
 
 El ajuste R3 evita reducir el terminal completo dentro de una sección editorial. Cada módulo usa una

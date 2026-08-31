@@ -21,11 +21,18 @@ repetían la tesis del hero sin añadir una lectura accionable. El CTA secundari
 `#modes` y las secciones visibles se numeran Market primitives 01, One clock 02, Session evidence 03
 y The workspace 04.
 
-El copy público está en inglés y presenta cada lectura por su función. Los valores de los módulos
-son fixtures deterministas de interfaz; no se afirman como replay histórico, ni Apex se presenta
-como broker o plataforma de trading conectada.
+El copy público está en inglés y presenta cada lectura por la pregunta de mercado que ayuda a
+responder. Los eyebrows comunican dirección, presión, concentración, aceptación, liquidez y ritmo
+de ejecución; no enumeran cantidades de elementos, estados de animación ni detalles de fixture. Los
+valores de los módulos son fixtures deterministas de interfaz; no se afirman como replay histórico,
+ni Apex se presenta como broker o plataforma de trading conectada.
 
-Las secciones son navegables mediante `#modes`, `#session` y `#workspace`. Los CTA principales son anchors reales hacia `/demo`; la navegación primaria incluye `Components`, un enlace mismo-origen hacia `/storybook/` para explorar superficies aisladas con datos deterministas. Los enlaces externos a Devsigner abren una pestaña nueva con `noopener noreferrer`. La atribución declara discretamente que Apex Trader está diseñado y construido por Devsigner y presentado como case study público interactivo.
+Las secciones son navegables mediante `#modes`, `#session` y `#workspace`. Los CTA `Open workspace`
+son anchors reales hacia `/demo`; `Compare market views` enlaza a `#modes`. La navegación primaria
+incluye `Component library`, un enlace mismo-origen hacia `/storybook/` para explorar superficies
+aisladas con datos deterministas. Los enlaces externos a Devsigner abren una pestaña nueva con
+`noopener noreferrer`. La atribución declara discretamente que Apex Trader está diseñado y
+construido por Devsigner y presentado como case study público interactivo.
 
 ## Rutas
 

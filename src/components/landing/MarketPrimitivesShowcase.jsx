@@ -339,45 +339,45 @@ export default function MarketPrimitivesShowcase() {
       ref={rootRef}
     >
       <PrimitiveRow
-        body="Four completed candles establish direction. The latest candle keeps a valid open, high and low while its close moves inside that traded range, making the live interval easy to read."
-        eyebrow="CANDLES · 5 BARS · LATEST BAR UPDATES"
-        heading="Price over time"
+        body="Candles make direction, range and pace immediately visible. Use them to spot expansion, rejection and shifts in momentum before opening the order-flow detail."
+        eyebrow="SEE DIRECTION AND MOMENTUM"
+        heading="Start with the shape of the move"
         id="candles"
         sequence="01"
       >
         <CandlesScene bars={snapshot.candles} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="A completed candle preserves the last interval while the current Footprint updates beside it. Bid volume stays on the left, ask volume on the right and finite delta makes the imbalance explicit."
-        eyebrow="FOOTPRINT · 2 BARS · CURRENT VALUES UPDATE"
-        heading="Executed volume at price"
+        body="Footprint separates executed buying and selling at every price. Imbalances and delta reveal where one side became aggressive — and whether price responded."
+        eyebrow="SEE WHO TRADED AT EACH PRICE"
+        heading="Find the pressure inside the candle"
         id="footprint"
         sequence="02"
       >
         <FootprintScene bars={snapshot.footprintBars} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="The previous profile remains fixed while the current interval reshapes beside it. Comparing both silhouettes makes concentration, imbalance and rejection easier to read."
-        eyebrow="STEP PROFILE · 2 BARS · CURRENT DISTRIBUTION UPDATES"
-        heading="Distribution inside one interval"
+        body="Step Profile turns each interval into a volume distribution. Compare where activity clustered, where it thinned out and how that structure changed from one candle to the next."
+        eyebrow="SEE WHERE VOLUME CONCENTRATED"
+        heading="Read the distribution inside each candle"
         id="step-profile"
         sequence="03"
       >
         <StepProfileScene bars={snapshot.stepProfileBars} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="Horizontal bars show participation at each price. The profile updates as the visible session evolves, while POC, VAH and VAL keep the dominant area easy to read."
-        eyebrow="VOLUME PROFILE · POC / VAH / VAL · BARS UPDATE"
-        heading="Where the session traded"
+        body="Volume Profile shows where the market did the most business. POC, VAH and VAL frame the accepted area so you can distinguish balance from an attempted breakout."
+        eyebrow="FIND THE PRICES THE MARKET ACCEPTED"
+        heading="Map value across the visible session"
         id="volume-profile"
         sequence="04"
       >
         <VolumeProfileScene profile={snapshot.profile} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="Three ask levels, the last traded price and three bid levels are enough to explain the ladder. Quantities and depth bars update without exposing the rest of the workstation."
-        eyebrow="DOM · 3 ASKS + LAST + 3 BIDS · DEPTH UPDATES"
-        heading="Liquidity around the last price"
+        body="The DOM shows resting liquidity above and below the last trade. Use it to see where the next move may meet friction and how quickly depth changes as price approaches."
+        eyebrow="WATCH LIQUIDITY FORM AROUND PRICE"
+        heading="See where buyers and sellers are waiting"
         id="dom"
         sequence="05"
       >
@@ -388,9 +388,9 @@ export default function MarketPrimitivesShowcase() {
         />
       </PrimitiveRow>
       <PrimitiveRow
-        body="Six recent prints communicate pace and aggressor side without a full table. New trades enter at the top while price, size and time remain tied to the same market clock."
-        eyebrow="LAST TRADES · 6 EXECUTIONS · STREAM UPDATES"
-        heading="The latest executions"
+        body="Time & Sales reveals the sequence, size and aggressor side of recent trades. Use the pace of prints to judge whether buying or selling pressure is building."
+        eyebrow="FOLLOW THE PACE OF EXECUTION"
+        heading="See who is crossing the spread"
         id="last-trades"
         sequence="06"
       >

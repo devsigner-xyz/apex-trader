@@ -14,17 +14,20 @@ test('landing renders its product thesis without loading historical data', async
   await page.goto('/')
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Candles show the result. They hide the behavior.'
+    'See what moved the market, not just where it closed.'
   )
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
-  await expect(page.getByRole('link', { name: 'Launch demo' })).toHaveAttribute('href', '/demo')
-  await expect(page.getByRole('link', { name: 'Explore market primitives' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Open workspace' }).first()).toHaveAttribute(
+    'href',
+    '/demo'
+  )
+  await expect(page.getByRole('link', { name: 'Compare market views' })).toHaveAttribute(
     'href',
     '#modes'
   )
   await expect(page.getByText('Four prices are not the whole interval.')).toHaveCount(0)
   await expect(page.locator('#blind-spot')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Modes', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toHaveAttribute(
     'href',
     '#modes'
   )
@@ -36,7 +39,7 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     '#workspace'
   )
-  await expect(page.getByRole('link', { name: 'Components', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Component library', exact: true })).toHaveAttribute(
     'href',
     '/storybook/'
   )
@@ -128,6 +131,26 @@ test('isolated market primitives load near the viewport without mounting the wor
 
   await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
   await expect(showcase.locator('.landing-primitive-grid-backdrop')).toHaveCount(6)
+  for (const valueMessage of [
+    'SEE DIRECTION AND MOMENTUM',
+    'SEE WHO TRADED AT EACH PRICE',
+    'SEE WHERE VOLUME CONCENTRATED',
+    'FIND THE PRICES THE MARKET ACCEPTED',
+    'WATCH LIQUIDITY FORM AROUND PRICE',
+    'FOLLOW THE PACE OF EXECUTION'
+  ]) {
+    await expect(showcase.getByText(valueMessage, { exact: true })).toBeVisible()
+  }
+  for (const implementationMessage of [
+    'LATEST BAR UPDATES',
+    'CURRENT VALUES UPDATE',
+    'CURRENT DISTRIBUTION UPDATES',
+    'BARS UPDATE',
+    'DEPTH UPDATES',
+    'STREAM UPDATES'
+  ]) {
+    await expect(showcase.getByText(implementationMessage, { exact: false })).toHaveCount(0)
+  }
   await expect(showcase.locator('.market-chart')).toHaveCount(0)
   await expect(showcase.getByRole('button')).toHaveCount(2)
   await expect(
@@ -275,7 +298,7 @@ test('isolated market primitives load near the viewport without mounting the wor
 
 test('primary landing CTA opens the canonical demo', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Launch demo' }).click()
+  await page.getByRole('link', { name: 'Open workspace' }).first().click()
   await expect(page).toHaveURL(/\/demo$/)
   await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
   await expect(page.getByLabel('candles historical chart')).toBeVisible()
@@ -310,8 +333,8 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   }))
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Open demo' }).first()).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Modes', exact: true })).toBeHidden()
+  await expect(page.getByRole('link', { name: 'Open workspace' }).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toBeHidden()
 
   await page.locator('.landing-primitives-loader').scrollIntoViewIfNeeded()
   const showcase = page.locator('.landing-primitives')

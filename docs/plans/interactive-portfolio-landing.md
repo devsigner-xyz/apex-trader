@@ -133,6 +133,18 @@ de producto completo.
 - La retícula reutiliza `--pro-subtle`, mantiene opacidad 0.26 y no se anima en ningún estado.
 - El motion queda limitado a datos explicativos: última vela, order flow, perfil, DOM y trades.
 
+## Copy orientado a valor R11
+
+- Se sustituyen los eyebrows que parecían un registro técnico —cantidades de barras o filas,
+  `updates` y nombres de estados— por mensajes sobre la lectura que aporta cada superficie.
+- Candles presenta dirección y momentum; Footprint, presión ejecutada; Step Profile, concentración;
+  Volume Profile, aceptación; DOM, liquidez disponible; y Time & Sales, ritmo de ejecución.
+- Hero, navegación, métricas, callouts, secciones, CTAs, cierre y estados de carga comparten la misma
+  narrativa: entender cómo se forma un movimiento y conservar el contexto entre vistas.
+- El vocabulario técnico se mantiene solo cuando identifica una herramienta real y su explicación
+  aporta significado. Apex sigue presentándose como producto, sin afirmar conexión a broker ni
+  operativa en vivo.
+
 ## Arquitectura React vigente
 
 ```text
@@ -197,8 +209,8 @@ R2 reutiliza instancias de los masters Candles `132:3266`, Footprint `132:867`, 
 representa como geometría vectorial aislada ligada a las variables locales. Direction B y todos los
 masters permanecen intactos.
 
-R3 está implementado en código y verificado en navegador, pero todavía no se ha sincronizado con
-Figma. R4 ajusta además el encuadre del carrusel únicamente en código. R2 se conserva como referencia
+R3–R11 están implementados en código, pero todavía no se han sincronizado con Figma. R4 ajusta
+además el encuadre del carrusel únicamente en código. R2 se conserva como referencia
 aprobada; no debe declararse paridad Figma/código hasta crear o actualizar una revisión preservando
 IDs y masters.
 
@@ -215,7 +227,7 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R10    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R10                                           | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R11    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R10 y R11 está local                          | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
@@ -228,12 +240,16 @@ IDs y masters.
 | 19 · Release R9                     | complete | `2169d902…`; Railway `f38993ff…`; UI pública desktop/mobile verificada                                         | —                          |
 | 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | —                          |
 | 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | —                          |
+| 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | Publicar solo con permiso  |
+| 23 · Release R11                    | pending  | Sin commit, push ni despliegue                                                                                  | Requiere autorización      |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
 ## Criterios de aceptación
 
 - `/` presenta Apex como demo funcional de una UI de trading avanzada.
+- El hero y cada sección explican una capacidad o una lectura útil para el usuario final; ningún
+  tagline enumera filas, barras, estados de actualización ni detalles de fixture.
 - Hay seis filas visuales aisladas, todas unframed, y ninguna monta `.market-chart` ni paneles
   vecinos.
 - Candles contiene cinco velas próximas y solo cambia el close de la última dentro de extremos
@@ -252,7 +268,7 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R10; hasta entonces el
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R11; hasta entonces el
   gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 

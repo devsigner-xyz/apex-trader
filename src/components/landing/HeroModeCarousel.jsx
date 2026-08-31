@@ -90,7 +90,7 @@ export default function HeroModeCarousel() {
       ref={rootRef}
     >
       <div className="landing-mode-carousel__toolbar">
-        <span>APEX / CHART MODES</span>
+        <span>ONE SESSION / THREE MARKET VIEWS</span>
         <span>
           {String(activeIndex + 1).padStart(2, '0')} / {String(modeSlides.length).padStart(2, '0')}
         </span>

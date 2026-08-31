@@ -2,17 +2,17 @@ import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMark
 import HeroModeCarousel from '../components/landing/HeroModeCarousel.jsx'
 
 const metrics = [
-  ['6', 'ISOLATED MARKET SURFACES'],
-  ['1', 'SYNCHRONIZED CLOCK'],
-  ['24 HOURS', 'BTCUSDT SESSION'],
-  ['420,562', 'REAL TRADES']
+  ['6', 'COMPLEMENTARY MARKET VIEWS'],
+  ['1', 'SHARED MARKET CLOCK'],
+  ['24 HOURS', 'CONTINUOUS BTCUSDT SESSION'],
+  ['420,562', 'RECORDED MARKET TRADES']
 ]
 
 const callouts = [
-  'CHANGE PERSPECTIVE',
-  'INSPECT PRICE',
-  'FOLLOW THE TAPE',
-  'KEEP THE SESSION ALIGNED'
+  'COMPARE THREE CHART MODES',
+  'INSPECT VOLUME AT PRICE',
+  'READ MARKET DEPTH',
+  'FOLLOW EVERY EXECUTION'
 ]
 
 export default function LandingPage() {
@@ -27,15 +27,15 @@ export default function LandingPage() {
           APEX TRADER
         </a>
         <nav className="landing-nav" aria-label="Apex Trader primary navigation">
-          <a href="#modes">Modes</a>
+          <a href="#modes">Market views</a>
           <a href="#session">Session</a>
           <a href="#workspace">Workspace</a>
-          <a href="/storybook/">Components</a>
+          <a href="/storybook/">Component library</a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             Devsigner ↗
           </a>
           <a className="landing-button landing-button--primary" href="/demo">
-            Open demo
+            Open workspace
           </a>
         </nav>
       </header>
@@ -43,18 +43,18 @@ export default function LandingPage() {
       <main id="main-content">
         <section className="landing-section landing-opening" aria-labelledby="opening-title">
           <div className="landing-copy landing-copy--hero">
-            <p className="landing-kicker">A DIFFERENT WAY TO READ A SESSION</p>
-            <h1 id="opening-title">Candles show the result. They hide the behavior.</h1>
+            <p className="landing-kicker">PRICE, ORDER FLOW AND LIQUIDITY — IN ONE VIEW</p>
+            <h1 id="opening-title">See what moved the market, not just where it closed.</h1>
             <p className="landing-lede">
-              Apex Trader brings price, executed volume, order flow, depth and tape into one
-              synchronized market view.
+              Apex Trader connects price action with traded volume, liquidity and the tape, so you
+              can understand how a move formed without switching tools.
             </p>
             <div className="landing-actions">
               <a className="landing-button landing-button--primary" href="/demo">
-                Launch demo
+                Open workspace
               </a>
               <a className="landing-button landing-button--secondary" href="#modes">
-                Explore market primitives
+                Compare market views
               </a>
             </div>
           </div>
@@ -68,11 +68,11 @@ export default function LandingPage() {
           aria-labelledby="modes-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">01 / MARKET PRIMITIVES</p>
-            <h2 id="modes-title">Read one signal at a time.</h2>
+            <p className="landing-kicker">01 / SEE MORE THAN PRICE</p>
+            <h2 id="modes-title">Choose the view that answers your question.</h2>
             <p className="landing-lede">
-              Each scene isolates one chart or market surface. The values update deterministically,
-              but the terminal controls and surrounding panels stay out of the way.
+              Start with direction, drill into who traded at each price, then compare participation
+              and liquidity without losing the session context.
             </p>
           </div>
           <DeferredMarketPrimitivesShowcase />
@@ -84,20 +84,21 @@ export default function LandingPage() {
           aria-labelledby="session-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">02 / ONE CLOCK</p>
-            <h2 id="session-title">Every surface advances together.</h2>
+            <p className="landing-kicker">02 / KEEP EVERY VIEW IN CONTEXT</p>
+            <h2 id="session-title">One market moment, seen from every angle.</h2>
             <p className="landing-lede">
-              Candles, order flow, visible-range volume, depth and recent executions all describe
-              the same deterministic moment rather than unrelated decorative examples.
+              Switch between charts, depth and tape without comparing unrelated snapshots. Every
+              surface stays aligned to the same point in the session.
             </p>
           </div>
 
           <div className="landing-session-evidence" aria-labelledby="evidence-title">
             <div className="landing-copy">
-              <p className="landing-kicker">03 / SESSION EVIDENCE</p>
-              <h3 id="evidence-title">A complete day, kept in context.</h3>
+              <p className="landing-kicker">03 / EXPLORE A COMPLETE SESSION</p>
+              <h3 id="evidence-title">Follow the session, not a highlight.</h3>
               <p className="landing-lede">
-                Explore one 24-hour BTCUSDT session across every mode and synchronized surface.
+                Move through a full 24-hour BTCUSDT session and switch from price action to order
+                flow and execution detail without losing your place.
               </p>
             </div>
             <dl className="landing-metrics">
@@ -117,11 +118,11 @@ export default function LandingPage() {
           aria-labelledby="workspace-title"
         >
           <div className="landing-copy">
-            <p className="landing-kicker">04 / THE WORKSPACE</p>
-            <h2 id="workspace-title">Move from summary to market structure.</h2>
+            <p className="landing-kicker">04 / WORK WITHOUT LOSING CONTEXT</p>
+            <h2 id="workspace-title">Move from overview to execution detail.</h2>
             <p className="landing-lede">
-              Pan, zoom, change timeframe, inspect depth, follow the tape and compare chart modes
-              inside one focused workspace.
+              Pan through price, change timeframe, inspect volume at price, read depth and follow
+              the tape from one focused workspace.
             </p>
           </div>
 
@@ -144,15 +145,15 @@ export default function LandingPage() {
 
           <div className="landing-closing">
             <div className="landing-copy">
-              <h2>Read the session beyond the candle.</h2>
+              <h2>Ready to read the move differently?</h2>
               <p className="landing-lede">
-                Open Apex Trader and explore the same market history from three synchronized
-                perspectives.
+                Open Apex Trader and explore the same session through Candles, Footprint and Step
+                Profile.
               </p>
             </div>
             <div className="landing-actions">
               <a className="landing-button landing-button--primary" href="/demo">
-                Open demo
+                Open workspace
               </a>
               <a
                 className="landing-button landing-button--secondary"
@@ -183,7 +184,7 @@ export default function LandingPage() {
           <span>See beyond the candle.</span>
         </div>
         <nav aria-label="Apex Trader footer navigation">
-          <a href="/demo">OPEN DEMO</a>
+          <a href="/demo">OPEN WORKSPACE</a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             DEVSIGNER ↗
           </a>

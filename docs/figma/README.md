@@ -79,7 +79,9 @@ SVG ambientales distintos. El nodo R2 `688:21222` continúa mostrando tres filas
 backdrops está aún representado en Figma, por lo que el gap R3–R9 permanece abierto.
 R10, ya publicado, sustituye esos backdrops animados por una única retícula CSS estática y
 desvanecida en los seis visuales. Figma tampoco representa este reemplazo, por lo que el gap vigente
-pasa a ser R3–R10.
+pasa a ser R3–R10. R11 revisa localmente el copy del hero, navegación, secciones, módulos y CTAs para
+expresar valor de producto en lugar de detalles de implementación. Este contenido tampoco está
+sincronizado con los frames de landing, por lo que el gap vigente pasa a ser R3–R11.
 
 ## Producción
 
