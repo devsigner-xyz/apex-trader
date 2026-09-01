@@ -334,22 +334,19 @@
 
 .landing-primitive {
   position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 560px) minmax(320px, 1fr);
   grid-template-areas: 'visual copy';
   gap: var(--pro-space-64);
   align-items: center;
   min-height: 360px;
-  padding: var(--pro-space-48) 0;
-  overflow: visible;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.landing-primitive:nth-child(odd) {
-  background: transparent;
+  padding: var(--pro-space-48);
+  overflow: hidden;
+  background: var(--pro-panel);
+  border: 1px solid var(--pro-border);
+  border-radius: 16px;
+  box-shadow: var(--pro-marketing-surface-shadow);
 }
 
 .landing-primitive:nth-child(even) {
@@ -360,6 +357,7 @@
 .landing-primitive__visual {
   position: relative;
   isolation: isolate;
+  z-index: 1;
   grid-area: visual;
   display: grid;
   width: 100%;
@@ -480,34 +478,18 @@
   font: 500 10px 'Roboto Mono', monospace;
 }
 
-.landing-primitive__visual > :not(.landing-primitive-grid-backdrop) {
-  position: relative;
-  z-index: 1;
-}
-
 .landing-primitive-grid-backdrop {
   position: absolute;
   z-index: 0;
-  inset: -16px;
+  inset: 0;
   pointer-events: none;
   background-image:
     linear-gradient(to right, var(--pro-subtle) 1px, transparent 1px),
     linear-gradient(to bottom, var(--pro-subtle) 1px, transparent 1px);
   background-position: center;
   background-size: 36px 36px;
-  opacity: 0.26;
-  mask-image: radial-gradient(
-    ellipse 72% 76% at center,
-    var(--pro-text) 8%,
-    var(--pro-text) 46%,
-    transparent 86%
-  );
-  -webkit-mask-image: radial-gradient(
-    ellipse 72% 76% at center,
-    var(--pro-text) 8%,
-    var(--pro-text) 46%,
-    transparent 86%
-  );
+  border-radius: inherit;
+  opacity: 0.16;
 }
 
 .landing-primitive__copy {
@@ -796,7 +778,7 @@
   .landing-primitive:nth-child(even) {
     grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr);
     gap: var(--pro-space-24);
-    padding: var(--pro-space-24) 0;
+    padding: var(--pro-space-24);
   }
 
   .landing-primitive:nth-child(even) {
@@ -893,7 +875,7 @@
       'copy';
     gap: var(--pro-space-32);
     min-height: 0;
-    padding: var(--pro-space-24) 0;
+    padding: var(--pro-space-24);
   }
 
   .landing-primitive__visual,

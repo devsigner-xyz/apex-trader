@@ -75,9 +75,10 @@ siguientes alternan ese orden:
   muestran headers, tabs, settings, resizers ni chrome de chart.
 - En Footprint y Step Profile la barra cerrada baja 6 px y la actual sube 6 px para distinguir sus
   siluetas sin convertir el desplazamiento en protagonista.
-- Las siete filas son unframed: tanto la fila como el área visual eliminan surface, borde, radio y
-  shadow. La columna de copy tampoco añade separadores verticales. DOM y Last Trades mantienen
-  únicamente el panel real que contiene sus datos y controles.
+- Cada una de las siete filas se presenta como una surface elevada de dos columnas, con borde sutil,
+  radio de 16 px y sombra contenida. La retícula neutral ocupa toda la surface hasta el borde y la
+  columna de copy tampoco añade separadores verticales. DOM y Last Trades mantienen únicamente el
+  panel real que contiene sus datos y controles.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
   punteadas. La escena no añade un eje de precios lateral ni un wrapper exterior.
 - Liquidity Heatmap se representa como líneas continuas por precio y tiempo, con un glow muy sutil y
@@ -97,10 +98,10 @@ siguientes alternan ese orden:
   captura del componente.
 - Un reloj determinista compartido actualiza cantidades cada 1,4 s. `IntersectionObserver` lo activa
   cerca del viewport, `document.hidden` lo pausa y reduced motion fija un estado final legible.
-- Cada visual incorpora un fondo CSS neutral y `aria-hidden`, sin surface, borde ni sombra. Dos
-  `linear-gradient` forman una retícula de 36 px y una máscara radial la desvanece hacia los bordes.
-  La capa comparte `--pro-subtle`, usa opacidad 0.26 y permanece estática en todos los estados; el
-  motion se reserva para los datos que explican el producto.
+- Cada surface incorpora un fondo CSS neutral y `aria-hidden`. Dos `linear-gradient` forman una
+  retícula de 36 px que llega hasta el borde redondeado; comparte `--pro-subtle`, usa opacidad 0.16
+  y permanece estática en todos los estados. La elevación usa el token
+  `--pro-marketing-surface-shadow`; el motion se reserva para los datos que explican el producto.
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 

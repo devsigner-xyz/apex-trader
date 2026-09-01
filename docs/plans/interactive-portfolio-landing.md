@@ -181,6 +181,13 @@ de producto completo.
 - El header mantiene solo `Component library`, `Devsigner` y `Open demo`; `Market views` no se
   presenta como enlace de navegación porque la sección ya queda explicada en el flujo de la landing.
 
+## Elevated primitive surfaces R17
+
+- Las siete secciones de Market primitives se presentan como surfaces de dos columnas con borde sutil,
+  radio de 16 px y elevación contenida.
+- El grid neutral deja de limitarse al visual y cubre la surface completa hasta su borde redondeado,
+  con opacidad 0.16 y sin máscara radial.
+
 ## Arquitectura React vigente
 
 ```text

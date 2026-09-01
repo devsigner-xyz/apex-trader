@@ -336,8 +336,8 @@ function PrimitiveRow({ body, children, eyebrow, heading, id }) {
       className="landing-primitive"
       data-primitive={id}
     >
+      <span aria-hidden="true" className="landing-primitive-grid-backdrop" data-backdrop="grid" />
       <div className="landing-primitive__visual">
-        <span aria-hidden="true" className="landing-primitive-grid-backdrop" data-backdrop="grid" />
         {children}
       </div>
       <div className="landing-primitive__copy">

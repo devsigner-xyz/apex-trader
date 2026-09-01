@@ -5,6 +5,7 @@ import test from 'node:test'
 const colorLiteral = /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|%23[0-9a-f]{3,8}\b/i
 const tokenValues = {
   '--pro-accent': 'var(--color-text-accent, #f1cfa1)',
+  '--pro-marketing-surface-shadow': '0 14px 28px rgb(0 0 0 / 0.28)',
   '--pro-popover-surface': 'rgb(24 32 39 / 0.98)',
   '--pro-popover-shadow': '0 12px 28px rgb(0 0 0 / 0.55)',
   '--pro-profile-bid': '#223e63',

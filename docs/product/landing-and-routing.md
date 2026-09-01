@@ -96,9 +96,9 @@ poster estático y mantiene los tres selectores manuales.
   segunda actualiza niveles, delta y volumen finitos 6 px por encima.
 - Step Profile: dos barras de nueve niveles; la primera permanece cerrada 6 px por debajo y la
   segunda actualiza su distribución, delta y volumen finitos 6 px por encima.
-- Ninguna de las siete filas usa surface, borde, radio ni sombra de card en la fila o en el marco del
-  visual; conservan únicamente la retícula editorial y el componente aislado. La columna de copy no
-  añade separadores verticales.
+- Cada una de las siete filas usa una surface elevada para las dos columnas, con borde sutil, radio
+  de 16 px y sombra contenida. La retícula editorial cubre toda la surface hasta el borde redondeado;
+  la columna de copy no añade separadores verticales.
 - Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo. La escena se centra
   en la distribución y no añade una escala de precios lateral.
 - Liquidity Heatmap: líneas continuas de intensidad por precio y tiempo, con un glow muy sutil y un
@@ -112,9 +112,9 @@ poster estático y mantiene los tres selectores manuales.
 - Last Trades: panel centrado de hasta 500 px con context header, cabeceras de columna y exactamente
   seis ejecuciones en `All trades`. Settings filtra transitoriamente por all, buy o sell y actualiza
   tanto el resumen del header como las filas visibles.
-- Los siete visuales incluyen una retícula CSS no semántica detrás del dato principal. Dos gradientes
-  lineales forman el grid y una máscara radial lo desvanece hacia los bordes. La capa comparte tokens
-  neutrales, no se anima y no depende del estado del reloj de datos.
+- Las siete surfaces incluyen una retícula CSS no semántica detrás del contenido. Dos gradientes
+  lineales forman el grid hasta el borde redondeado. La capa comparte tokens neutrales, usa una
+  opacidad sutil, no se anima y no depende del estado del reloj de datos.
 - Un reloj de cuatro fases, activo solo cerca del viewport y con el documento visible, coordina los
   siete módulos. `prefers-reduced-motion` conserva la fase 0 completa.
 
