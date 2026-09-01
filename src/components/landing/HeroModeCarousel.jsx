@@ -2,24 +2,23 @@ import { useEffect, useRef, useState } from 'react'
 
 const modeSlides = [
   {
-    alt: 'Complete Apex Trader workstation with the Candles chart active.',
     id: 'candles',
     label: 'Candles',
-    src: '/media/hero-terminal-candles.png'
+    start: 0
   },
   {
-    alt: 'Complete Apex Trader workstation with the Footprint chart active.',
     id: 'footprint',
     label: 'Footprint',
-    src: '/media/hero-terminal-footprint.png'
+    start: 4.2
   },
   {
-    alt: 'Complete Apex Trader workstation with the Step Profile chart active.',
     id: 'step-profile',
     label: 'Step Profile',
-    src: '/media/hero-terminal-step-profile.png'
+    start: 8.4
   }
 ]
+
+const replayDuration = 12.12
 
 function useReducedMotion() {
   const [reducedMotion, setReducedMotion] = useState(
@@ -40,6 +39,7 @@ function useReducedMotion() {
 
 export default function HeroModeCarousel() {
   const rootRef = useRef(null)
+  const videoRef = useRef(null)
   const reducedMotion = useReducedMotion()
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
@@ -65,54 +65,62 @@ export default function HeroModeCarousel() {
   }, [])
 
   useEffect(() => {
-    if (!isPlaying) return undefined
-    const timer = window.setInterval(
-      () => setActiveIndex((current) => (current + 1) % modeSlides.length),
-      4_200
-    )
-    return () => window.clearInterval(timer)
+    const video = videoRef.current
+    if (!video) return undefined
+    if (!isPlaying) {
+      video.pause()
+      return undefined
+    }
+    void video.play().catch(() => undefined)
+    return undefined
   }, [isPlaying])
 
   const activeSlide = modeSlides[activeIndex]
 
+  const updateActiveMode = (event) => {
+    const currentTime = event.currentTarget.currentTime % replayDuration
+    const nextIndex = modeSlides.reduce(
+      (selected, slide, index) => (currentTime >= slide.start ? index : selected),
+      0
+    )
+    setActiveIndex(nextIndex)
+  }
+
   const selectMode = (index) => {
+    const video = videoRef.current
+    if (video) {
+      video.currentTime = modeSlides[index].start
+      video.pause()
+    }
     setActiveIndex(index)
     setUserPaused(true)
   }
 
   return (
     <section
-      aria-label="Apex Trader chart modes"
+      aria-label="Apex Trader workstation replay"
       aria-roledescription="carousel"
       className="landing-analysis-card landing-mode-carousel"
       data-active-mode={activeSlide.id}
       data-rotation-state={reducedMotion ? 'static' : isPlaying ? 'playing' : 'paused'}
       ref={rootRef}
     >
-      <div className="landing-mode-carousel__toolbar">
-        <span>ONE SESSION / THREE MARKET VIEWS</span>
-        <span>
-          {String(activeIndex + 1).padStart(2, '0')} / {String(modeSlides.length).padStart(2, '0')}
-        </span>
-      </div>
-
       <div className="landing-mode-carousel__stage">
-        {modeSlides.map((slide, index) => (
-          <figure
-            aria-hidden={index !== activeIndex}
-            className={`landing-mode-slide${index === activeIndex ? ' is-active' : ''}`}
-            key={slide.id}
-          >
-            <img
-              alt={slide.alt}
-              decoding="async"
-              height="900"
-              loading="eager"
-              src={slide.src}
-              width="1600"
-            />
-          </figure>
-        ))}
+        <video
+          aria-label="Apex Trader workstation replay cycling through Candles, Footprint and Step Profile charts."
+          autoPlay={!reducedMotion}
+          className="landing-mode-carousel__video"
+          loop
+          muted
+          onTimeUpdate={updateActiveMode}
+          playsInline
+          poster="/media/hero-terminal-candles.png"
+          preload="metadata"
+          ref={videoRef}
+        >
+          <source src="/media/hero-replay.mp4" type="video/mp4" />
+          <source src="/media/hero-replay.webm" type="video/webm" />
+        </video>
       </div>
 
       <div className="landing-mode-carousel__controls">

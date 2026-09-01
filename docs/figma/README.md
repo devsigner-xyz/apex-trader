@@ -17,12 +17,14 @@ Archivo maestro: [Apex Trader](https://www.figma.com/design/Ze9eGnPaNDj8u0oB1iUt
 
 Direction B sustituye a Direction A como referencia de la landing. Los roots y exploraciones de Direction A se retiraron del área activa; no deben usarse para reconstruir copy, estructura o responsive.
 
-La implementación R6 conserva el orden Header → Opening thesis → Market primitives → One clock +
-Session evidence → Product reveal → Case study endorsement → Footer. `The blind spot` permanece en
-la referencia Figma anterior, pero se ha retirado del checkout local porque no añade contenido sobre
-la tesis del hero. Los media exports de producto se versionan bajo `public/media/`; una captura
-verifica apariencia, mientras que rutas, lazy loading, semántica y accesibilidad se verifican en
-código y navegador.
+La implementación vigente conserva el orden Header → Opening thesis → Market primitives →
+Devsigner banner → Footer. One clock, Session evidence, Product reveal y The workspace permanecen en
+referencias históricas, pero se han retirado del checkout local porque no aportan contenido adicional
+en esta fase. `The blind spot` también permanece en la referencia Figma anterior, pero se ha retirado
+del checkout local porque no añade contenido sobre la tesis del hero. El hero ejecutable usa un vídeo
+grabado de la workstation y conserva un poster estático; los media exports se versionan bajo
+`public/media/`. Una captura verifica apariencia, mientras que rutas, lazy loading, semántica y
+accesibilidad se verifican en código y navegador.
 
 ### Dirección interactiva, revisión R2 y ajuste R3
 
@@ -82,6 +84,11 @@ desvanecida en los seis visuales. Figma tampoco representa este reemplazo, por l
 pasa a ser R3–R10. R11 revisa localmente el copy del hero, navegación, secciones, módulos y CTAs para
 expresar valor de producto en lugar de detalles de implementación. Este contenido tampoco está
 sincronizado con los frames de landing, por lo que el gap vigente pasa a ser R3–R11.
+R12 retira la numeración decorativa `01`–`06` de las filas de modos en código; Figma tampoco refleja
+este ajuste. R13 retira One clock, Session evidence y The workspace y añade el banner de Devsigner;
+Figma tampoco refleja este ajuste. R14 sustituye el carrusel de capturas por un vídeo grabado de la
+workstation con poster y controles de segmento; Figma tampoco refleja este ajuste, por lo que el gap
+vigente pasa a ser R3–R14.
 
 ## Producción
 

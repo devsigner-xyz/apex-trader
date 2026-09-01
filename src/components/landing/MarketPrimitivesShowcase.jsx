@@ -277,22 +277,18 @@ function VolumeProfileScene({ profile }) {
   )
 }
 
-function PrimitiveRow({ body, children, eyebrow, heading, id, sequence }) {
+function PrimitiveRow({ body, children, eyebrow, heading, id }) {
   return (
     <section
       aria-labelledby={`${id}-title`}
       className="landing-primitive"
       data-primitive={id}
-      data-sequence={sequence}
     >
       <div className="landing-primitive__visual">
         <span aria-hidden="true" className="landing-primitive-grid-backdrop" data-backdrop="grid" />
         {children}
       </div>
       <div className="landing-primitive__copy">
-        <span aria-hidden="true" className="landing-primitive__sequence">
-          {sequence}
-        </span>
         <p>{eyebrow}</p>
         <h3 id={`${id}-title`}>{heading}</h3>
         <p>{body}</p>
@@ -322,8 +318,7 @@ PrimitiveRow.propTypes = {
   children: PropTypes.node.isRequired,
   eyebrow: PropTypes.string.isRequired,
   heading: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  sequence: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired
 }
 
 export default function MarketPrimitivesShowcase() {
@@ -343,7 +338,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="SEE DIRECTION AND MOMENTUM"
         heading="Start with the shape of the move"
         id="candles"
-        sequence="01"
       >
         <CandlesScene bars={snapshot.candles} />
       </PrimitiveRow>
@@ -352,7 +346,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="SEE WHO TRADED AT EACH PRICE"
         heading="Find the pressure inside the candle"
         id="footprint"
-        sequence="02"
       >
         <FootprintScene bars={snapshot.footprintBars} />
       </PrimitiveRow>
@@ -361,7 +354,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="SEE WHERE VOLUME CONCENTRATED"
         heading="Read the distribution inside each candle"
         id="step-profile"
-        sequence="03"
       >
         <StepProfileScene bars={snapshot.stepProfileBars} />
       </PrimitiveRow>
@@ -370,7 +362,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="FIND THE PRICES THE MARKET ACCEPTED"
         heading="Map value across the visible session"
         id="volume-profile"
-        sequence="04"
       >
         <VolumeProfileScene profile={snapshot.profile} />
       </PrimitiveRow>
@@ -379,7 +370,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="WATCH LIQUIDITY FORM AROUND PRICE"
         heading="See where buyers and sellers are waiting"
         id="dom"
-        sequence="05"
       >
         <CompactDom
           currentPrice={snapshot.currentPrice}
@@ -392,7 +382,6 @@ export default function MarketPrimitivesShowcase() {
         eyebrow="FOLLOW THE PACE OF EXECUTION"
         heading="See who is crossing the spread"
         id="last-trades"
-        sequence="06"
       >
         <CompactTimeSales trades={snapshot.trades} />
       </PrimitiveRow>

@@ -31,14 +31,6 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     '#modes'
   )
-  await expect(page.getByRole('link', { name: 'Session', exact: true })).toHaveAttribute(
-    'href',
-    '#session'
-  )
-  await expect(page.getByRole('link', { name: 'Workspace', exact: true })).toHaveAttribute(
-    'href',
-    '#workspace'
-  )
   await expect(page.getByRole('link', { name: 'Component library', exact: true })).toHaveAttribute(
     'href',
     '/storybook/'
@@ -47,7 +39,14 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     'https://devsigner.xyz'
   )
-  await expect(page.getByText('420,562', { exact: true })).toBeVisible()
+  await expect(page.getByText('One market moment, seen from every angle.')).toHaveCount(0)
+  await expect(page.getByText('Follow the session, not a highlight.')).toHaveCount(0)
+  await expect(page.getByText('Move from overview to execution detail.')).toHaveCount(0)
+  await expect(page.getByText('ONE SESSION / THREE MARKET VIEWS', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Visit devsigner.xyz ↗' })).toHaveAttribute(
+    'href',
+    'https://devsigner.xyz'
+  )
   await page.waitForTimeout(250)
   expect(historicalRequests).toEqual([])
   expect(errors).toEqual([])
@@ -57,36 +56,28 @@ test('every remaining exported product image loads when its section enters the v
   page
 }) => {
   await page.goto('/')
-  const images = page.locator('main img')
-  await expect(images).toHaveCount(4)
-
-  for (let index = 0; index < (await images.count()); index += 1) {
-    const image = images.nth(index)
-    await image.scrollIntoViewIfNeeded()
-    await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0)
-    await expect(image).not.toHaveAttribute('alt', '')
-  }
-
-  const carouselImages = page.locator('.landing-mode-slide img')
-  await expect(carouselImages).toHaveCount(3)
-  for (let index = 0; index < (await carouselImages.count()); index += 1) {
-    await expect
-      .poll(() =>
-        carouselImages.nth(index).evaluate((node) => ({
-          height: node.naturalHeight,
-          width: node.naturalWidth
-        }))
-      )
-      .toEqual({ height: 900, width: 1600 })
-    await expect(carouselImages.nth(index)).toHaveCSS('object-fit', 'contain')
-  }
+  const replay = page.locator('.landing-mode-carousel__video')
+  await expect(replay).toHaveCount(1)
+  await expect(replay).toHaveAttribute('poster', '/media/hero-terminal-candles.png')
+  await expect(replay.locator('source[type="video/mp4"]')).toHaveAttribute(
+    'src',
+    '/media/hero-replay.mp4'
+  )
+  await expect(replay.locator('source[type="video/webm"]')).toHaveAttribute(
+    'src',
+    '/media/hero-replay.webm'
+  )
+  await expect
+    .poll(() => replay.evaluate((node) => ({ height: node.videoHeight, width: node.videoWidth })))
+    .toEqual({ height: 900, width: 1600 })
+  await expect(replay).toHaveCSS('object-fit', 'contain')
 })
 
-test('hero carousel rotates through the three chart modes and supports manual control', async ({
+test('hero replay rotates through the three chart modes and supports manual control', async ({
   page
 }) => {
   await page.goto('/')
-  const carousel = page.getByRole('region', { name: 'Apex Trader chart modes' })
+  const carousel = page.getByRole('region', { name: 'Apex Trader workstation replay' })
   await expect(carousel).toHaveAttribute('data-active-mode', 'candles')
   await expect(carousel).toHaveAttribute('data-rotation-state', 'playing')
 
@@ -130,6 +121,7 @@ test('isolated market primitives load near the viewport without mounting the wor
   expect(showcaseRequests).toHaveLength(1)
 
   await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive__sequence')).toHaveCount(0)
   await expect(showcase.locator('.landing-primitive-grid-backdrop')).toHaveCount(6)
   for (const valueMessage of [
     'SEE DIRECTION AND MOMENTUM',
@@ -323,7 +315,7 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
 
-  const carousel = page.getByRole('region', { name: 'Apex Trader chart modes' })
+  const carousel = page.getByRole('region', { name: 'Apex Trader workstation replay' })
   await expect(carousel).toHaveAttribute('data-rotation-state', 'static')
   await expect(carousel).toHaveAttribute('data-active-mode', 'candles')
 

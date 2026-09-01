@@ -30,8 +30,8 @@ gráfico como variación. R4 es un cambio local hasta recibir una autorización 
 
 - Presentar Apex como una interfaz de trading avanzada, no como una replay workstation.
 - Explicar cada lectura mediante componentes React pequeños, editables y deterministas.
-- Reservar las imágenes para mostrar la composición completa, donde una UI real dejaría de ser
-  legible por escala.
+- Reservar el media del hero para una grabación de la composición completa, donde la UI real aporta
+  contexto sin reducirse a una escala ilegible.
 - Mantener `/demo` y su replay, preferencias y rutas sin regresiones.
 - Mantener el copy público en inglés y la documentación interna en español.
 
@@ -145,6 +145,34 @@ de producto completo.
   aporta significado. Apex sigue presentándose como producto, sin afirmar conexión a broker ni
   operativa en vivo.
 
+## Jerarquía limpia R12
+
+- Se retiran los marcadores visuales `01`–`06` de las seis filas de Market primitives.
+- La secuencia permanece implícita en el orden y explícita en el nombre de cada herramienta; no se
+  conserva un elemento decorativo ni un contrato CSS para esos números.
+
+## Landing focalizada R13
+
+- Se retiran de la composición pública las secciones One clock, Session evidence y The workspace,
+  junto con sus métricas, callouts, imagen de terminal completa y CTA de cierre.
+- La navegación deja solo los destinos que existen en la página: Market views, Component library,
+  Devsigner y Open workspace.
+- El cierre pasa a ser un banner de Devsigner con una propuesta breve y un CTA directo a
+  `https://devsigner.xyz`.
+- El hero y las seis vistas aisladas permanecen sin cambios de producto; el banner conserva la
+  atribución sin convertir la landing en una página de case study.
+
+## Hero replay R14
+
+- El hero usa una grabación 1600 × 900 de `/demo` generada con Playwright: 4 s de estabilización,
+  Candles, Footprint y Step Profile en secuencia y un loop final de 12,12 s.
+- El vídeo se sirve como MP4 y WebM desde `public/media/`, con poster PNG para carga inicial y
+  `prefers-reduced-motion`.
+- Los controles manuales del hero buscan el inicio de cada segmento y pausan el vídeo; no abren ni
+  muestran el selector nativo del replay.
+- Se elimina la barra superior `ONE SESSION / THREE MARKET VIEWS`; los nombres de modo quedan en los
+  controles inferiores.
+
 ## Arquitectura React vigente
 
 ```text
@@ -209,8 +237,8 @@ R2 reutiliza instancias de los masters Candles `132:3266`, Footprint `132:867`, 
 representa como geometría vectorial aislada ligada a las variables locales. Direction B y todos los
 masters permanecen intactos.
 
-R3–R11 están implementados en código, pero todavía no se han sincronizado con Figma. R4 ajusta
-además el encuadre del carrusel únicamente en código. R2 se conserva como referencia
+R3–R14 están implementados en código, pero todavía no se han sincronizado con Figma. R4 ajusta
+además el encuadre del carrusel únicamente en código y R14 lo sustituye por vídeo. R2 se conserva como referencia
 aprobada; no debe declararse paridad Figma/código hasta crear o actualizar una revisión preservando
 IDs y masters.
 
@@ -227,7 +255,7 @@ IDs y masters.
 | 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
 | 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
-| 9 · Sincronización Figma R3–R11    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R11                                           | Requiere trabajo Figma     |
+| 9 · Sincronización Figma R3–R14    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R11; R12/R13/R14 están locales          | Requiere trabajo Figma     |
 | 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
 | 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
 | 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
@@ -242,6 +270,9 @@ IDs y masters.
 | 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | —                          |
 | 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | —                          |
 | 23 · Release R11                    | complete | `0b399ec…`; Railway `e3d07c19…`; copy, rutas, assets y UI pública verificados                                  | —                          |
+| 24 · Jerarquía limpia R12            | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r12-clean-hierarchy-local.md`; 21/21 E2E       | —                          |
+| 25 · Landing focalizada R13          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md`; 21/21 E2E; QA desktop/mobile | Publicar solo con permiso |
+| 26 · Hero replay R14                 | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md`; vídeo MP4/WebM; 21/21 E2E | Publicar solo con permiso |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -250,6 +281,9 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - `/` presenta Apex como demo funcional de una UI de trading avanzada.
 - El hero y cada sección explican una capacidad o una lectura útil para el usuario final; ningún
   tagline enumera filas, barras, estados de actualización ni detalles de fixture.
+- Las seis filas de modos no muestran numeración decorativa `01`–`06`.
+- No aparecen las secciones One clock, Session evidence ni The workspace; el cierre es un banner de
+  Devsigner con CTA a `devsigner.xyz`.
 - Hay seis filas visuales aisladas, todas unframed, y ninguna monta `.market-chart` ni paneles
   vecinos.
 - Candles contiene cinco velas próximas y solo cambia el close de la última dentro de extremos
@@ -268,7 +302,7 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - Mobile 390 no tiene overflow ni paneles desktop ilegibles.
 - `/` no solicita `/data/tardis/**` ni altera preferencias persistidas de `/demo`.
 - `/demo`, modos, paneles, foco, rutas y Storybook no tienen regresiones.
-- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R11; hasta entonces el
+- Antes de cerrar la fase 9, Figma y código deben describir el mismo contrato R13; hasta entonces el
   gap permanece explícito en `docs/figma/README.md`.
 - Railway sirve el commit exacto con estado `SUCCESS` antes de declarar la publicación.
 

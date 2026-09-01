@@ -17,6 +17,7 @@
     "data:tardis": "node scripts/tardis-ingest-v2.mjs",
     "data:tardis:download": "node scripts/tardis-ingest-v2.mjs --download",
     "data:tardis:liquidity": "node scripts/tardis-liquidity-tiles.mjs",
+    "record:landing-hero": "node scripts/record-landing-hero.mjs",
     "test:unit": "node --test tests/*.test.js",
     "test:coverage": "TMPDIR=/tmp node --test --experimental-test-coverage --test-coverage-include='src/services/**/*.js' --test-coverage-include='src/hooks/**/*.js' --test-coverage-include='src/components/professional/chart/marketChartPresentation.js' tests/*.test.js",
     "test:coverage:chart": "TMPDIR=/tmp node --test --experimental-test-coverage --test-coverage-include='src/components/professional/chart/marketChartPresentation.js' --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 tests/marketChartPresentation.test.js",

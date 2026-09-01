@@ -62,6 +62,12 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   de producto.
 - [Interactive portfolio landing R11 production](verification/2026-08-31-interactive-portfolio-landing-r11-production.md):
   commit funcional, Railway, rutas, assets y comprobación pública desktop/mobile del copy R11.
+- [Interactive portfolio landing R12 clean hierarchy](verification/2026-09-01-interactive-portfolio-landing-r12-clean-hierarchy-local.md):
+  retirada local de la numeración decorativa de las seis filas de modos y regresión estructural.
+- [Interactive portfolio landing R13 focused landing](verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md):
+  retirada local de las secciones de contexto y nuevo banner final de Devsigner con CTA externo.
+- [Interactive portfolio landing R14 hero replay](verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md):
+  vídeo local de la workstation real, secuencia de modos, fallback y regresión de la landing.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
@@ -98,7 +104,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. En el [plan de landing interactiva](plans/interactive-portfolio-landing.md),
-R2–R11 están publicados y verificados. R4–R11 permanecen pendientes de sincronización con Figma.
+R2–R11 están publicados y verificados. R12–R14 están verificados solo en local y R3–R14
+permanecen pendientes de sincronización con Figma.
 
 ## Jerarquía y estados
 

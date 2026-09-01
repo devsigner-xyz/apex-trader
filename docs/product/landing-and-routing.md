@@ -12,14 +12,13 @@ owners: product-design-engineering
 R2 de módulos aislados `688:21215`. La sección `Market primitives` contiene Candles, Footprint, Step
 Profile, Volume Profile, DOM y Last Trades como escenas React compactas de dos columnas. Las filas
 alternan visual y copy para crear ritmo editorial sin montar la terminal ni un `MarketChart`
-completo. Opening thesis usa un carrusel de tres exports reales del workstation completo, todos con
-el mismo encuadre y con Candles, Footprint o Step Profile como única variación. The workspace
-mantiene una imagen optimizada adicional porque también muestra la composición completa.
+completo. Opening thesis usa un vídeo generado desde la workstation real, con el mismo encuadre y
+Candles, Footprint o Step Profile como única variación. El foco actual termina en las vistas aisladas
+y no añade una sección de producto adicional.
 
 La antigua sección `The blind spot` y su comparación OHLC/Volume at Price se retiran en R6 porque
 repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario enlaza directamente a
-`#modes` y las secciones visibles se numeran Market primitives 01, One clock 02, Session evidence 03
-y The workspace 04.
+`#modes` y la sección visible se limita a Market primitives 01.
 
 El copy público está en inglés y presenta cada lectura por la pregunta de mercado que ayuda a
 responder. Los eyebrows comunican dirección, presión, concentración, aceptación, liquidez y ritmo
@@ -27,8 +26,11 @@ de ejecución; no enumeran cantidades de elementos, estados de animación ni det
 valores de los módulos son fixtures deterministas de interfaz; no se afirman como replay histórico,
 ni Apex se presenta como broker o plataforma de trading conectada.
 
-Las secciones son navegables mediante `#modes`, `#session` y `#workspace`. Los CTA `Open workspace`
-son anchors reales hacia `/demo`; `Compare market views` enlaza a `#modes`. La navegación primaria
+Las filas de modos de gráfico se presentan sin numeración decorativa; la jerarquía se apoya en el
+nombre de la herramienta y en la explicación de la lectura.
+
+La única sección editorial navegable es `#modes`. Los CTA `Open workspace` son anchors reales hacia
+`/demo`; `Compare market views` enlaza a `#modes`. La navegación primaria
 incluye `Component library`, un enlace mismo-origen hacia `/storybook/` para explorar superficies
 aisladas con datos deterministas. Los enlaces externos a Devsigner abren una pestaña nueva con
 `noopener noreferrer`. La atribución declara discretamente que Apex Trader está diseñado y
@@ -67,18 +69,17 @@ Footprint y Step Profile, la geometría del Volume Profile y filas compartidas d
 pero no monta `.market-chart`, resizers ni paneles vecinos. DOM y Time & Sales sí conservan su
 context header y su settings popover real porque ambos controles modifican el módulo aislado.
 
-El runtime de la landing referencia cuatro PNG de `public/media/`: Opening thesis precarga
-`hero-terminal-candles.png`, `hero-terminal-footprint.png` y `hero-terminal-step-profile.png` para
-que el crossfade no muestre estados vacíos. Los tres assets son capturas 1600 × 900 de la aplicación
-real, conservan el workstation completo y el mismo viewport; solo cambia el modo del gráfico. El
-contenedor mantiene su proporción 16:9 y usa `object-fit: contain`, también en mobile, para no
-recortar paneles. El terminal completo de The workspace usa lazy loading. Los exports históricos no
+El runtime de la landing referencia `hero-replay.mp4` y `hero-replay.webm` en `public/media/`. El
+vídeo es una grabación 1600 × 900 de la aplicación real, conserva la workstation completa y recorre
+Candles, Footprint y Step Profile en un loop de 12,12 s. El poster `hero-terminal-candles.png` cubre
+la carga inicial y el fallback del navegador. El contenedor mantiene su proporción 16:9 y usa
+`object-fit: contain`, también en mobile, para no recortar paneles. Los exports históricos no
 referenciados permanecen físicamente en `public/media/`; esta iniciativa no autoriza borrarlos.
 
-El carrusel empieza siempre en Candles y avanza Candles → Footprint → Step Profile cada 4,2 s con
-un crossfade de 420 ms. Se pausa fuera de viewport, con la pestaña oculta o mediante su control
-visible; elegir manualmente un modo también pausa la rotación. `prefers-reduced-motion` conserva
-Candles estático, mantiene los tres selectores manuales y elimina la transición.
+El vídeo empieza siempre en Candles y avanza Candles → Footprint → Step Profile cada 4,2 s. Se pausa
+fuera de viewport, con la pestaña oculta o mediante su control visible; elegir manualmente un modo
+busca el segmento correspondiente y pausa la reproducción. `prefers-reduced-motion` conserva el
+poster estático y mantiene los tres selectores manuales.
 
 ## Contrato de los módulos aislados
 

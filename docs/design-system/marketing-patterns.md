@@ -21,25 +21,26 @@ Estos valores viven en `src/styles/professional.css`; `src/styles/landing.css` s
 
 ## Composición Direction B
 
-El orden contractual R6 es Header, Opening thesis, Market primitives, One clock, Session evidence,
-The workspace, Case study endorsement y Footer. Opening thesis ya muestra el terminal completo en
-su carrusel; `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o una
-lectura adicional. El CTA secundario del hero salta directamente a Market primitives.
+El orden contractual vigente es Header, Opening thesis, Market primitives, Devsigner banner y Footer.
+Opening thesis muestra el terminal completo en su carrusel; las secciones de contexto One clock,
+Session evidence y The workspace se mantienen como snapshots históricos, pero no forman parte de la
+landing actual. `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o
+una lectura adicional. El CTA secundario del hero salta directamente a Market primitives.
 
 - Header sólido y sticky, sin blur ni transparencia.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
-- El carrusel de apertura usa tres exports 16:9 del workstation real con el mismo encuadre. Solo
-  cambia el modo activo entre Candles, Footprint y Step Profile; el crossfade es ligero y conserva
-  controles manuales y pausa explícita. Las imágenes usan `contain`, no `cover`, para mantener
-  visibles watchlist, chart, DOM, ejecución, tape y activity en cada estado.
+- El hero usa un vídeo 16:9 del workstation real con el mismo encuadre. Recorre Candles, Footprint y
+  Step Profile, conserva controles manuales y pausa explícita. El vídeo usa `contain`, no `cover`,
+  para mantener visibles watchlist, chart, DOM, ejecución, tape y activity en cada estado; el poster
+  cubre carga inicial y movimiento reducido.
 - Las acciones primarias enlazan con elementos `<a href="/demo">` reales.
 - Foco visible, skip link y heading hierarchy son obligatorios.
 
 ## Responsive y motion
 
 - Desktop conserva padding lateral de 80 px dentro de una referencia de 1440 px.
-- Tablet reduce el padding y reorganiza carrusel, evidence y módulos alternos sin reducir texto hasta hacerlo ilegible.
-- Mobile usa 24 px laterales y 64 px verticales; lecturas y paneles pasan a una columna y las métricas a 2 × 2.
+- Tablet reduce el padding y reorganiza el hero y los módulos alternos sin reducir texto hasta hacerlo ilegible.
+- Mobile usa 24 px laterales y 64 px verticales; lecturas y paneles pasan a una columna.
 - La landing no depende de hover ni de movimiento para explicar contenido. `prefers-reduced-motion` conserva todo el contenido en estado estático.
 - Ningún breakpoint debe introducir overflow horizontal.
 
@@ -53,7 +54,7 @@ lectura adicional. El CTA secundario del hero salta directamente a Market primit
 - Los términos del producto —Candles, Footprint, Step Profile, Volume Profile, DOM y Time & Sales—
   se conservan cuando ayudan a reconocer la herramienta, pero siempre acompañados de una
   explicación comprensible.
-- La navegación usa `Market views`, `Session`, `Workspace` y `Component library`. Las acciones
+- La navegación usa `Market views`, `Component library` y `Devsigner`. Las acciones
   principales usan `Open workspace`; la acción secundaria del hero usa `Compare market views`.
 - La promesa debe ser verificable por el producto mostrado. No se afirma conexión a broker,
   operativa en vivo ni funcionalidad que la demo no exponga.
@@ -95,5 +96,7 @@ siguientes alternan ese orden:
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 
-Las imágenes de producto se limitan al carrusel de modos en Opening thesis y al contexto completo de
-The workspace. Las seis explicaciones de Market primitives siguen siendo componentes React reales.
+El media de producto del hero se sirve como vídeo con poster estático; las seis explicaciones de
+Market primitives siguen siendo componentes React reales.
+Las filas de Market primitives no muestran numeración decorativa; el orden se comunica mediante la
+posición, el nombre de la herramienta y su explicación.
