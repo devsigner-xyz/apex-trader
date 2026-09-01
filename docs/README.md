@@ -68,6 +68,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   retirada local de las secciones de contexto y nuevo banner final de Devsigner con CTA externo.
 - [Interactive portfolio landing R14 hero replay](verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md):
   vídeo local de la workstation real, secuencia de modos, fallback y regresión de la landing.
+- [Interactive portfolio landing R14 hero replay production](verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md):
+  publicación del vídeo, eliminación de la barra superior y comprobación pública del dominio y assets.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
@@ -104,8 +106,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 Los documentos [apex-trader-verification-report.md](apex-trader-verification-report.md),
 [figma-implementation-inventory.md](figma-implementation-inventory.md) y los planes marcados como
 históricos son snapshots. En el [plan de landing interactiva](plans/interactive-portfolio-landing.md),
-R2–R11 están publicados y verificados. R12–R14 están verificados solo en local y R3–R14
-permanecen pendientes de sincronización con Figma.
+R2–R11 y R14 están publicados y verificados. R12 y R13 permanecen verificados solo en local; R3–R14
+siguen pendientes de sincronización con Figma.
 
 ## Jerarquía y estados
 

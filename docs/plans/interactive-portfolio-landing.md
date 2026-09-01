@@ -273,6 +273,7 @@ IDs y masters.
 | 24 · Jerarquía limpia R12            | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r12-clean-hierarchy-local.md`; 21/21 E2E       | —                          |
 | 25 · Landing focalizada R13          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md`; 21/21 E2E; QA desktop/mobile | Publicar solo con permiso |
 | 26 · Hero replay R14                 | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md`; vídeo MP4/WebM; 21/21 E2E | Publicar solo con permiso |
+| 27 · Release hero replay R14          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md`; Railway `2b300a52…`; UI pública verificada | — |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
