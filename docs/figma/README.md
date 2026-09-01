@@ -90,7 +90,9 @@ Figma tampoco refleja este ajuste. R14 sustituye el carrusel de capturas por un 
 workstation con poster y controles de segmento; Figma tampoco refleja este ajuste, por lo que el gap
 vigente pasa a ser R3–R14.
 R15 añade una séptima escena aislada de Liquidity Heatmap con intensidad configurable y fixtures
-locales; Figma tampoco refleja este ajuste, por lo que el gap vigente pasa a ser R3–R15.
+locales; Figma tampoco refleja este ajuste, por lo que el gap vigente pasa a ser R3-R15. R16 ajusta
+el CTA secundario del hero y retira la etiqueta `TIME` del heatmap; Figma tampoco refleja ese copy
+ni ese detalle de composición.
 
 ## Producción
 

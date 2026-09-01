@@ -285,7 +285,7 @@ IDs y masters.
 | 25 · Landing focalizada R13          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md`; 21/21 E2E; QA desktop/mobile | Publicar solo con permiso |
 | 26 · Hero replay R14                 | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md`; vídeo MP4/WebM; 21/21 E2E | Publicar solo con permiso |
 | 27 · Release hero replay R14          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md`; Railway `2b300a52…`; UI pública verificada | — |
-| 28 · Liquidity Heatmap R15             | in_progress | Séptima escena local, matriz 8×12 y settings de intensidad; QA pendiente | Cerrar QA local |
+| 28 · Liquidity Heatmap R15             | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r15-production.md`; heatmap, CTA y UI pública verificados | — |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
