@@ -59,6 +59,13 @@ construido por Devsigner y presentado como case study público interactivo.
 
 `src/app/routes.js` es la fuente pura para resolver y construir rutas. `App.jsx` es el único propietario de `pushState`, `replaceState` y `popstate`; `ProfessionalTerminal` solo solicita un cambio de modo.
 
+## Analítica
+
+El script diferido de Umami se declara una sola vez en `index.html`, con el website ID de
+`apex.devsigner.xyz`. Por tanto mide la carga inicial de la landing y de las rutas de producto; el
+tracker intercepta los cambios internos realizados por `pushState` y `replaceState`, incluidos los
+cambios entre modos de `/demo` y las redirecciones de aliases.
+
 ## Biblioteca de componentes
 
 `pnpm run storybook` abre el explorador local en el puerto 6006. `pnpm run build:storybook` genera su salida en `dist/storybook`; el build de producción lo ejecuta después de Vite para publicar la ruta `/storybook/` junto con la landing. Las historias Canvas importan los estilos ejecutables de Apex y presentan fixtures locales; no cargan el replay histórico ni solicitan assets bajo `/data/tardis/**`. El catálogo cubre foundations, las seis variantes activas de MarketChart (Candles, Footprint y Step Profile con volumen mostrado u oculto), las cinco vistas de Activity y el panel/matriz de ejecución. Line no se publica como modo activo: permanece como variante Figma legado.
