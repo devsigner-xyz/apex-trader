@@ -8,6 +8,7 @@ import {
   formatDomGrouping
 } from '../../services/domPresentation.js'
 import { formatNumber as fmt } from './formatters.js'
+import { trackEvent } from '../../services/analytics.js'
 
 function DomLevelRow({ index, interactive = true, maximum, onPrice, row, side }) {
   const content = (
@@ -210,6 +211,11 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
     setIsOpen: setSettingsOpen,
     triggerRef: settingsTriggerRef
   })
+  const handlePriceGroupingChange = (event) => {
+    const grouping = Number(event.target.value)
+    setPriceGrouping(grouping)
+    trackEvent('change_demo_setting', { area: 'dom', setting: 'price_grouping', value: grouping })
+  }
 
   useLayoutEffect(() => {
     if (previousDomGrouping.current !== priceGrouping) {
@@ -267,7 +273,7 @@ export default function Dom({ currentPrice, orderbook, onPrice, sourceTickSize }
             PRICE GROUPING
             <select
               aria-label="DOM price grouping"
-              onChange={(event) => setPriceGrouping(Number(event.target.value))}
+              onChange={handlePriceGroupingChange}
               value={priceGrouping}
             >
               {groupingOptions.map((grouping) => (

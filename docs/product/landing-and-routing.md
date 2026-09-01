@@ -66,6 +66,19 @@ El script diferido de Umami se declara una sola vez en `index.html`, con el webs
 tracker intercepta los cambios internos realizados por `pushState` y `replaceState`, incluidos los
 cambios entre modos de `/demo` y las redirecciones de aliases.
 
+Los eventos personalizados se emiten a través de `src/services/analytics.js`, que no altera la
+experiencia si Umami todavía no está disponible. La instrumentación se limita a intención de producto:
+
+- `open_demo` desde header, hero o footer de la landing (`placement`).
+- `select_hero_mode` al elegir manualmente una vista del replay (`mode`).
+- `select_demo_mode` al cambiar manualmente la vista de la terminal (`mode`, `previous_mode`).
+- `change_demo_setting` al confirmar un ajuste de chart, DOM o Time & Sales (`area`, `setting`,
+  `value`). La intensidad de liquidez se registra al terminar el arrastre o un ajuste de teclado, no
+  en cada cambio intermedio.
+
+No se envían precios, tamaños, ticks, posiciones del cursor, movimientos de pan/zoom ni actividad
+automática del replay.
+
 ## Biblioteca de componentes
 
 `pnpm run storybook` abre el explorador local en el puerto 6006. `pnpm run build:storybook` genera su salida en `dist/storybook`; el build de producción lo ejecuta después de Vite para publicar la ruta `/storybook/` junto con la landing. Las historias Canvas importan los estilos ejecutables de Apex y presentan fixtures locales; no cargan el replay histórico ni solicitan assets bajo `/data/tardis/**`. El catálogo cubre foundations, las seis variantes activas de MarketChart (Candles, Footprint y Step Profile con volumen mostrado u oculto), las cinco vistas de Activity y el panel/matriz de ejecución. Line no se publica como modo activo: permanece como variante Figma legado.

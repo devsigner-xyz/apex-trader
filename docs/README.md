@@ -13,6 +13,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Professional terminal specification](product/professional-terminal.md): comportamiento, datos, persistencia y limitaciones.
 - [Historical liquidity heatmap](product/liquidity-heatmap.md): L2, tiles, controles, límites y renderizado.
 - [Landing and routing specification](product/landing-and-routing.md): narrativa pública, rutas canónicas, aliases y frontera de carga.
+- [Umami product events verification](verification/2026-09-01-umami-product-events-local.md):
+  instrumentación de intención y comprobación local de sus payloads.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
 - [Marketing patterns](design-system/marketing-patterns.md): tokens, composición responsive y media de la landing.
 - [Interactive portfolio landing plan](plans/interactive-portfolio-landing.md): dirección planificada para presentar Apex como demo funcional de portfolio mediante componentes React animados y escenas de scroll.

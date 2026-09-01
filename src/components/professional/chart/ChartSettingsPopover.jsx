@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
-export function LiquidityIntensityControl({ enabled, intensity, onChange }) {
+export function LiquidityIntensityControl({ enabled, intensity, onChange, onCommit }) {
+  const commitIntensity = (event) => onCommit?.(Number(event.currentTarget.value) / 100)
+
   return (
     <label className="chart-liquidity-intensity">
       <span>INTENSITY</span>
@@ -9,6 +11,22 @@ export function LiquidityIntensityControl({ enabled, intensity, onChange }) {
         max="100"
         min="20"
         onChange={(event) => onChange(Number(event.target.value) / 100)}
+        onKeyUp={(event) => {
+          if (
+            [
+              'ArrowDown',
+              'ArrowLeft',
+              'ArrowRight',
+              'ArrowUp',
+              'End',
+              'Home',
+              'PageDown',
+              'PageUp'
+            ].includes(event.key)
+          )
+            commitIntensity(event)
+        }}
+        onPointerUp={commitIntensity}
         step="5"
         type="range"
         value={Math.round(intensity * 100)}
@@ -21,6 +39,7 @@ export function LiquidityIntensityControl({ enabled, intensity, onChange }) {
 export default function ChartSettingsPopover({
   liquidity,
   onLiquidityEnabledChange,
+  onLiquidityIntensityCommit,
   onLiquidityIntensityChange,
   onPanelVisibilityChange,
   panelVisibility,
@@ -75,6 +94,7 @@ export default function ChartSettingsPopover({
         <LiquidityIntensityControl
           enabled={liquidity.enabled}
           intensity={liquidity.intensity}
+          onCommit={onLiquidityIntensityCommit}
           onChange={onLiquidityIntensityChange}
         />
       </div>

@@ -11,6 +11,7 @@ import Dom from './professional/Dom.jsx'
 import Execution from './professional/execution/Execution.jsx'
 import PanelResizer from './professional/PanelResizer.jsx'
 import Watchlist from './professional/Watchlist.jsx'
+import { trackEvent } from '../services/analytics.js'
 
 const { panelSizes: panelSizesStorageKey } = storageKeys
 
@@ -28,7 +29,12 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
 
   const routeMode = (next) => {
     if (next === 'footprint') setTimeframe((current) => Math.max(current, 60))
+    if (next !== mode) trackEvent('select_demo_mode', { mode: next, previous_mode: mode })
     onMode(next)
+  }
+  const changeTimeframe = (next) => {
+    setTimeframe(next)
+    trackEvent('change_demo_setting', { area: 'chart', setting: 'timeframe', value: next })
   }
   const workspaceStyle = {
     '--dom-width': `${columns.dom}px`,
@@ -54,7 +60,7 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
           <MarketChart
             mode={mode}
             onMode={routeMode}
-            onTimeframe={setTimeframe}
+            onTimeframe={changeTimeframe}
             sourceTickSize={session.tickSize}
             timeframe={timeframe}
             view={view}

@@ -3,6 +3,7 @@ import { Settings as SettingsIcon } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { useSettingsPopoverFocus } from '../../../hooks/useSettingsPopoverFocus.js'
 import { formatClock as clock, formatNumber as fmt } from '../formatters.js'
+import { trackEvent } from '../../../services/analytics.js'
 
 const tradeFilters = [
   { id: 'all', label: 'All trades', summary: 'Showing all' },
@@ -141,6 +142,14 @@ export default function TimeSales({ initialFilter = 'all', initialSettingsOpen =
     () => trades.filter((trade) => filter === 'all' || trade.side === filter).slice(0, 20),
     [filter, trades]
   )
+  const handleFilterChange = (nextFilter) => {
+    setFilter(nextFilter)
+    trackEvent('change_demo_setting', {
+      area: 'time_sales',
+      setting: 'trade_filter',
+      value: nextFilter
+    })
+  }
 
   return (
     <section aria-label="Time and Sales" className="tape" ref={tapeRef}>
@@ -174,7 +183,7 @@ export default function TimeSales({ initialFilter = 'all', initialSettingsOpen =
                 <input
                   checked={filter === id}
                   name="time-sales-filter"
-                  onChange={() => setFilter(id)}
+                  onChange={() => handleFilterChange(id)}
                   type="radio"
                   value={id}
                 />

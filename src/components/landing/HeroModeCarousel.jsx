@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { trackEvent } from '../../services/analytics.js'
 
 const modeSlides = [
   {
@@ -94,6 +95,7 @@ export default function HeroModeCarousel() {
     }
     setActiveIndex(index)
     setUserPaused(true)
+    trackEvent('select_hero_mode', { mode: modeSlides[index].id })
   }
 
   return (

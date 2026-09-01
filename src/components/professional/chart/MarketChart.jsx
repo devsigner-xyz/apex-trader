@@ -40,6 +40,7 @@ import {
   deriveProfileMarkers,
   selectVisibleTimeTickIndexes
 } from './marketChartPresentation.js'
+import { trackEvent } from '../../../services/analytics.js'
 
 const { chartWidth, mainBottom, mainTop, plotLeft, plotRight, priceChartHeight } = chartDimensions
 const plotWidth = plotRight - plotLeft
@@ -71,7 +72,9 @@ export default function MarketChart({
     chartPanelVisibilityStorageKey,
     normalizeChartPanelVisibility
   )
-  const [storyLiquidity, setStoryLiquidity] = useState(() => normalizeChartLiquidity(initialLiquidity))
+  const [storyLiquidity, setStoryLiquidity] = useState(() =>
+    normalizeChartLiquidity(initialLiquidity)
+  )
   const [storyPanelVisibility, setStoryPanelVisibility] = useState(() =>
     normalizeChartPanelVisibility(initialPanelVisibility)
   )
@@ -219,12 +222,29 @@ export default function MarketChart({
   }
   const handlePanelVisibilityChange = (panel, visible) => {
     setPanelVisibility((currentVisibility) => ({ ...currentVisibility, [panel]: visible }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: panel,
+      value: visible ? 'visible' : 'hidden'
+    })
   }
   const handleLiquidityEnabledChange = (enabled) => {
     setLiquidity((currentLiquidity) => ({ ...currentLiquidity, enabled }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: 'liquidity_heatmap',
+      value: enabled ? 'enabled' : 'disabled'
+    })
   }
   const handleLiquidityIntensityChange = (intensity) => {
     setLiquidity((currentLiquidity) => ({ ...currentLiquidity, intensity }))
+  }
+  const handleLiquidityIntensityCommit = (intensity) => {
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: 'liquidity_intensity',
+      value: Math.round(intensity * 100)
+    })
   }
   const summaryBar = bars[hoveredBarIndex] ?? current
 
@@ -246,6 +266,7 @@ export default function MarketChart({
         <ChartSettingsPopover
           liquidity={liquidity}
           onLiquidityEnabledChange={handleLiquidityEnabledChange}
+          onLiquidityIntensityCommit={handleLiquidityIntensityCommit}
           onLiquidityIntensityChange={handleLiquidityIntensityChange}
           onPanelVisibilityChange={handlePanelVisibilityChange}
           panelVisibility={panelVisibility}

@@ -1,5 +1,6 @@
 import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMarketPrimitivesShowcase.jsx'
 import HeroModeCarousel from '../components/landing/HeroModeCarousel.jsx'
+import { trackEvent } from '../services/analytics.js'
 
 export default function LandingPage() {
   return (
@@ -17,7 +18,11 @@ export default function LandingPage() {
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             Devsigner ↗
           </a>
-          <a className="landing-button landing-button--primary" href="/demo">
+          <a
+            className="landing-button landing-button--primary"
+            href="/demo"
+            onClick={() => trackEvent('open_demo', { placement: 'header' })}
+          >
             Open demo
           </a>
         </nav>
@@ -33,7 +38,11 @@ export default function LandingPage() {
               can understand how a move formed without switching tools.
             </p>
             <div className="landing-actions">
-              <a className="landing-button landing-button--primary" href="/demo">
+              <a
+                className="landing-button landing-button--primary"
+                href="/demo"
+                onClick={() => trackEvent('open_demo', { placement: 'hero' })}
+              >
                 Open demo
               </a>
               <a
@@ -46,7 +55,8 @@ export default function LandingPage() {
               </a>
             </div>
             <p className="landing-disclaimer">
-              Personal portfolio demo by devsigner.xyz - for interface exploration, not live trading.
+              Personal portfolio demo by devsigner.xyz - for interface exploration, not live
+              trading.
             </p>
           </div>
 
@@ -95,7 +105,9 @@ export default function LandingPage() {
           <span>See beyond the candle.</span>
         </div>
         <nav aria-label="Apex Trader footer navigation">
-          <a href="/demo">OPEN DEMO</a>
+          <a href="/demo" onClick={() => trackEvent('open_demo', { placement: 'footer' })}>
+            OPEN DEMO
+          </a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             DEVSIGNER ↗
           </a>
