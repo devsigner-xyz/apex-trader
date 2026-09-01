@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Settings as SettingsIcon } from 'lucide-react'
 import PropTypes from 'prop-types'
 import { CompactDom } from '../professional/Dom.jsx'
-import { formatNumber as fmt } from '../professional/formatters.js'
 import CandlesLayer from '../professional/chart/CandlesLayer.jsx'
 import FootprintLayer from '../professional/chart/FootprintLayer.jsx'
 import StepProfileLayer from '../professional/chart/StepProfileLayer.jsx'
 import { CompactTimeSales } from '../professional/execution/TimeSales.jsx'
+import { LiquidityIntensityControl } from '../professional/chart/ChartSettingsPopover.jsx'
 import { deriveSessionProfileBarGeometry } from '../../services/professionalChartGeometry.js'
+import { useSettingsPopoverFocus } from '../../hooks/useSettingsPopoverFocus.js'
 import {
   createMarketPrimitiveSnapshot,
   marketPrimitivePhaseCount,
@@ -198,22 +200,14 @@ function StepProfileScene({ bars }) {
 
 function VolumeProfileScene({ profile }) {
   const maximumVolume = Math.max(...profile.map((level) => level.ask + level.bid), 1)
-  const priceAxisX = 456
-  const plotRight = 448
+  const plotRight = 536
   return (
     <svg
-      aria-label="Updating visible-range Volume Profile with price scale"
+      aria-label="Updating visible-range Volume Profile"
       role="img"
       viewBox="0 0 560 260"
     >
-      <title>Volume Profile with point of control, value area and aligned price scale</title>
-      <rect
-        className="price-axis-bg landing-profile-price-axis-bg"
-        height="260"
-        width="80"
-        x={priceAxisX}
-        y="0"
-      />
+      <title>Volume Profile with point of control and value area</title>
       <g className="session-profile-bars" transform="translate(64 0)">
         {profile.map((level, index) => {
           const geometry = deriveSessionProfileBarGeometry(level, maximumVolume, 384)
@@ -249,31 +243,89 @@ function VolumeProfileScene({ profile }) {
           </text>
         </g>
       ))}
-      <g aria-label="Price scale" className="landing-profile-price-axis">
-        {profile.map((level, index) => {
-          const y = 29.5 + index * 24
-          return (
-            <g key={level.price}>
-              <line
-                className="price-tick-mark"
-                x1={plotRight}
-                x2={priceAxisX}
-                y1={y}
-                y2={y}
-              />
-              <text
-                className="price-tick landing-profile-price-tick"
-                data-price={level.price}
-                x={priceAxisX + 8}
-                y={y + 4}
-              >
-                {fmt(level.price)}
-              </text>
-            </g>
-          )
-        })}
-      </g>
     </svg>
+  )
+}
+
+function heatmapStrength(value) {
+  if (value >= 0.72) return 'strong'
+  if (value >= 0.5) return 'medium'
+  if (value >= 0.28) return 'soft'
+  return 'base'
+}
+
+function LiquidityHeatmapScene({ heatmap }) {
+  const sceneRef = useRef(null)
+  const settingsPopoverRef = useRef(null)
+  const settingsTriggerRef = useRef(null)
+  const [intensity, setIntensity] = useState(0.75)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const plotLeft = 18
+  const plotRight = 542
+  const cellWidth = (plotRight - plotLeft) / heatmap[0].length
+  const cellHeight = (202 - 20) / heatmap.length
+  const { handleTriggerClick } = useSettingsPopoverFocus({
+    containerRef: sceneRef,
+    isOpen: settingsOpen,
+    popoverRef: settingsPopoverRef,
+    setIsOpen: setSettingsOpen,
+    triggerRef: settingsTriggerRef
+  })
+
+  return (
+    <div
+      className="landing-heatmap-scene"
+      data-intensity={Math.round(intensity * 100)}
+      ref={sceneRef}
+    >
+      <header className="landing-heatmap-header">
+        <span>BTC · LIQUIDITY</span>
+        <button
+          aria-controls="landing-heatmap-settings"
+          aria-expanded={settingsOpen}
+          aria-label="Liquidity heatmap settings"
+          className="chart-settings-button landing-heatmap-settings-button"
+          onClick={handleTriggerClick}
+          ref={settingsTriggerRef}
+          title="Liquidity heatmap settings"
+          type="button"
+        >
+          <SettingsIcon aria-hidden="true" size={16} strokeWidth={2} />
+        </button>
+      </header>
+      <div className="landing-heatmap-plot">
+        <svg aria-label="Liquidity heatmap by price and time" role="img" viewBox="0 0 560 228">
+          <title>Resting liquidity by price and time</title>
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((row) =>
+            heatmap[row].map((value, column) => (
+              <line
+                className={`landing-heatmap-liquidity-line landing-heatmap-liquidity-line--${heatmapStrength(value)}`}
+                data-column={column}
+                data-row={row}
+                key={`${row}-${column}`}
+                opacity={0.18 + value * 0.72 * intensity}
+                x1={plotLeft + column * cellWidth}
+                x2={plotLeft + (column + 1) * cellWidth}
+                y1={20 + row * cellHeight + cellHeight / 2}
+                y2={20 + row * cellHeight + cellHeight / 2}
+              />
+            ))
+          )}
+        </svg>
+      </div>
+      {settingsOpen && (
+        <aside
+          aria-label="Liquidity heatmap settings"
+          className="dom-settings-popover landing-heatmap-settings-popover"
+          id="landing-heatmap-settings"
+          ref={settingsPopoverRef}
+          role="dialog"
+        >
+          <strong>HEATMAP SETTINGS</strong>
+          <LiquidityIntensityControl enabled intensity={intensity} onChange={setIntensity} />
+        </aside>
+      )}
+    </div>
   )
 }
 
@@ -313,6 +365,10 @@ VolumeProfileScene.propTypes = {
   profile: PropTypes.arrayOf(levelType).isRequired
 }
 
+LiquidityHeatmapScene.propTypes = {
+  heatmap: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number.isRequired)).isRequired
+}
+
 PrimitiveRow.propTypes = {
   body: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
@@ -342,7 +398,7 @@ export default function MarketPrimitivesShowcase() {
         <CandlesScene bars={snapshot.candles} />
       </PrimitiveRow>
       <PrimitiveRow
-        body="Footprint separates executed buying and selling at every price. Imbalances and delta reveal where one side became aggressive — and whether price responded."
+        body="Footprint separates executed buying and selling at every price. Imbalances and delta reveal where one side became aggressive - and whether price responded."
         eyebrow="SEE WHO TRADED AT EACH PRICE"
         heading="Find the pressure inside the candle"
         id="footprint"
@@ -364,6 +420,14 @@ export default function MarketPrimitivesShowcase() {
         id="volume-profile"
       >
         <VolumeProfileScene profile={snapshot.profile} />
+      </PrimitiveRow>
+      <PrimitiveRow
+        body="The liquidity heatmap shows resting orders before price reaches them. Adjust intensity to separate a quiet background from the levels most likely to create friction or support."
+        eyebrow="SEE LIQUIDITY BEFORE PRICE ARRIVES"
+        heading="Spot resting orders before they matter"
+        id="liquidity-heatmap"
+      >
+        <LiquidityHeatmapScene heatmap={snapshot.heatmap} />
       </PrimitiveRow>
       <PrimitiveRow
         body="The DOM shows resting liquidity above and below the last trade. Use it to see where the next move may meet friction and how quickly depth changes as price approaches."

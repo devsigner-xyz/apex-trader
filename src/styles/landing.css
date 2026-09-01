@@ -198,12 +198,20 @@
   align-items: center;
 }
 
+.landing-disclaimer {
+  max-width: 620px;
+  margin: -8px 0 0;
+  color: var(--pro-muted);
+  font-family: Inter, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .landing-analysis-card {
   position: relative;
   overflow: hidden;
   background: var(--pro-raised);
   border: 1px solid var(--pro-border);
-  border-top: 2px solid var(--pro-accent);
   border-radius: 3px;
   box-shadow: var(--pro-popover-shadow);
 }
@@ -375,6 +383,103 @@
   height: 100%;
 }
 
+.landing-heatmap-scene {
+  position: relative;
+  display: grid;
+  grid-template-rows: 36px minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.landing-heatmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 10px;
+  color: var(--pro-muted);
+  background: var(--pro-panel);
+  border-bottom: 1px solid var(--pro-border);
+  font: 500 10px 'Roboto Mono', monospace;
+}
+
+.landing-heatmap-plot {
+  position: relative;
+  min-height: 0;
+}
+
+.landing-heatmap-plot > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.landing-heatmap-liquidity-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 2;
+  transition: opacity 180ms ease-in-out, stroke-width 180ms ease-in-out;
+}
+
+.landing-heatmap-liquidity-line--base {
+  color: var(--pro-profile-bid);
+  filter: drop-shadow(0 0 2px var(--pro-profile-bid));
+  stroke: var(--pro-profile-bid);
+}
+
+.landing-heatmap-liquidity-line--soft {
+  color: var(--pro-profile-ask);
+  filter: drop-shadow(0 0 2px var(--pro-profile-ask));
+  stroke: var(--pro-profile-ask);
+}
+
+.landing-heatmap-liquidity-line--medium {
+  color: var(--pro-profile-value);
+  filter: drop-shadow(0 0 2px var(--pro-profile-value));
+  stroke: var(--pro-profile-value);
+}
+
+.landing-heatmap-liquidity-line--strong {
+  color: var(--pro-accent);
+  filter: drop-shadow(0 0 2px var(--pro-accent));
+  stroke: var(--pro-accent);
+}
+
+.landing-heatmap-label {
+  fill: var(--pro-muted);
+  font: 700 9px 'Roboto Mono', monospace;
+  letter-spacing: 0.08em;
+}
+
+.landing-heatmap-settings-button {
+  position: static !important;
+  z-index: 3;
+}
+
+.landing-heatmap-settings-popover {
+  top: 38px;
+  right: 4px;
+  width: 190px;
+}
+
+.landing-heatmap-settings-popover label {
+  display: grid;
+  gap: 6px;
+  color: var(--pro-muted);
+  font: 700 10px 'Roboto Mono', monospace;
+}
+
+.landing-heatmap-settings-popover select {
+  width: 100%;
+  height: 32px;
+  padding: 0 7px;
+  color: var(--pro-text);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 500 10px 'Roboto Mono', monospace;
+}
+
 .landing-primitive__visual > :not(.landing-primitive-grid-backdrop) {
   position: relative;
   z-index: 1;
@@ -413,8 +518,7 @@
   gap: 14px;
   align-content: center;
   min-height: 180px;
-  padding: var(--pro-space-24) 0 var(--pro-space-24) var(--pro-space-24);
-  border-left: 1px solid var(--pro-border);
+  padding: var(--pro-space-24) 0;
 }
 
 .landing-primitive__copy > p:first-child {
@@ -483,14 +587,6 @@
   fill: var(--pro-muted);
   font: 700 10px 'Roboto Mono', monospace;
   letter-spacing: 0.08em;
-}
-
-.landing-profile-price-axis-bg {
-  vector-effect: non-scaling-stroke;
-}
-
-.landing-profile-price-axis .price-tick-mark {
-  vector-effect: non-scaling-stroke;
 }
 
 .dom--compact,
@@ -812,10 +908,6 @@
   .landing-primitive__copy h3 {
     font-size: 22px;
     line-height: 30px;
-  }
-
-  .landing-profile-price-tick {
-    font-size: 12px;
   }
 
   .landing-reading:last-child {

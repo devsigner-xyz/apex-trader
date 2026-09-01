@@ -10,15 +10,17 @@ owners: product-design-engineering
 
 `/` conserva la narrativa Beyond the candle y sustituye las antiguas lecturas raster por el contrato
 R2 de módulos aislados `688:21215`. La sección `Market primitives` contiene Candles, Footprint, Step
-Profile, Volume Profile, DOM y Last Trades como escenas React compactas de dos columnas. Las filas
+Profile, Volume Profile, Liquidity Heatmap, DOM y Last Trades como escenas React compactas de dos columnas. Las filas
 alternan visual y copy para crear ritmo editorial sin montar la terminal ni un `MarketChart`
 completo. Opening thesis usa un vídeo generado desde la workstation real, con el mismo encuadre y
 Candles, Footprint o Step Profile como única variación. El foco actual termina en las vistas aisladas
 y no añade una sección de producto adicional.
 
+El marco del vídeo usa el borde neutro de la superficie; no añade una franja superior de color acento.
+
 La antigua sección `The blind spot` y su comparación OHLC/Volume at Price se retiran en R6 porque
-repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario enlaza directamente a
-`#modes` y la sección visible se limita a Market primitives 01.
+repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario del hero enlaza a
+`https://devsigner.xyz` en una pestaña nueva y la sección visible se limita a Market primitives 01.
 
 El copy público está en inglés y presenta cada lectura por la pregunta de mercado que ayuda a
 responder. Los eyebrows comunican dirección, presión, concentración, aceptación, liquidez y ritmo
@@ -26,11 +28,15 @@ de ejecución; no enumeran cantidades de elementos, estados de animación ni det
 valores de los módulos son fixtures deterministas de interfaz; no se afirman como replay histórico,
 ni Apex se presenta como broker o plataforma de trading conectada.
 
+El hero usa el titular `See beyond the candles.` y declara de forma breve que la experiencia es una
+demo de portfolio personal de `devsigner.xyz`, no una herramienta para operar en vivo.
+
 Las filas de modos de gráfico se presentan sin numeración decorativa; la jerarquía se apoya en el
 nombre de la herramienta y en la explicación de la lectura.
 
-La única sección editorial navegable es `#modes`. Los CTA `Open workspace` son anchors reales hacia
-`/demo`; `Compare market views` enlaza a `#modes`. La navegación primaria
+La única sección editorial navegable es `#modes`. El CTA principal `Open demo` es un anchor real hacia
+`/demo`; el CTA secundario `Visit devsigner.xyz` abre `https://devsigner.xyz` en una pestaña nueva.
+La navegación primaria
 incluye `Component library`, un enlace mismo-origen hacia `/storybook/` para explorar superficies
 aisladas con datos deterministas. Los enlaces externos a Devsigner abren una pestaña nueva con
 `noopener noreferrer`. La atribución declara discretamente que Apex Trader está diseñado y
@@ -89,21 +95,27 @@ poster estático y mantiene los tres selectores manuales.
   segunda actualiza niveles, delta y volumen finitos 6 px por encima.
 - Step Profile: dos barras de nueve niveles; la primera permanece cerrada 6 px por debajo y la
   segunda actualiza su distribución, delta y volumen finitos 6 px por encima.
-- Ninguna de las seis filas usa surface, borde, radio ni sombra de card en la fila o en el marco del
-  visual; conservan únicamente la retícula editorial y el componente aislado.
-- Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo. Una escala de precio
-  a la derecha reproduce el eje del chart profesional y alinea cada etiqueta con su nivel.
+- Ninguna de las siete filas usa surface, borde, radio ni sombra de card en la fila o en el marco del
+  visual; conservan únicamente la retícula editorial y el componente aislado. La columna de copy no
+  añade separadores verticales.
+- Volume Profile: nueve niveles y marcadores POC/VAH/VAL sin candles de fondo. La escena se centra
+  en la distribución y no añade una escala de precios lateral.
+- Liquidity Heatmap: líneas continuas de intensidad por precio y tiempo, con un glow muy sutil y un
+  header de contexto. El fixture local procede de una muestra estática del replay de 30 min; su
+  settings popover reutiliza el slider real de intensidad, de 20% a 100% en pasos de 5%, sin
+  solicitar tiles en runtime.
 - DOM: panel centrado de hasta 500 px con context header, cabeceras de columna, exactamente tres
   asks, last price y tres bids. Ninguna cifra usa elipsis. Settings cambia el price grouping de
-  forma transitoria y actualiza metadata, filas y cantidades agregadas.
+  forma transitoria y actualiza metadata, filas y cantidades agregadas. En la animación, el last
+  price y el spread avanzan por estados alineados al tick junto con las cotizaciones.
 - Last Trades: panel centrado de hasta 500 px con context header, cabeceras de columna y exactamente
   seis ejecuciones en `All trades`. Settings filtra transitoriamente por all, buy o sell y actualiza
   tanto el resumen del header como las filas visibles.
-- Los seis visuales incluyen una retícula CSS no semántica detrás del dato principal. Dos gradientes
+- Los siete visuales incluyen una retícula CSS no semántica detrás del dato principal. Dos gradientes
   lineales forman el grid y una máscara radial lo desvanece hacia los bordes. La capa comparte tokens
   neutrales, no se anima y no depende del estado del reloj de datos.
 - Un reloj de cuatro fases, activo solo cerca del viewport y con el documento visible, coordina los
-  seis módulos. `prefers-reduced-motion` conserva la fase 0 completa.
+  siete módulos. `prefers-reduced-motion` conserva la fase 0 completa.
 
 ## Estado de publicación
 

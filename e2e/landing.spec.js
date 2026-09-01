@@ -14,17 +14,24 @@ test('landing renders its product thesis without loading historical data', async
   await page.goto('/')
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'See what moved the market, not just where it closed.'
+    'See beyond the candles.'
   )
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
-  await expect(page.getByRole('link', { name: 'Open workspace' }).first()).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Open demo' }).first()).toHaveAttribute(
     'href',
     '/demo'
   )
-  await expect(page.getByRole('link', { name: 'Compare market views' })).toHaveAttribute(
-    'href',
-    '#modes'
-  )
+  await expect(
+    page.getByText(
+      'Personal portfolio demo by devsigner.xyz - for interface exploration, not live trading.'
+    )
+  ).toBeVisible()
+  const heroDevsignerLink = page.locator('.landing-actions').getByRole('link', {
+    name: 'Visit devsigner.xyz'
+  })
+  await expect(heroDevsignerLink).toHaveAttribute('href', 'https://devsigner.xyz')
+  await expect(heroDevsignerLink).toHaveAttribute('target', '_blank')
+  await expect(heroDevsignerLink).toHaveAttribute('rel', 'noopener noreferrer')
   await expect(page.getByText('Four prices are not the whole interval.')).toHaveCount(0)
   await expect(page.locator('#blind-spot')).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Market views', exact: true })).toHaveAttribute(
@@ -71,6 +78,7 @@ test('every remaining exported product image loads when its section enters the v
     .poll(() => replay.evaluate((node) => ({ height: node.videoHeight, width: node.videoWidth })))
     .toEqual({ height: 900, width: 1600 })
   await expect(replay).toHaveCSS('object-fit', 'contain')
+  await expect(page.locator('.landing-mode-carousel')).toHaveCSS('border-top-width', '1px')
 })
 
 test('hero replay rotates through the three chart modes and supports manual control', async ({
@@ -120,14 +128,15 @@ test('isolated market primitives load near the viewport without mounting the wor
   await expect(showcase).toBeVisible()
   expect(showcaseRequests).toHaveLength(1)
 
-  await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive')).toHaveCount(7)
   await expect(showcase.locator('.landing-primitive__sequence')).toHaveCount(0)
-  await expect(showcase.locator('.landing-primitive-grid-backdrop')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive-grid-backdrop')).toHaveCount(7)
   for (const valueMessage of [
     'SEE DIRECTION AND MOMENTUM',
     'SEE WHO TRADED AT EACH PRICE',
     'SEE WHERE VOLUME CONCENTRATED',
     'FIND THE PRICES THE MARKET ACCEPTED',
+    'SEE LIQUIDITY BEFORE PRICE ARRIVES',
     'WATCH LIQUIDITY FORM AROUND PRICE',
     'FOLLOW THE PACE OF EXECUTION'
   ]) {
@@ -144,47 +153,45 @@ test('isolated market primitives load near the viewport without mounting the wor
     await expect(showcase.getByText(implementationMessage, { exact: false })).toHaveCount(0)
   }
   await expect(showcase.locator('.market-chart')).toHaveCount(0)
-  await expect(showcase.getByRole('button')).toHaveCount(2)
+  await expect(showcase.getByRole('button')).toHaveCount(3)
   await expect(
     showcase.locator('[data-primitive="candles"] g.up, [data-primitive="candles"] g.down')
   ).toHaveCount(5)
   await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
   await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
   const volumeProfile = showcase.locator('[data-primitive="volume-profile"]')
-  const volumeProfileTicks = volumeProfile.locator('.landing-profile-price-tick')
-  await expect(volumeProfile.locator('.landing-profile-price-axis-bg')).toHaveCount(1)
-  await expect(volumeProfileTicks).toHaveCount(9)
-  await expect(volumeProfileTicks).toHaveText([
-    '21,843.00',
-    '21,842.75',
-    '21,842.50',
-    '21,842.25',
-    '21,842.00',
-    '21,841.75',
-    '21,841.50',
-    '21,841.25',
-    '21,841.00'
-  ])
-  const profileAlignment = await volumeProfile.evaluate((node) => {
-    const levels = [...node.querySelectorAll('.session-profile-bars > g')]
-    const ticks = [...node.querySelectorAll('.landing-profile-price-tick')]
-    return levels.map((level, index) => {
-      const bar = level.querySelector('rect')
-      const tick = ticks[index]
-      return {
-        baselineOffset: Number(tick.getAttribute('y')) - (Number(bar.getAttribute('y')) + 7.5),
-        samePrice: level.getAttribute('data-price') === tick.getAttribute('data-price')
-      }
-    })
-  })
-  expect(profileAlignment).toEqual(
-    Array.from({ length: 9 }, () => ({ baselineOffset: 4, samePrice: true }))
-  )
+  await expect(volumeProfile.getByRole('img', { name: 'Updating visible-range Volume Profile' })).toBeVisible()
+  await expect(volumeProfile.locator('.session-profile-bars > g')).toHaveCount(9)
+  await expect(volumeProfile.locator('.landing-profile-marker')).toHaveCount(3)
+  await expect(volumeProfile.locator('.landing-profile-price-axis')).toHaveCount(0)
+  const heatmap = showcase.locator('[data-primitive="liquidity-heatmap"]')
+  await expect(heatmap.locator('.landing-heatmap-liquidity-line')).toHaveCount(96)
+  await expect(heatmap.getByRole('img', { name: 'Liquidity heatmap by price and time' })).toBeVisible()
+  await expect(heatmap.locator('.landing-heatmap-candles')).toHaveCount(0)
+  await expect(heatmap.locator('.landing-heatmap-price-tick')).toHaveCount(0)
+  await expect(heatmap.locator('.landing-heatmap-price-axis-bg')).toHaveCount(0)
+  await expect(heatmap.getByText('TIME', { exact: true })).toHaveCount(0)
+  await expect(heatmap.locator('.landing-heatmap-header')).toContainText('BTC · LIQUIDITY')
+  const heatmapScene = heatmap.locator('.landing-heatmap-scene')
+  await expect(heatmapScene).toHaveAttribute('data-intensity', '75')
+  await heatmap.getByRole('button', { name: 'Liquidity heatmap settings' }).click()
+  const heatmapSettings = heatmap.getByRole('dialog', { name: 'Liquidity heatmap settings' })
+  await expect(heatmapSettings).toBeVisible()
+  const heatmapIntensity = heatmapSettings.getByLabel('Liquidity heatmap intensity')
+  await expect(heatmapIntensity).toHaveValue('75')
+  await expect(heatmapIntensity).toHaveAttribute('min', '20')
+  await expect(heatmapIntensity).toHaveAttribute('max', '100')
+  await expect(heatmapIntensity).toHaveAttribute('step', '5')
+  await heatmapIntensity.fill('40')
+  await expect(heatmapScene).toHaveAttribute('data-intensity', '40')
+  await page.keyboard.press('Escape')
+  await expect(heatmapSettings).toBeHidden()
   for (const primitive of [
     'candles',
     'footprint',
     'step-profile',
     'volume-profile',
+    'liquidity-heatmap',
     'dom',
     'last-trades'
   ]) {
@@ -220,7 +227,8 @@ test('isolated market primitives load near the viewport without mounting the wor
   const compactDom = showcase.locator('.dom--compact')
   await expect(compactDom.locator(':scope > header')).toContainText('BTC · 0.25 · x1')
   await expect(compactDom.locator('.dom-row.ask')).toHaveCount(3)
-  await expect(compactDom.locator('.dom-spread-row')).toHaveCount(1)
+  const domSpreadRow = compactDom.locator('.dom-spread-row')
+  await expect(domSpreadRow).toHaveCount(1)
   await expect(compactDom.locator('.dom-row.bid')).toHaveCount(3)
   await expect(compactDom).toHaveCSS('width', '500px')
   const domAlignment = await compactDom.evaluate((node) => {
@@ -235,6 +243,14 @@ test('isolated market primitives load near the viewport without mounting the wor
   })
   expect(domAlignment.centerDelta).toBeLessThanOrEqual(1)
   expect(domAlignment.truncatedValues).toBe(0)
+  const initialDomPrice = await domSpreadRow.getAttribute('data-price')
+  const initialDomSpread = await domSpreadRow.getAttribute('data-spread')
+  await expect
+    .poll(() => domSpreadRow.getAttribute('data-price'), { timeout: 4_000 })
+    .not.toBe(initialDomPrice)
+  await expect
+    .poll(() => domSpreadRow.getAttribute('data-spread'), { timeout: 4_000 })
+    .not.toBe(initialDomSpread)
 
   const domSettingsButton = showcase.getByRole('button', { name: 'Compact DOM settings' })
   await domSettingsButton.click()
@@ -290,7 +306,7 @@ test('isolated market primitives load near the viewport without mounting the wor
 
 test('primary landing CTA opens the canonical demo', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Open workspace' }).first().click()
+  await page.getByRole('link', { name: 'Open demo' }).first().click()
   await expect(page).toHaveURL(/\/demo$/)
   await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
   await expect(page.getByLabel('candles historical chart')).toBeVisible()
@@ -325,14 +341,14 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   }))
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Open workspace' }).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open demo' }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Market views', exact: true })).toBeHidden()
 
   await page.locator('.landing-primitives-loader').scrollIntoViewIfNeeded()
   const showcase = page.locator('.landing-primitives')
   await expect(showcase).toHaveAttribute('data-animation-state', 'static')
   await expect(showcase).toHaveAttribute('data-phase', '0')
-  await expect(showcase.locator('.landing-primitive')).toHaveCount(6)
+  await expect(showcase.locator('.landing-primitive')).toHaveCount(7)
   await expect(showcase.locator('.landing-primitive-grid-backdrop').first()).toHaveCSS(
     'animation-name',
     'none'

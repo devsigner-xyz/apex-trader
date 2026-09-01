@@ -89,6 +89,8 @@ este ajuste. R13 retira One clock, Session evidence y The workspace y añade el 
 Figma tampoco refleja este ajuste. R14 sustituye el carrusel de capturas por un vídeo grabado de la
 workstation con poster y controles de segmento; Figma tampoco refleja este ajuste, por lo que el gap
 vigente pasa a ser R3–R14.
+R15 añade una séptima escena aislada de Liquidity Heatmap con intensidad configurable y fixtures
+locales; Figma tampoco refleja este ajuste, por lo que el gap vigente pasa a ser R3–R15.
 
 ## Producción
 

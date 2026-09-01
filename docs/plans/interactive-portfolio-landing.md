@@ -37,7 +37,7 @@ gráfico como variación. R4 es un cambio local hasta recibir una autorización 
 
 ## Contrato visual R2
 
-La sección `Market primitives` contiene seis filas compactas de dos columnas: visual a la izquierda
+La sección `Market primitives` contiene siete filas compactas de dos columnas: visual a la izquierda
 y explicación a la derecha. En mobile se apilan visual y copy sin escalar un terminal desktop.
 
 | Módulo         | Visual aislado                                                                 |
@@ -156,10 +156,10 @@ de producto completo.
 - Se retiran de la composición pública las secciones One clock, Session evidence y The workspace,
   junto con sus métricas, callouts, imagen de terminal completa y CTA de cierre.
 - La navegación deja solo los destinos que existen en la página: Market views, Component library,
-  Devsigner y Open workspace.
+  Devsigner y Open demo.
 - El cierre pasa a ser un banner de Devsigner con una propuesta breve y un CTA directo a
   `https://devsigner.xyz`.
-- El hero y las seis vistas aisladas permanecen sin cambios de producto; el banner conserva la
+- El hero y las siete vistas aisladas permanecen sin cambios de producto; el banner conserva la
   atribución sin convertir la landing en una página de case study.
 
 ## Hero replay R14
@@ -173,6 +173,12 @@ de producto completo.
 - Se elimina la barra superior `ONE SESSION / THREE MARKET VIEWS`; los nombres de modo quedan en los
   controles inferiores.
 
+## Hero attribution R16
+
+- El CTA secundario del hero es `Visit devsigner.xyz`, abre el sitio en una pestaña nueva y el
+  disclaimer identifica la experiencia como demo de portfolio de `devsigner.xyz`, no como trading
+  en vivo.
+
 ## Arquitectura React vigente
 
 ```text
@@ -184,7 +190,7 @@ src/components/landing/
 ```
 
 - `DeferredMarketPrimitivesShowcase` solicita el chunk al aproximarse al viewport.
-- `MarketPrimitivesShowcase` comparte un único reloj de cuatro fases entre las seis escenas.
+- `MarketPrimitivesShowcase` comparte un único reloj de cuatro fases entre las siete escenas.
 - `CandlesLayer`, `FootprintLayer` y `StepProfileLayer` siguen siendo las capas reales del producto.
 - `CompactDom` y `CompactTimeSales` viven junto a los componentes profesionales y reutilizan sus
   filas, formato, headers, settings y tokens sin modificar el comportamiento por defecto de
@@ -197,7 +203,7 @@ src/components/landing/
 ## Datos y movimiento
 
 - `/` no inicializa `useProfessionalPlayback()` ni solicita `/data/tardis/**`.
-- Los seis módulos comparten un fixture generado y no se presentan como datos históricos.
+- Los siete módulos comparten un fixture generado y no se presentan como datos históricos.
 - El reloj avanza cada 1,4 s solo cuando la escena está próxima al viewport y el documento visible.
 - `document.hidden` pausa el reloj.
 - `prefers-reduced-motion` fija la fase 0 completa; ninguna explicación depende del movimiento.
@@ -206,6 +212,11 @@ src/components/landing/
   actual conservan identidad y valores.
 - Footprint y Step Profile mantienen su primera barra estable y actualizan solo la segunda.
 - DOM contiene exactamente 3 asks + last + 3 bids y Last Trades exactamente 6 filas.
+- DOM anima el last price y el spread mediante estados válidos alineados al tick, junto con sus
+  cotizaciones y cantidades.
+- Liquidity Heatmap contiene 96 líneas de intensidad locales y un glow sutil; sus valores proceden de
+  una muestra estática del replay de 30 min y su settings popover permite ajustar la intensidad sin
+  solicitar datos históricos.
 
 ## Responsive y rendimiento
 
@@ -274,6 +285,7 @@ IDs y masters.
 | 25 · Landing focalizada R13          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md`; 21/21 E2E; QA desktop/mobile | Publicar solo con permiso |
 | 26 · Hero replay R14                 | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md`; vídeo MP4/WebM; 21/21 E2E | Publicar solo con permiso |
 | 27 · Release hero replay R14          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md`; Railway `2b300a52…`; UI pública verificada | — |
+| 28 · Liquidity Heatmap R15             | in_progress | Séptima escena local, matriz 8×12 y settings de intensidad; QA pendiente | Cerrar QA local |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 
@@ -282,21 +294,24 @@ Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 - `/` presenta Apex como demo funcional de una UI de trading avanzada.
 - El hero y cada sección explican una capacidad o una lectura útil para el usuario final; ningún
   tagline enumera filas, barras, estados de actualización ni detalles de fixture.
-- Las seis filas de modos no muestran numeración decorativa `01`–`06`.
+- Las siete filas de modos no muestran numeración decorativa `01`–`06`.
 - No aparecen las secciones One clock, Session evidence ni The workspace; el cierre es un banner de
   Devsigner con CTA a `devsigner.xyz`.
-- Hay seis filas visuales aisladas, todas unframed, y ninguna monta `.market-chart` ni paneles
+- El hero ofrece `Open demo` y `Visit devsigner.xyz`; este último abre `https://devsigner.xyz` en una
+  pestaña nueva con `noopener noreferrer`.
+- Hay siete filas visuales aisladas, todas unframed, y ninguna monta `.market-chart` ni paneles
   vecinos.
 - Candles contiene cinco velas próximas y solo cambia el close de la última dentro de extremos
   válidos.
 - Footprint y Step Profile contienen una vela pasada estable y una actual.
 - Volume Profile no muestra candles ni el resto del chart.
-- Volume Profile muestra nueve precios en un eje derecho, alineados con sus nueve niveles, sin card
-  exterior.
+- Volume Profile muestra nueve niveles y sus marcadores de valor sin escala de precios lateral ni
+  card exterior.
 - DOM contiene exactamente 3 asks + last + 3 bids al abrir, queda centrado y no trunca cifras.
 - DOM y Last Trades muestran su context header y settings funcionales con foco restaurado al cerrar.
 - Last Trades contiene exactamente seis ejecuciones con el filtro All trades y mantiene una altura
   compacta mediante filas de 42 px.
+- Liquidity Heatmap reutiliza el slider real de intensidad, con rango 20%-100% y pasos de 5%.
 - Cada primitivo incluye la misma retícula CSS neutral y no semántica, desvanecida hacia los bordes
   y sin animación en cualquier estado de motion.
 - Las fases son deterministas, se pausan fuera de viewport/pestaña y respetan reduced motion.

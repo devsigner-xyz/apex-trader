@@ -25,14 +25,15 @@ El orden contractual vigente es Header, Opening thesis, Market primitives, Devsi
 Opening thesis muestra el terminal completo en su carrusel; las secciones de contexto One clock,
 Session evidence y The workspace se mantienen como snapshots históricos, pero no forman parte de la
 landing actual. `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o
-una lectura adicional. El CTA secundario del hero salta directamente a Market primitives.
+una lectura adicional. El CTA secundario del hero dirige a Devsigner en una pestaña nueva.
 
 - Header sólido y sticky, sin blur ni transparencia.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
 - El hero usa un vídeo 16:9 del workstation real con el mismo encuadre. Recorre Candles, Footprint y
   Step Profile, conserva controles manuales y pausa explícita. El vídeo usa `contain`, no `cover`,
   para mantener visibles watchlist, chart, DOM, ejecución, tape y activity en cada estado; el poster
-  cubre carga inicial y movimiento reducido.
+  cubre carga inicial y movimiento reducido. Su marco mantiene un borde neutro, sin franja superior
+  de color acento.
 - Las acciones primarias enlazan con elementos `<a href="/demo">` reales.
 - Foco visible, skip link y heading hierarchy son obligatorios.
 
@@ -55,7 +56,9 @@ una lectura adicional. El CTA secundario del hero salta directamente a Market pr
   se conservan cuando ayudan a reconocer la herramienta, pero siempre acompañados de una
   explicación comprensible.
 - La navegación usa `Market views`, `Component library` y `Devsigner`. Las acciones
-  principales usan `Open workspace`; la acción secundaria del hero usa `Compare market views`.
+  principales usan `Open demo`; la acción secundaria del hero usa `Visit devsigner.xyz` y abre
+  `https://devsigner.xyz` en una pestaña nueva. El hero incluye un disclaimer breve que identifica
+  la demo de portfolio de `devsigner.xyz` y aclara que no es trading en vivo.
 - La promesa debe ser verificable por el producto mostrado. No se afirma conexión a broker,
   operativa en vivo ni funcionalidad que la demo no exponga.
 
@@ -72,14 +75,19 @@ siguientes alternan ese orden:
   muestran headers, tabs, settings, resizers ni chrome de chart.
 - En Footprint y Step Profile la barra cerrada baja 6 px y la actual sube 6 px para distinguir sus
   siluetas sin convertir el desplazamiento en protagonista.
-- Las seis filas son unframed: tanto la fila como el área visual eliminan surface, borde, radio y
-  shadow. DOM y Last Trades mantienen únicamente el panel real que contiene sus datos y controles.
+- Las siete filas son unframed: tanto la fila como el área visual eliminan surface, borde, radio y
+  shadow. La columna de copy tampoco añade separadores verticales. DOM y Last Trades mantienen
+  únicamente el panel real que contiene sus datos y controles.
 - Volume Profile se representa sin candles y conserva POC, VAH y VAL mediante líneas discretas y
-  punteadas. Su eje derecho reutiliza surface, borde, ticks y formato del price axis profesional;
-  cada precio queda alineado con el centro de su nivel, sin reintroducir un wrapper exterior.
+  punteadas. La escena no añade un eje de precios lateral ni un wrapper exterior.
+- Liquidity Heatmap se representa como líneas continuas por precio y tiempo, con un glow muy sutil y
+  un header de contexto inspirado en el chart profesional; su fixture local procede de una muestra
+  estática del replay de 30 min y su settings popover reutiliza el slider real de intensidad, de 20%
+  a 100% en pasos de 5%, sin cargar tiles.
 - DOM limita su lectura a 3 asks + last + 3 bids y ocupa hasta 500 px, centrado, con columnas sin
-  elipsis. Last Trades muestra seis impresiones en filas de 42 px para ganar contexto sin duplicar
-  la altura del módulo.
+  elipsis. Su last price y spread forman parte de la animación y cambian entre estados alineados al
+  tick. Last Trades muestra seis impresiones en filas de 42 px para ganar contexto sin duplicar la
+  altura del módulo.
 - DOM y Last Trades conservan su context header, cabeceras y trigger de settings. El price grouping
   del DOM y el filtro all/buy/sell de Trades son funcionales, transitorios y reutilizan el foco,
   cierre y tokens del producto.
@@ -96,7 +104,7 @@ siguientes alternan ese orden:
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 
-El media de producto del hero se sirve como vídeo con poster estático; las seis explicaciones de
+El media de producto del hero se sirve como vídeo con poster estático; las siete explicaciones de
 Market primitives siguen siendo componentes React reales.
 Las filas de Market primitives no muestran numeración decorativa; el orden se comunica mediante la
 posición, el nombre de la herramienta y su explicación.

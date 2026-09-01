@@ -1,4 +1,23 @@
 /* eslint-disable react/prop-types */
+export function LiquidityIntensityControl({ enabled, intensity, onChange }) {
+  return (
+    <label className="chart-liquidity-intensity">
+      <span>INTENSITY</span>
+      <input
+        aria-label="Liquidity heatmap intensity"
+        disabled={!enabled}
+        max="100"
+        min="20"
+        onChange={(event) => onChange(Number(event.target.value) / 100)}
+        step="5"
+        type="range"
+        value={Math.round(intensity * 100)}
+      />
+      <output>{Math.round(intensity * 100)}%</output>
+    </label>
+  )
+}
+
 export default function ChartSettingsPopover({
   liquidity,
   onLiquidityEnabledChange,
@@ -53,20 +72,11 @@ export default function ChartSettingsPopover({
           />
           <span>LIQUIDITY HEATMAP</span>
         </label>
-        <label className="chart-liquidity-intensity">
-          <span>INTENSITY</span>
-          <input
-            aria-label="Liquidity heatmap intensity"
-            disabled={!liquidity.enabled}
-            max="100"
-            min="20"
-            onChange={(event) => onLiquidityIntensityChange(Number(event.target.value) / 100)}
-            step="5"
-            type="range"
-            value={Math.round(liquidity.intensity * 100)}
-          />
-          <output>{Math.round(liquidity.intensity * 100)}%</output>
-        </label>
+        <LiquidityIntensityControl
+          enabled={liquidity.enabled}
+          intensity={liquidity.intensity}
+          onChange={onLiquidityIntensityChange}
+        />
       </div>
     </aside>
   )

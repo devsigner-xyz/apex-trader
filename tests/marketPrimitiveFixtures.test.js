@@ -26,6 +26,8 @@ test('keeps every isolated market primitive intentionally compact', () => {
     assert.equal(snapshot.stepProfileBars[0].levels.length, 9)
     assert.equal(snapshot.stepProfileBars[1].levels.length, 9)
     assert.equal(snapshot.profile.length, 9)
+    assert.equal(snapshot.heatmap.length, 8)
+    assert.equal(snapshot.heatmap.every((row) => row.length === 12), true)
     assert.equal(snapshot.orderbook.asks.length, 3)
     assert.equal(snapshot.orderbook.bids.length, 3)
     assert.equal(snapshot.trades.length, 6)
@@ -67,5 +69,25 @@ test('keeps closed bars stable and updates only values that can change in an ope
   assert.notDeepEqual(first.footprintBars[1].levels, second.footprintBars[1].levels)
   assert.notDeepEqual(first.stepProfileBars[1].levels, second.stepProfileBars[1].levels)
   assert.notDeepEqual(first.profile, second.profile)
+  assert.notDeepEqual(first.heatmap, second.heatmap)
+  assert.notEqual(first.currentPrice, second.currentPrice)
+  assert.notEqual(
+    first.orderbook.asks[0].price - first.orderbook.bids[0].price,
+    second.orderbook.asks[0].price - second.orderbook.bids[0].price
+  )
   assert.notDeepEqual(first.trades, second.trades)
+})
+
+test('moves the DOM price and spread through valid tick-aligned states', () => {
+  const spreads = Array.from({ length: marketPrimitivePhaseCount }, (_, phase) => {
+    const { currentPrice, orderbook } = createMarketPrimitiveSnapshot(phase)
+    const spread = orderbook.asks[0].price - orderbook.bids[0].price
+    assert.equal((currentPrice * 100) % 25, 0)
+    assert.equal((spread * 100) % 25, 0)
+    assert.equal(orderbook.asks[0].price > currentPrice, true)
+    assert.equal(orderbook.bids[0].price < currentPrice, true)
+    return spread
+  })
+
+  assert.deepEqual(spreads, [0.5, 0.75, 0.75, 1])
 })

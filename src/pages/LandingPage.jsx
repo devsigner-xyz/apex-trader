@@ -19,7 +19,7 @@ export default function LandingPage() {
             Devsigner ↗
           </a>
           <a className="landing-button landing-button--primary" href="/demo">
-            Open workspace
+            Open demo
           </a>
         </nav>
       </header>
@@ -27,20 +27,28 @@ export default function LandingPage() {
       <main id="main-content">
         <section className="landing-section landing-opening" aria-labelledby="opening-title">
           <div className="landing-copy landing-copy--hero">
-            <p className="landing-kicker">PRICE, ORDER FLOW AND LIQUIDITY — IN ONE VIEW</p>
-            <h1 id="opening-title">See what moved the market, not just where it closed.</h1>
+            <p className="landing-kicker">PRICE, ORDER FLOW AND LIQUIDITY - IN ONE VIEW</p>
+            <h1 id="opening-title">See beyond the candles.</h1>
             <p className="landing-lede">
               Apex Trader connects price action with traded volume, liquidity and the tape, so you
               can understand how a move formed without switching tools.
             </p>
             <div className="landing-actions">
               <a className="landing-button landing-button--primary" href="/demo">
-                Open workspace
+                Open demo
               </a>
-              <a className="landing-button landing-button--secondary" href="#modes">
-                Compare market views
+              <a
+                className="landing-button landing-button--secondary"
+                href="https://devsigner.xyz"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Visit devsigner.xyz
               </a>
             </div>
+            <p className="landing-disclaimer">
+              Personal portfolio demo by devsigner.xyz - for interface exploration, not live trading.
+            </p>
           </div>
 
           <HeroModeCarousel />
@@ -88,7 +96,7 @@ export default function LandingPage() {
           <span>See beyond the candle.</span>
         </div>
         <nav aria-label="Apex Trader footer navigation">
-          <a href="/demo">OPEN WORKSPACE</a>
+          <a href="/demo">OPEN DEMO</a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             DEVSIGNER ↗
           </a>

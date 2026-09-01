@@ -25,6 +25,24 @@ const currentCandleStates = [
 const bidVolumes = [24, 38, 61, 156, 344, 682, 1120, 1340, 934]
 const askVolumes = [35, 52, 104, 238, 526, 974, 1480, 1610, 1180]
 const phaseOffsets = [0, 19, -11, 27]
+const domPriceStates = [
+  { asks: [0.25, 0.5, 0.75], bids: [0.25, 0.5, 0.75], current: 21842.25 },
+  { asks: [0.5, 0.75, 1], bids: [0.25, 0.5, 0.75], current: 21842.5 },
+  { asks: [0.25, 0.5, 0.75], bids: [0.5, 0.75, 1], current: 21842.75 },
+  { asks: [0.75, 1, 1.25], bids: [0.25, 0.5, 0.75], current: 21842.5 }
+]
+// Static 30 min replay sample, extracted from the real 2019-12-01 16:30-24:00 UTC liquidity tiles.
+// Rows run high-to-low in the chart, and values use the production log-normalized 0-1 scale.
+const heatmapBase = [
+  [0.32, 0.32, 0.32, 0.33, 0.33, 0.37, 0.41, 0.32, 0.32, 0.37, 0.42, 0.4],
+  [0.56, 0.66, 0.67, 0.67, 0.67, 0.67, 0.67, 0.67, 0.68, 0.67, 0.7, 0.68],
+  [0.24, 0.23, 0.32, 0.24, 0.34, 0.42, 0.4, 0.37, 0.36, 0.36, 0.39, 0.34],
+  [0.5, 0.53, 0.59, 0.57, 0.57, 0.61, 0.57, 0.68, 0.69, 0.32, 0.36, 0.36],
+  [0.35, 0.31, 0.33, 0.19, 0.04, 0.24, 0.45, 0.23, 0.35, 0.25, 0.28, 0.2],
+  [0.26, 0.35, 0.36, 0.44, 0.49, 0.46, 0.28, 0.29, 0.32, 0.3, 0.22, 0.27],
+  [0.41, 0.29, 0.35, 0.45, 0.23, 0.35, 0.15, 0.56, 0.21, 0.22, 0.17, 0.07],
+  [0.46, 0.42, 0.46, 0.42, 0.49, 0.41, 0.33, 0.42, 0.41, 0.53, 0.51, 0.53]
+]
 
 export function normalizeMarketPrimitivePhase(value) {
   if (!Number.isFinite(value)) return 0
@@ -65,15 +83,17 @@ function createOrderFlowBar({ levels, ...bar }) {
 
 function createOrderbook(phase) {
   const shift = phaseOffsets[phase]
+  const priceState = domPriceStates[phase]
   return {
-    asks: [21842.5, 21842.75, 21843].map((price, index) => ({
+    asks: priceState.asks.map((offset, index) => ({
       amount: 96 + index * 53 + shift * (index + 1),
-      price
+      price: Number((priceState.current + offset).toFixed(2))
     })),
-    bids: [21842, 21841.75, 21841.5].map((price, index) => ({
+    bids: priceState.bids.map((offset, index) => ({
       amount: 112 + index * 67 - shift * (index - 2),
-      price
+      price: Number((priceState.current - offset).toFixed(2))
     })),
+    currentPrice: priceState.current,
     groupsApplied: 1
   }
 }
@@ -98,8 +118,23 @@ function createTrades(phase) {
   })
 }
 
+function createHeatmap(phase) {
+  const phaseOffset = [0, 0.06, -0.04, 0.03][phase]
+  return heatmapBase.map((row, rowIndex) =>
+    row.map((value, columnIndex) =>
+      Number(
+        Math.min(
+          1,
+          Math.max(0.04, value + phaseOffset * ((columnIndex + rowIndex) % 3 === 0 ? 1 : 0.45))
+        ).toFixed(2)
+      )
+    )
+  )
+}
+
 export function createMarketPrimitiveSnapshot(value) {
   const phase = normalizeMarketPrimitivePhase(value)
+  const orderbook = createOrderbook(phase)
   const levels = createLevels(phase)
   const completedFootprintLevels = createLevels(0, 0.74)
   const completedStepProfileLevels = createLevels(0, 0.82)
@@ -114,7 +149,8 @@ export function createMarketPrimitiveSnapshot(value) {
 
   return {
     candles: [...completedCandles, currentCandle],
-    currentPrice: 21842.25,
+    currentPrice: orderbook.currentPrice,
+    heatmap: createHeatmap(phase),
     footprintBars: [
       createOrderFlowBar({
         close: 21840.75,
@@ -133,7 +169,7 @@ export function createMarketPrimitiveSnapshot(value) {
         timestamp: baseTimestamp
       })
     ],
-    orderbook: createOrderbook(phase),
+    orderbook,
     phase,
     profile: createProfile(phase),
     stepProfileBars: [

@@ -70,6 +70,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   vídeo local de la workstation real, secuencia de modos, fallback y regresión de la landing.
 - [Interactive portfolio landing R14 hero replay production](verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md):
   publicación del vídeo, eliminación de la barra superior y comprobación pública del dominio y assets.
+- [Interactive portfolio landing R15 liquidity heatmap](verification/2026-09-01-interactive-portfolio-landing-r15-liquidity-heatmap-local.md):
+  nueva escena aislada de heatmap con intensidad configurable y fixtures locales.
 - [Interactive portfolio landing production](verification/2026-08-31-interactive-portfolio-landing-production.md):
   commit funcional, Railway, rutas, assets y comprobación directa de la UI pública R2.
 - [Bounded replay verification](verification/2026-08-29-bounded-replay-window-local.md):
