@@ -17,6 +17,8 @@ Candles, Footprint o Step Profile como única variación. El foco actual termina
 y no añade una sección de producto adicional.
 
 El marco del vídeo usa el borde neutro de la superficie; no añade una franja superior de color acento.
+El CTA primario y los indicadores de foco de la landing reutilizan la crema de Devsigner a través de
+`--pro-accent`; verde y rojo siguen reservados a estados de mercado.
 
 La antigua sección `The blind spot` y su comparación OHLC/Volume at Price se retiran en R6 porque
 repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario del hero enlaza a

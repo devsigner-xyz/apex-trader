@@ -9,7 +9,7 @@
   --pro-strong: #5c6972;
   --pro-text: #edf2f5;
   --pro-muted: #9aa6af;
-  --pro-accent: #d68b54;
+  --pro-accent: var(--color-text-accent, #f1cfa1);
   --pro-buy: #2fb67c;
   --pro-sell: #e15b64;
   --pro-popover-surface: rgb(24 32 39 / 0.98);
@@ -24,13 +24,13 @@
   --pro-footprint-bid-imbalance: #71dcb1;
   --pro-footprint-ask-imbalance: #ff8e97;
   --pro-price-axis: #11171c;
-  --pro-current-price-tag: #8e5b37;
+  --pro-current-price-tag: var(--color-text-accent, #f1cfa1);
   --pro-dom-ask-volume: rgb(225 91 100 / 0.25);
   --pro-dom-bid-volume: rgb(47 182 124 / 0.25);
   --pro-action-buy: #226f55;
   --pro-action-sell: #853946;
   --pro-action-text: #fff;
-  --pro-quote-update: rgb(214 139 84 / 0.16);
+  --pro-quote-update: rgb(241 207 161 / 0.16);
   --pro-tape-update: rgb(47 182 124 / 0.12);
   --pro-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='m2 2 4 4 4-4' stroke='%2389959F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --pro-space-24: 24px;

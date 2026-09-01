@@ -8,7 +8,7 @@ owners: product-design-engineering
 
 ## Alcance
 
-La landing de Apex Trader amplía el lenguaje visual del producto sin crear un tema paralelo. Usa los roles `--pro-canvas`, `--pro-panel`, `--pro-raised`, `--pro-text`, `--pro-muted`, `--pro-border`, `--pro-subtle` y `--pro-accent`. Verde y rojo siguen reservados a significado de mercado dentro de las capturas del producto.
+La landing de Apex Trader amplía el lenguaje visual del producto sin crear un tema paralelo. Usa los roles `--pro-canvas`, `--pro-panel`, `--pro-raised`, `--pro-text`, `--pro-muted`, `--pro-border`, `--pro-subtle` y `--pro-accent`. El acento reutiliza la crema de Devsigner; verde y rojo siguen reservados a significado de mercado dentro de las capturas del producto.
 
 ## Dimensiones aprobadas
 

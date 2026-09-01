@@ -14,7 +14,7 @@ Figma organiza 28 primitivos, 37 roles semánticos y 24 dimensiones bajo `Apex P
 
 - Canvas carbón, superficies densas y bordes discretos.
 - Texto primario claro; metadata y ejes quietos.
-- Naranja como acento limitado, no estado universal.
+- Crema de Devsigner como acento limitado, no estado universal.
 - Verde y rojo expresan buy/positive y sell/negative; no decoran filtros neutros.
 - Roboto Mono para datos densos; Inter para labels y estructura cuando lo define el patrón.
 - Estados no dependen solo del color.
@@ -22,15 +22,16 @@ Figma organiza 28 primitivos, 37 roles semánticos y 24 dimensiones bajo `Apex P
 
 ## Capas
 
-1. Primitivos físicos: neutral, orange, green, red, blue y profile.
+1. Primitivos físicos: neutral, cream, green, red, blue y profile.
 2. Roles semánticos: canvas, panel, raised, text, border, market, chart y action.
 3. Dimensiones: spacing, radius, row/control sizes, strokes y font sizes.
 4. Patrón/componente: headers, popovers, filas, tabs y markers.
 
 Los nuevos componentes enlazan propiedades a variables existentes cuando exista un rol aplicable.
 Las reglas de UI y JSX no introducen literales de color: `--pro-*` cubre superficies, estados de
-mercado, profile, Footprint, ejes, acciones, actualizaciones y popovers. Los valores físicos viven
-solamente en las definiciones de token, preservando la paleta independiente de Apex.
+mercado, profile, Footprint, ejes, acciones, actualizaciones y popovers. El acento `--pro-accent`
+reutiliza la crema `--color-text-accent` de Devsigner, preservando los estados semánticos de mercado.
+Los valores físicos viven solamente en las definiciones de token.
 
 El chevron de los selects usa `--pro-select-chevron`: el navegador no puede interpolar una variable
 CSS dentro del SVG data-URI, por lo que su color se conserva dentro de ese token de recurso. La

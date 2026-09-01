@@ -4,6 +4,7 @@ import test from 'node:test'
 
 const colorLiteral = /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)|%23[0-9a-f]{3,8}\b/i
 const tokenValues = {
+  '--pro-accent': 'var(--color-text-accent, #f1cfa1)',
   '--pro-popover-surface': 'rgb(24 32 39 / 0.98)',
   '--pro-popover-shadow': '0 12px 28px rgb(0 0 0 / 0.55)',
   '--pro-profile-bid': '#223e63',
@@ -16,13 +17,13 @@ const tokenValues = {
   '--pro-footprint-bid-imbalance': '#71dcb1',
   '--pro-footprint-ask-imbalance': '#ff8e97',
   '--pro-price-axis': '#11171c',
-  '--pro-current-price-tag': '#8e5b37',
+  '--pro-current-price-tag': 'var(--color-text-accent, #f1cfa1)',
   '--pro-dom-ask-volume': 'rgb(225 91 100 / 0.25)',
   '--pro-dom-bid-volume': 'rgb(47 182 124 / 0.25)',
   '--pro-action-buy': '#226f55',
   '--pro-action-sell': '#853946',
   '--pro-action-text': '#fff',
-  '--pro-quote-update': 'rgb(214 139 84 / 0.16)',
+  '--pro-quote-update': 'rgb(241 207 161 / 0.16)',
   '--pro-tape-update': 'rgb(47 182 124 / 0.12)'
 }
 
