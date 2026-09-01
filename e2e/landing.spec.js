@@ -34,10 +34,7 @@ test('landing renders its product thesis without loading historical data', async
   await expect(heroDevsignerLink).toHaveAttribute('rel', 'noopener noreferrer')
   await expect(page.getByText('Four prices are not the whole interval.')).toHaveCount(0)
   await expect(page.locator('#blind-spot')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toHaveAttribute(
-    'href',
-    '#modes'
-  )
+  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toHaveCount(0)
   await expect(page.getByRole('link', { name: 'Component library', exact: true })).toHaveAttribute(
     'href',
     '/storybook/'
@@ -342,7 +339,7 @@ test('mobile landing has no horizontal overflow and honors reduced motion', asyn
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Open demo' }).first()).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toBeHidden()
+  await expect(page.getByRole('link', { name: 'Market views', exact: true })).toHaveCount(0)
 
   await page.locator('.landing-primitives-loader').scrollIntoViewIfNeeded()
   const showcase = page.locator('.landing-primitives')

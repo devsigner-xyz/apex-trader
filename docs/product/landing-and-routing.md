@@ -36,8 +36,7 @@ nombre de la herramienta y en la explicación de la lectura.
 
 La única sección editorial navegable es `#modes`. El CTA principal `Open demo` es un anchor real hacia
 `/demo`; el CTA secundario `Visit devsigner.xyz` abre `https://devsigner.xyz` en una pestaña nueva.
-La navegación primaria
-incluye `Component library`, un enlace mismo-origen hacia `/storybook/` para explorar superficies
+La navegación primaria incluye `Component library`, un enlace mismo-origen hacia `/storybook/` para explorar superficies
 aisladas con datos deterministas. Los enlaces externos a Devsigner abren una pestaña nueva con
 `noopener noreferrer`. La atribución declara discretamente que Apex Trader está diseñado y
 construido por Devsigner y presentado como case study público interactivo.

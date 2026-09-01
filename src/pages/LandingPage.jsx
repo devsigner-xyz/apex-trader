@@ -13,7 +13,6 @@ export default function LandingPage() {
           APEX TRADER
         </a>
         <nav className="landing-nav" aria-label="Apex Trader primary navigation">
-          <a href="#modes">Market views</a>
           <a href="/storybook/">Component library</a>
           <a href="https://devsigner.xyz" target="_blank" rel="noopener noreferrer">
             Devsigner ↗

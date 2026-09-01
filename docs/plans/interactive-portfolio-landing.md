@@ -178,6 +178,8 @@ de producto completo.
 - El CTA secundario del hero es `Visit devsigner.xyz`, abre el sitio en una pestaña nueva y el
   disclaimer identifica la experiencia como demo de portfolio de `devsigner.xyz`, no como trading
   en vivo.
+- El header mantiene solo `Component library`, `Devsigner` y `Open demo`; `Market views` no se
+  presenta como enlace de navegación porque la sección ya queda explicada en el flujo de la landing.
 
 ## Arquitectura React vigente
 

@@ -55,7 +55,7 @@ una lectura adicional. El CTA secundario del hero dirige a Devsigner en una pest
 - Los términos del producto —Candles, Footprint, Step Profile, Volume Profile, DOM y Time & Sales—
   se conservan cuando ayudan a reconocer la herramienta, pero siempre acompañados de una
   explicación comprensible.
-- La navegación usa `Market views`, `Component library` y `Devsigner`. Las acciones
+- La navegación usa `Component library` y `Devsigner`. Las acciones
   principales usan `Open demo`; la acción secundaria del hero usa `Visit devsigner.xyz` y abre
   `https://devsigner.xyz` en una pestaña nueva. El hero incluye un disclaimer breve que identifica
   la demo de portfolio de `devsigner.xyz` y aclara que no es trading en vivo.
