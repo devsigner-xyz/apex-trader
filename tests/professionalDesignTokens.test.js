@@ -22,6 +22,8 @@ const tokenValues = {
   '--pro-current-price-tag': 'var(--color-text-accent, #f1cfa1)',
   '--pro-candle-up': 'var(--pro-buy)',
   '--pro-candle-down': 'var(--pro-sell)',
+  '--pro-step-profile-bid': 'var(--pro-buy)',
+  '--pro-step-profile-ask': 'var(--pro-sell)',
   '--pro-dom-ask-volume': 'rgb(225 91 100 / 0.25)',
   '--pro-dom-bid-volume': 'rgb(47 182 124 / 0.25)',
   '--pro-action-buy': '#226f55',

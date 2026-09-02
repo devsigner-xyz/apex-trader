@@ -61,6 +61,11 @@ export function normalizeChartAppearance(candidate) {
     candles: {
       down: normalizeColor(candidate?.candles?.down) ?? chartAppearanceDefaults.candles.down,
       up: normalizeColor(candidate?.candles?.up) ?? chartAppearanceDefaults.candles.up
+    },
+    stepProfile: {
+      ask:
+        normalizeColor(candidate?.stepProfile?.ask) ?? chartAppearanceDefaults.stepProfile.ask,
+      bid: normalizeColor(candidate?.stepProfile?.bid) ?? chartAppearanceDefaults.stepProfile.bid
     }
   }
 }

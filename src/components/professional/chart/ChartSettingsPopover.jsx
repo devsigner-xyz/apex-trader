@@ -41,30 +41,23 @@ function semanticColor(token) {
   return getComputedStyle(document.documentElement).getPropertyValue(token).trim()
 }
 
-function CandleColorControls({ colors, onChange, onReset }) {
+function ChartColorControls({ colors, legend, onChange, onReset, options, resetLabel }) {
   return (
-    <fieldset className="chart-candle-color-options">
-      <legend>CANDLES</legend>
-      <label>
-        <span>UP CANDLE</span>
-        <input
-          aria-label="Up candle color"
-          onChange={(event) => onChange('up', event.target.value)}
-          type="color"
-          value={colors.up ?? semanticColor('--pro-buy')}
-        />
-      </label>
-      <label>
-        <span>DOWN CANDLE</span>
-        <input
-          aria-label="Down candle color"
-          onChange={(event) => onChange('down', event.target.value)}
-          type="color"
-          value={colors.down ?? semanticColor('--pro-sell')}
-        />
-      </label>
+    <fieldset className="chart-color-options">
+      <legend>{legend}</legend>
+      {options.map(({ ariaLabel, fallbackToken, label, side }) => (
+        <label key={side}>
+          <span>{label}</span>
+          <input
+            aria-label={ariaLabel}
+            onChange={(event) => onChange(side, event.target.value)}
+            type="color"
+            value={colors[side] ?? semanticColor(fallbackToken)}
+          />
+        </label>
+      ))}
       <button className="chart-colors-reset" onClick={onReset} type="button">
-        RESET CANDLE COLORS
+        {resetLabel}
       </button>
     </fieldset>
   )
@@ -79,9 +72,12 @@ export default function ChartSettingsPopover({
   onLiquidityIntensityCommit,
   onLiquidityIntensityChange,
   onPanelVisibilityChange,
+  onStepProfileColorChange,
   panelVisibility,
   popoverRef,
-  resetCandleColors
+  resetCandleColors,
+  resetStepProfileColors,
+  stepProfileColors
 }) {
   return (
     <aside
@@ -123,10 +119,26 @@ export default function ChartSettingsPopover({
         </label>
         {mode === 'candles' && (
           <>
-            <CandleColorControls
+            <ChartColorControls
               colors={candleColors}
+              legend="CANDLES"
               onChange={onCandleColorChange}
               onReset={resetCandleColors}
+              options={[
+                {
+                  ariaLabel: 'Up candle color',
+                  fallbackToken: '--pro-buy',
+                  label: 'UP CANDLE',
+                  side: 'up'
+                },
+                {
+                  ariaLabel: 'Down candle color',
+                  fallbackToken: '--pro-sell',
+                  label: 'DOWN CANDLE',
+                  side: 'down'
+                }
+              ]}
+              resetLabel="RESET CANDLE COLORS"
             />
             <span className="chart-settings-section-label">CANDLES OVERLAYS</span>
             <label>
@@ -145,6 +157,29 @@ export default function ChartSettingsPopover({
               onChange={onLiquidityIntensityChange}
             />
           </>
+        )}
+        {mode === 'step-profile' && (
+          <ChartColorControls
+            colors={stepProfileColors}
+            legend="STEP PROFILE"
+            onChange={onStepProfileColorChange}
+            onReset={resetStepProfileColors}
+            options={[
+              {
+                ariaLabel: 'Step profile bid color',
+                fallbackToken: '--pro-buy',
+                label: 'BID PROFILE',
+                side: 'bid'
+              },
+              {
+                ariaLabel: 'Step profile ask color',
+                fallbackToken: '--pro-sell',
+                label: 'ASK PROFILE',
+                side: 'ask'
+              }
+            ]}
+            resetLabel="RESET STEP PROFILE COLORS"
+          />
         )}
       </div>
     </aside>

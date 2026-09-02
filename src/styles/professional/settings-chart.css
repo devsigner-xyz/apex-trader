@@ -25,7 +25,7 @@
 }
 
 .chart-settings-section-label,
-.chart-candle-color-options legend {
+.chart-color-options legend {
   display: block;
   margin: 8px 5px 4px;
   color: var(--pro-muted);
@@ -37,17 +37,17 @@
   margin-top: 0;
 }
 
-.chart-candle-color-options {
+.chart-color-options {
   display: grid;
   padding: 0;
   border: 0;
 }
 
-.chart-candle-color-options legend {
+.chart-color-options legend {
   width: calc(100% - 10px);
 }
 
-.chart-panel-options .chart-candle-color-options label {
+.chart-panel-options .chart-color-options label {
   grid-template-columns: minmax(0, 1fr) 28px;
 }
 

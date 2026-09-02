@@ -45,9 +45,10 @@ el reloj del replay y no se monta en Footprint o Step Profile.
 
 Chart settings separa opciones comunes y específicas del modo. Profile, VAH/POC/VAL y volumen
 permanecen visibles en todos los modos. Candles añade sus colores `up` y `down`, el heatmap y su
-intensidad. Los colores aceptan selección libre, persisten en
-`apex-trader:chart-appearance:v1` bajo `candles` y pueden volver a los tokens semánticos del sistema;
-Footprint y Step Profile no heredan esos valores.
+intensidad. Step Profile añade colores independientes para sus perfiles `bid` y `ask`. Los colores
+aceptan selección libre, persisten en `apex-trader:chart-appearance:v1` bajo `candles` o
+`stepProfile` y pueden volver a los tokens semánticos del sistema. Footprint no hereda ninguno de
+esos valores y todavía no expone settings de color.
 
 ### Ventana de replay
 

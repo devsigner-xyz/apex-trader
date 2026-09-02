@@ -58,7 +58,7 @@ test('footprint chart panels, settings and volume size persist', async ({ page }
   expect((await volumePanel.boundingBox()).height).toBeCloseTo(118, 0)
 })
 
-test('chart settings keep common controls and scope candle colors to Candles', async ({ page }) => {
+test('chart settings keep common controls and scope colors to each supported mode', async ({ page }) => {
   await page.goto('/demo')
   const settingsTrigger = page.getByLabel('Chart settings')
   await settingsTrigger.click()
@@ -80,7 +80,10 @@ test('chart settings keep common controls and scope candle colors to Candles', a
     .poll(() =>
       page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-appearance:v1')))
     )
-    .toEqual({ candles: { down: '#884422', up: '#335577' } })
+    .toEqual({
+      candles: { down: '#884422', up: '#335577' },
+      stepProfile: { ask: null, bid: null }
+    })
   expect(
     await page.locator('.market-chart .up rect').first().evaluate((node) => getComputedStyle(node).fill)
   ).toBe('rgb(51, 85, 119)')
@@ -90,7 +93,36 @@ test('chart settings keep common controls and scope candle colors to Candles', a
   await expect(page.getByRole('dialog', { name: 'Chart settings' })).toBeVisible()
   await expect(page.getByLabel('Show visible range volume profile')).toBeVisible()
   await expect(page.getByLabel('Up candle color')).toHaveCount(0)
+  await expect(page.getByLabel('Step profile bid color')).toHaveCount(0)
   await expect(page.getByLabel('Show liquidity heatmap')).toHaveCount(0)
+
+  await page.getByLabel('Chart mode').selectOption('step-profile')
+  await expect(page).toHaveURL(/\/demo\/step-profile$/)
+  await expect(page.getByLabel('Step profile bid color')).toBeVisible()
+  await expect(page.getByLabel('Step profile ask color')).toBeVisible()
+  await expect(page.getByLabel('Up candle color')).toHaveCount(0)
+  await page.getByLabel('Step profile bid color').fill('#ddeeff')
+  await page.getByLabel('Step profile ask color').fill('#123456')
+  await expect
+    .poll(() =>
+      page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-appearance:v1')))
+    )
+    .toEqual({
+      candles: { down: '#884422', up: '#335577' },
+      stepProfile: { ask: '#123456', bid: '#ddeeff' }
+    })
+  expect(
+    await page
+      .locator('.step-profile-bid')
+      .first()
+      .evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(221, 238, 255)')
+  expect(
+    await page
+      .locator('.step-profile-ask')
+      .first()
+      .evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(18, 52, 86)')
 
   await page.getByLabel('Chart mode').selectOption('candles')
   await expect(page.getByLabel('Up candle color')).toHaveValue('#335577')

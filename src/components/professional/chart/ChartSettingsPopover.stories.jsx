@@ -12,6 +12,7 @@ export default meta
 function InteractiveSettings({ initialLiquidityEnabled = true, mode = 'candles' }) {
   const [liquidity, setLiquidity] = useState({ enabled: initialLiquidityEnabled, intensity: 0.6 })
   const [candleColors, setCandleColors] = useState({ down: null, up: null })
+  const [stepProfileColors, setStepProfileColors] = useState({ ask: null, bid: null })
   const [panelVisibility, setPanelVisibility] = useState({
     profile: true,
     valueArea: true,
@@ -34,8 +35,13 @@ function InteractiveSettings({ initialLiquidityEnabled = true, mode = 'candles' 
         onPanelVisibilityChange={(panel, visible) =>
           setPanelVisibility((current) => ({ ...current, [panel]: visible }))
         }
+        onStepProfileColorChange={(side, color) =>
+          setStepProfileColors((current) => ({ ...current, [side]: color }))
+        }
         panelVisibility={panelVisibility}
         resetCandleColors={() => setCandleColors({ down: null, up: null })}
+        resetStepProfileColors={() => setStepProfileColors({ ask: null, bid: null })}
+        stepProfileColors={stepProfileColors}
       />
     </div>
   )
@@ -56,4 +62,8 @@ export const HeatmapDisabled = {
 
 export const FootprintContext = {
   render: () => <InteractiveSettings mode="footprint" />
+}
+
+export const StepProfileContext = {
+  render: () => <InteractiveSettings mode="step-profile" />
 }

@@ -274,11 +274,39 @@ export default function MarketChart({
       value: 'system_default'
     })
   }
+  const handleStepProfileColorChange = (side, color) => {
+    setAppearance((currentAppearance) => ({
+      ...currentAppearance,
+      stepProfile: { ...currentAppearance.stepProfile, [side]: color }
+    }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: `step_profile_${side}_color`,
+      value: color
+    })
+  }
+  const resetStepProfileColors = () => {
+    setAppearance((currentAppearance) => ({
+      ...currentAppearance,
+      stepProfile: { ask: null, bid: null }
+    }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: 'step_profile_colors',
+      value: 'system_default'
+    })
+  }
   const summaryBar = bars[hoveredBarIndex] ?? current
   const chartAppearanceStyle = {
     ...chartPanelStyle,
     ...(appearance.candles.down ? { '--pro-candle-down': appearance.candles.down } : {}),
-    ...(appearance.candles.up ? { '--pro-candle-up': appearance.candles.up } : {})
+    ...(appearance.candles.up ? { '--pro-candle-up': appearance.candles.up } : {}),
+    ...(appearance.stepProfile.ask
+      ? { '--pro-step-profile-ask': appearance.stepProfile.ask }
+      : {}),
+    ...(appearance.stepProfile.bid
+      ? { '--pro-step-profile-bid': appearance.stepProfile.bid }
+      : {})
   }
 
   return (
@@ -305,9 +333,12 @@ export default function MarketChart({
           onLiquidityIntensityCommit={handleLiquidityIntensityCommit}
           onLiquidityIntensityChange={handleLiquidityIntensityChange}
           onPanelVisibilityChange={handlePanelVisibilityChange}
+          onStepProfileColorChange={handleStepProfileColorChange}
           panelVisibility={panelVisibility}
           popoverRef={settingsPopoverRef}
           resetCandleColors={resetCandleColors}
+          resetStepProfileColors={resetStepProfileColors}
+          stepProfileColors={appearance.stepProfile}
         />
       )}
       <div

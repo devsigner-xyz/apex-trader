@@ -11,17 +11,25 @@ import {
   writePersistentValue
 } from '../src/services/professionalTerminalPersistence.js'
 
-test('normalizes persistent chart appearance within the candles mode only', () => {
-  assert.deepEqual(normalizeChartAppearance(), { candles: { down: null, up: null } })
+test('normalizes persistent chart appearance per supported chart mode', () => {
+  assert.deepEqual(normalizeChartAppearance(), {
+    candles: { down: null, up: null },
+    stepProfile: { ask: null, bid: null }
+  })
   assert.deepEqual(
     normalizeChartAppearance({
       candles: { down: '#ABCDEF', up: '#123456' },
-      footprint: { down: '#111111', up: '#222222' }
+      footprint: { down: '#111111', up: '#222222' },
+      stepProfile: { ask: '#FEDCBA', bid: '#654321' }
     }),
-    { candles: { down: '#abcdef', up: '#123456' } }
+    {
+      candles: { down: '#abcdef', up: '#123456' },
+      stepProfile: { ask: '#fedcba', bid: '#654321' }
+    }
   )
   assert.deepEqual(normalizeChartAppearance({ candles: { down: 'red', up: '#12345' } }), {
-    candles: { down: null, up: null }
+    candles: { down: null, up: null },
+    stepProfile: { ask: null, bid: null }
   })
 })
 

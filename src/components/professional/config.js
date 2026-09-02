@@ -93,5 +93,6 @@ export const chartPanelSizeLimits = {
 export const chartPanelVisibilityDefaults = { profile: true, valueArea: true, volume: true }
 export const chartLiquidityDefaults = { enabled: true, intensity: 0.6 }
 export const chartAppearanceDefaults = {
-  candles: { down: null, up: null }
+  candles: { down: null, up: null },
+  stepProfile: { ask: null, bid: null }
 }

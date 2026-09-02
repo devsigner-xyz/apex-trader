@@ -20,6 +20,10 @@ Cada vela resume `Open`, `High`, `Low` y `Close` de un intervalo seleccionado:
 
 En hover, la toolbar sustituye temporalmente los valores de la barra actual por `O`, `H`, `L`, `C`, `Δ` y `V` de la vela bajo el puntero. La vista permite entre 28 y 160 barras: el límite inferior evita una separación excesiva en el zoom-in y el superior conserva la lectura de cuerpos y mechas.
 
+Chart settings permite sustituir de forma independiente los colores de velas `up` y `down`. La
+preferencia es propia de Candles, persiste entre sesiones y puede volver a los tokens semánticos del
+sistema sin modificar Footprint o Step Profile.
+
 ## Footprint
 
 Cada barra precio-tiempo distribuye las ejecuciones por nivel de precio. El lado bid representa ventas agresivas ejecutadas contra bids y el lado ask compras agresivas ejecutadas contra asks.
@@ -33,6 +37,10 @@ La vista permite entre 4 y 13 barras. En el zoom-out máximo, cada mitad bid/ask
 Cada intervalo contiene su propio perfil horizontal de volumen bid/ask por precio, un POC local y una espina high–low. La repetición de perfiles permite comparar la estructura de la subasta a lo largo del tiempo.
 
 Se diferencia del Volume Profile de rango en que Step Profile genera una distribución por intervalo; el overlay genera una sola distribución para todo el rango visible.
+
+Chart settings permite sustituir de forma independiente los colores de los perfiles `bid` y `ask`.
+La preferencia es propia de Step Profile, persiste entre sesiones y puede volver a los tokens
+semánticos del sistema sin modificar Candles o Footprint.
 
 La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfiles laterales mantienen una caja mínima legible en el zoom-out máximo y no se solapan con el siguiente intervalo.
 

@@ -163,11 +163,11 @@
 }
 
 .step-profile-bid {
-  fill: var(--pro-buy);
+  fill: var(--pro-step-profile-bid);
 }
 
 .step-profile-ask {
-  fill: var(--pro-sell);
+  fill: var(--pro-step-profile-ask);
 }
 
 .step-profile-cell-bg {
