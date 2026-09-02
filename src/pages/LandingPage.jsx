@@ -1,4 +1,5 @@
 import DeferredMarketPrimitivesShowcase from '../components/landing/DeferredMarketPrimitivesShowcase.jsx'
+import AiConversationPanel from '../components/landing/AiConversationPanel.jsx'
 import HeroModeCarousel from '../components/landing/HeroModeCarousel.jsx'
 import { trackEvent } from '../services/analytics.js'
 
@@ -78,6 +79,8 @@ export default function LandingPage() {
           </div>
           <DeferredMarketPrimitivesShowcase />
         </section>
+
+        <AiConversationPanel />
 
         <aside className="landing-devsigner-banner" aria-labelledby="devsigner-banner-title">
           <div className="landing-devsigner-banner__copy landing-copy">

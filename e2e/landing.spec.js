@@ -18,9 +18,7 @@ test('landing renders its product thesis without loading historical data', async
     '/media/apex-trader.svg'
   )
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/favicon.png')
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'See beyond the candles.'
-  )
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('See beyond the candles.')
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1)
   await expect(page.getByRole('link', { name: 'Open demo' }).first()).toHaveAttribute(
     'href',
@@ -56,6 +54,21 @@ test('landing renders its product thesis without loading historical data', async
     'href',
     'https://devsigner.xyz'
   )
+  const aiConversation = page.getByRole('region', { name: 'Ask an AI about Apex Trader' })
+  await expect(aiConversation.getByRole('heading', { level: 2 })).toHaveText(
+    'Ask an AI about Apex Trader.'
+  )
+  await expect(
+    aiConversation.getByText('Candles, Footprint, Step Profile, Volume Profile')
+  ).toBeVisible()
+  for (const provider of ['ChatGPT', 'Claude', 'Perplexity']) {
+    const providerLink = aiConversation.getByRole('link', { name: new RegExp(provider) })
+    await expect(providerLink).toHaveAttribute('target', '_blank')
+    await expect(providerLink).toHaveAttribute('rel', 'noreferrer nofollow')
+  }
+  for (const provider of ['Grok', 'Copilot']) {
+    await expect(aiConversation.getByRole('button', { name: new RegExp(provider) })).toBeVisible()
+  }
   await page.waitForTimeout(250)
   expect(historicalRequests).toEqual([])
   expect(errors).toEqual([])
@@ -162,13 +175,17 @@ test('isolated market primitives load near the viewport without mounting the wor
   await expect(showcase.locator('[data-primitive="footprint"] .footprint-bar')).toHaveCount(2)
   await expect(showcase.locator('[data-primitive="step-profile"] .step-profile-bar')).toHaveCount(2)
   const volumeProfile = showcase.locator('[data-primitive="volume-profile"]')
-  await expect(volumeProfile.getByRole('img', { name: 'Updating visible-range Volume Profile' })).toBeVisible()
+  await expect(
+    volumeProfile.getByRole('img', { name: 'Updating visible-range Volume Profile' })
+  ).toBeVisible()
   await expect(volumeProfile.locator('.session-profile-bars > g')).toHaveCount(9)
   await expect(volumeProfile.locator('.landing-profile-marker')).toHaveCount(3)
   await expect(volumeProfile.locator('.landing-profile-price-axis')).toHaveCount(0)
   const heatmap = showcase.locator('[data-primitive="liquidity-heatmap"]')
   await expect(heatmap.locator('.landing-heatmap-liquidity-line')).toHaveCount(96)
-  await expect(heatmap.getByRole('img', { name: 'Liquidity heatmap by price and time' })).toBeVisible()
+  await expect(
+    heatmap.getByRole('img', { name: 'Liquidity heatmap by price and time' })
+  ).toBeVisible()
   await expect(heatmap.locator('.landing-heatmap-candles')).toHaveCount(0)
   await expect(heatmap.locator('.landing-heatmap-price-tick')).toHaveCount(0)
   await expect(heatmap.locator('.landing-heatmap-price-axis-bg')).toHaveCount(0)

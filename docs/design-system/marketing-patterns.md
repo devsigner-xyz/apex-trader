@@ -21,7 +21,8 @@ Estos valores viven en `src/styles/professional.css`; `src/styles/landing.css` s
 
 ## Composición Direction B
 
-El orden contractual vigente es Header, Opening thesis, Market primitives, Devsigner banner y Footer.
+El orden contractual vigente es Header, Opening thesis, Market primitives, contextual AI prompt,
+Devsigner banner y Footer.
 Opening thesis muestra el terminal completo en su carrusel; las secciones de contexto One clock,
 Session evidence y The workspace se mantienen como snapshots históricos, pero no forman parte de la
 landing actual. `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o
@@ -62,6 +63,9 @@ una lectura adicional. El CTA secundario del hero dirige a Devsigner en una pest
   la demo de portfolio de `devsigner.xyz` y aclara que no es trading en vivo.
 - La promesa debe ser verificable por el producto mostrado. No se afirma conexión a broker,
   operativa en vivo ni funcionalidad que la demo no exponga.
+- La sección contextual de IA resume las vistas públicas de Apex y ofrece enlaces a proveedores con
+  el prompt precargado o copiado. Usa surface, borde, tipografía mono y acciones existentes de la
+  landing; la señal de analítica contiene solo proveedor y contexto, nunca el contenido del prompt.
 
 ## Patrón vigente: módulos de mercado aislados
 

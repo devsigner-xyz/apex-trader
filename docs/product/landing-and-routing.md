@@ -13,8 +13,10 @@ R2 de módulos aislados `688:21215`. La sección `Market primitives` contiene Ca
 Profile, Volume Profile, Liquidity Heatmap, DOM y Last Trades como escenas React compactas de dos columnas. Las filas
 alternan visual y copy para crear ritmo editorial sin montar la terminal ni un `MarketChart`
 completo. Opening thesis usa un vídeo generado desde la workstation real, con el mismo encuadre y
-Candles, Footprint o Step Profile como única variación. El foco actual termina en las vistas aisladas
-y no añade una sección de producto adicional.
+Candles, Footprint o Step Profile como única variación. Tras las vistas aisladas, una sección
+contextual de IA permite abrir ChatGPT, Claude o Perplexity con un prompt que resume el producto y
+sus funcionalidades públicas. Grok y Copilot reciben el mismo prompt a través del portapapeles antes
+de abrirse. No añade una vista de producto ni inicializa el runtime de la demo.
 
 El marco del vídeo usa el borde neutro de la superficie; no añade una franja superior de color acento.
 El CTA primario y los indicadores de foco de la landing reutilizan la crema de Devsigner a través de
@@ -78,9 +80,10 @@ experiencia si Umami todavía no está disponible. La instrumentación se limita
 - `change_demo_setting` al confirmar un ajuste de chart, DOM o Time & Sales (`area`, `setting`,
   `value`). La intensidad de liquidez se registra al terminar el arrastre o un ajuste de teclado, no
   en cada cambio intermedio.
+- `ask_ai` al abrir un proveedor desde la sección contextual de la landing (`provider`, `context`).
 
-No se envían precios, tamaños, ticks, posiciones del cursor, movimientos de pan/zoom ni actividad
-automática del replay.
+No se envían precios, tamaños, ticks, posiciones del cursor, movimientos de pan/zoom, contenido del
+prompt ni actividad automática del replay.
 
 ## Biblioteca de componentes
 
