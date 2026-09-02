@@ -4,7 +4,7 @@ last_verified: 2026-08-29
 owners: product-design-engineering
 ---
 
-# 0009 — Retirada de la arquitectura de terminal legacy
+# 0009 - Retirada de la arquitectura de terminal legacy
 
 ## Contexto
 

@@ -44,7 +44,7 @@ que R2 queda como referencia aprobada y no como paridad exacta del runtime públ
 | Isolated modules R2 | `688:21215` | Approved Figma reference · R3 pending   |
 
 R1 reutiliza botones, MarketChart, OrderBook/DOM y Time & Sales como instancias de masters locales y
-queda documentada en [Interactive portfolio landing — Figma approval
+queda documentada en [Interactive portfolio landing - Figma approval
 gate](../verification/2026-08-30-interactive-portfolio-landing-figma.md). R2 no modifica esos masters
 ni Direction B: recorta instancias editables para definir el encuadre de cada primitivo y usa
 geometría vectorial ligada a variables para Volume Profile.

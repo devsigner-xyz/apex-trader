@@ -1,11 +1,11 @@
 ---
-title: Direction B landing and demo routing — local verification
+title: Direction B landing and demo routing - local verification
 status: current
 last_verified: 2026-08-28
 owners: product-design-engineering
 ---
 
-# Direction B landing and demo routing — local verification
+# Direction B landing and demo routing - local verification
 
 This record covers the local implementation of the public Apex Trader landing and the canonical demo routes. It does not claim a commit, deployment, DNS change, or production verification.
 
@@ -33,8 +33,8 @@ The final implementation was checked locally on 2026-08-28 with:
 - `pnpm run lint`
 - `pnpm run test:unit`
 - `pnpm run build`
-- `pnpm exec playwright test e2e/landing.spec.js` — 15 tests across Chromium, Firefox, and WebKit.
-- `pnpm exec playwright test e2e/professional-terminal.spec.js e2e/orderbook.spec.js --project=chromium` — 21 Chromium regression tests.
+- `pnpm exec playwright test e2e/landing.spec.js` - 15 tests across Chromium, Firefox, and WebKit.
+- `pnpm exec playwright test e2e/professional-terminal.spec.js e2e/orderbook.spec.js --project=chromium` - 21 Chromium regression tests.
 
 ## Publication boundary
 

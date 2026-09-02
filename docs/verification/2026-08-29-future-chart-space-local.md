@@ -23,13 +23,13 @@ espacio futuro a la derecha sin usar zoom ni desalinear capas temporales.
 
 ## Gates
 
-- `pnpm run test:unit` — 16/16 archivos de tests pasan.
-- `pnpm run check:docs` — contrato documental correcto.
-- `pnpm run lint` — sin errores.
-- `pnpm run build` — build de producción correcto.
-- Suite profesional Chromium — 16/16 tests pasan.
-- E2E focalizado del drag — 3/3 en Chromium, Firefox y WebKit; la invocación retira variables
+- `pnpm run test:unit` - 16/16 archivos de tests pasan.
+- `pnpm run check:docs` - contrato documental correcto.
+- `pnpm run lint` - sin errores.
+- `pnpm run build` - build de producción correcto.
+- Suite profesional Chromium - 16/16 tests pasan.
+- E2E focalizado del drag - 3/3 en Chromium, Firefox y WebKit; la invocación retira variables
   proxy vacías del entorno local para que WebKit resuelva `localhost`.
-- `git diff --check` — correcto.
+- `git diff --check` - correcto.
 
 Esta evidencia es local. No se hizo commit, push, despliegue ni verificación de producción.

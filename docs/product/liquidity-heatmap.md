@@ -9,7 +9,7 @@ owners: product-engineering
 ## Propósito
 
 Candles puede mostrar una capa de liquidez histórica detrás de OHLC. Cada píxel representa el
-tamaño agregado de órdenes limit resting —bids y asks— en un intervalo de tiempo y precio. No
+tamaño agregado de órdenes limit resting -bids y asks- en un intervalo de tiempo y precio. No
 representa órdenes individuales, identidad de participantes, intención ni garantía de ejecución.
 
 La capa usa el mismo `incremental_book_L2` real de Binance BTCUSDT del 1 de diciembre de 2019 que
@@ -45,8 +45,8 @@ intermedia y no altera la normalización. El repintado temporal se sincroniza co
 layout que mueve el SVG para que heatmap, velas y volumen no presenten un frame desalineado.
 
 El dominio temporal del canvas usa exactamente los mismos slots que las velas. Cuando una sesión
-corta contiene menos barras que el número visible —por ejemplo, 24 velas de 1 h dentro de 34
-slots— el resto queda vacío y la capa termina en el borde temporal de la última vela disponible.
+corta contiene menos barras que el número visible -por ejemplo, 24 velas de 1 h dentro de 34
+slots- el resto queda vacío y la capa termina en el borde temporal de la última vela disponible.
 
 ## Controles
 

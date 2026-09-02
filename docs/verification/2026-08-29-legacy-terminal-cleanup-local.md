@@ -94,15 +94,15 @@ Archivos modificados por esta limpieza:
 
 ## Gates finales
 
-- `git diff --check` — correcto; Git solo avisa de normalización futura CRLF → LF en tres archivos.
-- `pnpm run check:docs` — correcto, 20 archivos requeridos.
-- `pnpm run lint` — correcto.
-- `pnpm run test:unit` — correcto, 12/12.
-- `pnpm run build` — correcto con Vite 4.3.9, 1.862 módulos transformados.
-- Regresión focalizada del contrato de timeframe — 3/3 en Chromium, Firefox y WebKit. El test
+- `git diff --check` - correcto; Git solo avisa de normalización futura CRLF → LF en tres archivos.
+- `pnpm run check:docs` - correcto, 20 archivos requeridos.
+- `pnpm run lint` - correcto.
+- `pnpm run test:unit` - correcto, 12/12.
+- `pnpm run build` - correcto con Vite 4.3.9, 1.862 módulos transformados.
+- Regresión focalizada del contrato de timeframe - 3/3 en Chromium, Firefox y WebKit. El test
   conserva la densidad de 34 slots y espera 24 barras reales al reservar el 30% de espacio futuro;
   no modifica el viewport ni el comportamiento profesional.
-- `pnpm run test:e2e --workers=1 --retries=1` — correcto, 96/96 en Chromium, Firefox y WebKit en
+- `pnpm run test:e2e --workers=1 --retries=1` - correcto, 96/96 en Chromium, Firefox y WebKit en
   8,6 minutos. Todos pasaron en primera instancia; el retry configurado no se utilizó.
 
 La ejecución paralela por defecto satura este host y WebKit hereda variables proxy vacías como un

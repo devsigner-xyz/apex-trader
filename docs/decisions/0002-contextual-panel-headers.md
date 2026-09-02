@@ -4,7 +4,7 @@ last_verified: 2026-08-27
 owners: product-design
 ---
 
-# 0002 — Contextual panel headers
+# 0002 - Contextual panel headers
 
 ## Context
 

@@ -4,7 +4,7 @@ last_verified: 2026-08-27
 owners: product-design-engineering
 ---
 
-# 0004 — Fractional chart viewport
+# 0004 - Fractional chart viewport
 
 ## Context
 

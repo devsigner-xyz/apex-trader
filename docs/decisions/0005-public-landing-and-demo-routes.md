@@ -4,7 +4,7 @@ last_verified: 2026-08-28
 owners: product-design-engineering
 ---
 
-# 0005 — Public landing and canonical demo routes
+# 0005 - Public landing and canonical demo routes
 
 ## Context
 

@@ -23,12 +23,12 @@ máximo por defecto, Volume Profile despejado y posibilidad de recuperar el over
 
 ## Gates
 
-- `pnpm run check:docs` — contrato documental correcto para 20 archivos requeridos.
-- `pnpm run lint` — sin errores.
-- `pnpm run test:unit` — 16/16 archivos de tests pasan.
-- `pnpm run build` — build de producción correcto.
-- Terminal profesional más heatmap en Chromium — 21/21 tests pasan.
-- Regresión focalizada del cambio de timeframe y drag — 3/3 en Chromium, Firefox y WebKit.
-- `git diff --check` — correcto.
+- `pnpm run check:docs` - contrato documental correcto para 20 archivos requeridos.
+- `pnpm run lint` - sin errores.
+- `pnpm run test:unit` - 16/16 archivos de tests pasan.
+- `pnpm run build` - build de producción correcto.
+- Terminal profesional más heatmap en Chromium - 21/21 tests pasan.
+- Regresión focalizada del cambio de timeframe y drag - 3/3 en Chromium, Firefox y WebKit.
+- `git diff --check` - correcto.
 
 Esta evidencia es local. No se hizo commit, push, despliegue ni verificación de producción.

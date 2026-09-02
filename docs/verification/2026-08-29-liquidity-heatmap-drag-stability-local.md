@@ -23,13 +23,13 @@ Candles horizontalmente, en especial al reservar espacio futuro y cruzar límite
 
 ## Gates
 
-- `pnpm run check:docs` — contrato documental correcto para 20 archivos requeridos.
-- `pnpm run lint` — sin errores.
-- `pnpm run test:unit` — 16/16 archivos de tests pasan.
-- `pnpm run build` — build de producción correcto.
-- Suite del heatmap en Chromium — 4/4 tests pasan.
-- Regresión focalizada del drag — 3/3 en Chromium, Firefox y WebKit.
-- Suite completa del terminal profesional en Chromium — 16/16 tests pasan.
-- `git diff --check` — correcto.
+- `pnpm run check:docs` - contrato documental correcto para 20 archivos requeridos.
+- `pnpm run lint` - sin errores.
+- `pnpm run test:unit` - 16/16 archivos de tests pasan.
+- `pnpm run build` - build de producción correcto.
+- Suite del heatmap en Chromium - 4/4 tests pasan.
+- Regresión focalizada del drag - 3/3 en Chromium, Firefox y WebKit.
+- Suite completa del terminal profesional en Chromium - 16/16 tests pasan.
+- `git diff --check` - correcto.
 
 Esta evidencia es local. No se hizo commit, push, despliegue ni verificación de producción.

@@ -4,7 +4,7 @@ date: 2026-08-29
 owners: product-engineering
 ---
 
-# 0007 — Bounded replay window for the one-day demo
+# 0007 - Bounded replay window for the one-day demo
 
 ## Context
 

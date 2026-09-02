@@ -4,7 +4,7 @@ last_verified: 2026-08-27
 owners: product-engineering
 ---
 
-# 0003 — Visible-range volume profile
+# 0003 - Visible-range volume profile
 
 ## Context
 

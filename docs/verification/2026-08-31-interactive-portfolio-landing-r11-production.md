@@ -23,7 +23,7 @@ owners: product-design-engineering
 ## HTTP y navegador público
 
 `/`, `/demo` y `/storybook/` respondieron HTTP 200 desde el dominio público. Los tres assets del
-carrusel —Candles, Footprint y Step Profile— respondieron HTTP 200 con `image/png`.
+carrusel -Candles, Footprint y Step Profile- respondieron HTTP 200 con `image/png`.
 
 La comprobación directa con Chromium confirmó:
 

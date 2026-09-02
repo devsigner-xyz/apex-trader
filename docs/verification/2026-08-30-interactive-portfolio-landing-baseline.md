@@ -1,11 +1,11 @@
 ---
-title: Interactive portfolio landing — baseline local
+title: Interactive portfolio landing - baseline local
 status: current
 last_verified: 2026-08-30
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing — baseline local
+# Interactive portfolio landing - baseline local
 
 Esta verificación fija el punto de partida de la exploración Figma descrita en
 `docs/plans/interactive-portfolio-landing.md`. No demuestra aprobación visual, implementación de la

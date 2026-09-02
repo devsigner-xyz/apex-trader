@@ -4,7 +4,7 @@ last_verified: 2026-09-01
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing R15 — liquidity heatmap local
+# Interactive portfolio landing R15 - liquidity heatmap local
 
 ## Alcance
 
@@ -16,11 +16,11 @@ montan `LiquidityHeatmapLayer`, no cargan tiles y no solicitan `/data/tardis/**`
 
 ## Verificación local
 
-- `git diff --check` — correcto.
-- `pnpm run check:docs` — correcto, 20 documentos requeridos.
-- `pnpm run lint` — correcto.
-- `pnpm run test:unit` — 19/19 correctos; fixture heatmap validado en 8 × 12 y variable por fase.
-- `pnpm run build` — aplicación y Storybook correctos.
+- `git diff --check` - correcto.
+- `pnpm run check:docs` - correcto, 20 documentos requeridos.
+- `pnpm run lint` - correcto.
+- `pnpm run test:unit` - 19/19 correctos; fixture heatmap validado en 8 × 12 y variable por fase.
+- `pnpm run build` - aplicación y Storybook correctos.
 - E2E de landing en Chromium, Firefox y WebKit - pendiente de ejecutar; séptima fila, 96 líneas,
   header de contexto, settings de intensidad y ausencia de replay histórico quedan cubiertos por la
   especificación actual.

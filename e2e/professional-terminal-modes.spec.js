@@ -312,7 +312,7 @@ for (const [route, mode] of terminalViews) {
       })
       expect(deltaGap).toBeGreaterThanOrEqual(8)
       const renderedValues = await values.allTextContents()
-      expect(renderedValues.some((value) => value !== '—' && Number.parseFloat(value) > 0)).toBe(
+      expect(renderedValues.some((value) => value !== '-' && Number.parseFloat(value) > 0)).toBe(
         true
       )
       const sourceValues = await cells.evaluateAll((nodes) =>

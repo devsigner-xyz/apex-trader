@@ -57,7 +57,7 @@ sistema.
 ### Ventana de replay
 
 La demo conserva la sesión Spot BTCUSDT de un día y empieza a reproducirla a las 16:30 UTC. Ese
-punto ofrece 34 intervalos agregados de 30 min —incluida la vela activa— sin aumentar el dataset.
+punto ofrece 34 intervalos agregados de 30 min -incluida la vela activa- sin aumentar el dataset.
 Al alcanzar el final de la sesión, el reloj vuelve a las 16:30 UTC y conserva cualquier pequeño
 exceso del tick para que el loop sea continuo. Cualquier seek se limita a esta ventana de demo.
 
@@ -151,7 +151,7 @@ semántica `progressbar`, incluido el 0%.
 - Chart, DOM y Time & Sales usan replay histórico compartido.
 - El manifest mutable se revalida en cada visita. Durante una release, un manifest anterior sin
   tiles de liquidez sigue cargando el replay base; la capa de heatmap degrada de forma aislada.
-- Cada operación de red del replay —manifest, sesión, book, trades o liquidez— admite como máximo
+- Cada operación de red del replay -manifest, sesión, book, trades o liquidez- admite como máximo
   tres intentos totales. El primero es inmediato y los dos siguientes esperan 100 ms y 200 ms. Se
   reintentan rechazos de transporte de `fetch` (`TypeError`, `NetworkError` y `TimeoutError`), HTTP
   408, 429 y 5xx. Son terminales una cancelación intencionada (`AbortError`), cualquier otro 4xx,

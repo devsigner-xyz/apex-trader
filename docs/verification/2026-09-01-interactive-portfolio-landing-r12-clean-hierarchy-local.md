@@ -4,7 +4,7 @@ last_verified: 2026-09-01
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing R12 — clean hierarchy local
+# Interactive portfolio landing R12 - clean hierarchy local
 
 ## Alcance
 

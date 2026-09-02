@@ -53,7 +53,7 @@ una lectura adicional. El CTA secundario del hero dirige a Devsigner en una pest
 - Los eyebrows de los módulos anticipan una lectura concreta: dirección, presión, concentración,
   aceptación, liquidez o ritmo de ejecución. El heading desarrolla esa lectura y el body explica
   cuándo resulta útil.
-- Los términos del producto —Candles, Footprint, Step Profile, Volume Profile, DOM y Time & Sales—
+- Los términos del producto -Candles, Footprint, Step Profile, Volume Profile, DOM y Time & Sales-
   se conservan cuando ayudan a reconocer la herramienta, pero siempre acompañados de una
   explicación comprensible.
 - La navegación usa `Component library` y `Devsigner`. Las acciones

@@ -4,7 +4,7 @@ last_verified: 2026-09-01
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing R14 — hero replay production
+# Interactive portfolio landing R14 - hero replay production
 
 ## Release
 

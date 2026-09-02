@@ -23,10 +23,10 @@ Candles al cambiar desde 5 min a 15 min, 30 min, 1 h y 4 h.
 
 ## Gates
 
-- `node --test tests/*.test.js` — 16/16 archivos de tests pasan.
-- `node scripts/check-docs.mjs` — contrato documental correcto.
-- ESLint local — sin errores.
-- Vite build local — correcto.
-- `git diff --check` — correcto.
+- `node --test tests/*.test.js` - 16/16 archivos de tests pasan.
+- `node scripts/check-docs.mjs` - contrato documental correcto.
+- ESLint local - sin errores.
+- Vite build local - correcto.
+- `git diff --check` - correcto.
 
 Esta evidencia es local. No se hizo commit, push, despliegue ni verificación de producción.

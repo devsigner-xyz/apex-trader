@@ -135,8 +135,8 @@ de producto completo.
 
 ## Copy orientado a valor R11
 
-- Se sustituyen los eyebrows que parecían un registro técnico —cantidades de barras o filas,
-  `updates` y nombres de estados— por mensajes sobre la lectura que aporta cada superficie.
+- Se sustituyen los eyebrows que parecían un registro técnico -cantidades de barras o filas,
+  `updates` y nombres de estados- por mensajes sobre la lectura que aporta cada superficie.
 - Candles presenta dirección y momentum; Footprint, presión ejecutada; Step Profile, concentración;
   Volume Profile, aceptación; DOM, liquidez disponible; y Time & Sales, ritmo de ejecución.
 - Hero, navegación, métricas, callouts, secciones, CTAs, cierre y estados de carga comparten la misma
@@ -266,35 +266,35 @@ IDs y masters.
 
 | Fase                               | Estado   | Evidencia / artefactos                                                                                         | Siguiente acción           |
 | ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| 0 · Baseline                       | complete | `docs/verification/2026-08-30-interactive-portfolio-landing-baseline.md`                                       | —                          |
+| 0 · Baseline                       | complete | `docs/verification/2026-08-30-interactive-portfolio-landing-baseline.md`                                       | -                          |
 | 1 · Figma R1                       | complete | `656:7413`, `656:7414`, `656:7415`; aprobación del 2026-08-30                                                  | Preservada como snapshot   |
 | 2 · Prototipo R1                   | complete | `docs/verification/2026-08-30-interactive-portfolio-landing-phase2-local.md`                                   | Sustituido por feedback R2 |
 | 3 · Revisión Figma R2              | complete | `688:21215`; `output/figma/interactive-landing-isolated-modules-r2.png`                                        | Sincronizar código         |
 | 4 · Módulos React y composición    | complete | Seis escenas aisladas, carga lazy, fixture compartido, imágenes de UI completa limitadas a contexto            | Cerrar docs y QA           |
-| 5 · Contratos, documentación y QA  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright    | —                          |
-| 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | —                          |
+| 5 · Contratos, documentación y QA  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-isolated-modules-local.md`; capturas Playwright    | -                          |
+| 6 · Release y verificación pública | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-production.md`; Railway `SUCCESS` para `23879f6e…` | -                          |
 | 7 · Refinamiento R3 local          | complete | Carrusel, alternancia, OHLC válido, dos barras order-flow y landing 21/21                                      | Sincronizar Figma          |
-| 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | —                          |
+| 8 · Release R3                     | complete | `874648af…`; Railway `59df0562…`; UI pública R3 verificada                                                     | -                          |
 | 9 · Sincronización Figma R3–R14    | pending  | R2 permanece como referencia aprobada; runtime publicado ejecuta R11; R12/R13/R14 están locales          | Requiere trabajo Figma     |
-| 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | —                          |
-| 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | —                          |
-| 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | —                          |
+| 10 · Hero workstation completo R4  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r4-full-workstation-hero-local.md`; 21/21 E2E      | -                          |
+| 11 · Order flow unframed R5         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r5-order-flow-unframed-local.md`; 21/21 E2E         | -                          |
+| 12 · Release R4/R5                  | complete | `db5effee…`; Railway `99f97679…`; assets, rutas y UI pública verificadas                                        | -                          |
 | 13 · Simplificación narrativa R6    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r6-narrative-simplification-local.md`; 21/21 E2E   | Publicar solo con permiso  |
 | 14 · Paneles compactos unframed R7  | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r7-panel-settings-unframed-local.md`; 21/21 + 2/2 | Publicar con R6            |
-| 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | —                          |
+| 15 · Release R6/R7                  | complete | `3b625f9…`; Railway `966c184c…`; rutas, bundles y UI pública verificadas                                        | -                          |
 | 16 · Price scale R8 local           | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r8-volume-profile-price-scale-local.md`; 21/21 E2E | Publicar solo con permiso  |
-| 17 · Release R8                     | complete | `c6d941e…`; Railway `a62124bc…`; UI pública desktop/mobile verificada                                          | —                          |
-| 18 · Ambient depth R9 local         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r9-ambient-depth-local.md`; 21/21 E2E              | —                          |
-| 19 · Release R9                     | complete | `2169d902…`; Railway `f38993ff…`; UI pública desktop/mobile verificada                                         | —                          |
-| 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | —                          |
-| 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | —                          |
-| 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | —                          |
-| 23 · Release R11                    | complete | `0b399ec…`; Railway `e3d07c19…`; copy, rutas, assets y UI pública verificados                                  | —                          |
-| 24 · Jerarquía limpia R12            | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r12-clean-hierarchy-local.md`; 21/21 E2E       | —                          |
+| 17 · Release R8                     | complete | `c6d941e…`; Railway `a62124bc…`; UI pública desktop/mobile verificada                                          | -                          |
+| 18 · Ambient depth R9 local         | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r9-ambient-depth-local.md`; 21/21 E2E              | -                          |
+| 19 · Release R9                     | complete | `2169d902…`; Railway `f38993ff…`; UI pública desktop/mobile verificada                                         | -                          |
+| 20 · Static faded grid R10 local    | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r10-static-grid-local.md`; 21/21 E2E               | -                          |
+| 21 · Release R10                    | complete | `91da3add…`; Railway `3aa05fe2…`; UI pública desktop/mobile verificada                                         | -                          |
+| 22 · Copy orientado a valor R11     | complete | `docs/verification/2026-08-31-interactive-portfolio-landing-r11-user-value-copy-local.md`; 21/21 E2E          | -                          |
+| 23 · Release R11                    | complete | `0b399ec…`; Railway `e3d07c19…`; copy, rutas, assets y UI pública verificados                                  | -                          |
+| 24 · Jerarquía limpia R12            | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r12-clean-hierarchy-local.md`; 21/21 E2E       | -                          |
 | 25 · Landing focalizada R13          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r13-focused-landing-local.md`; 21/21 E2E; QA desktop/mobile | Publicar solo con permiso |
 | 26 · Hero replay R14                 | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-local.md`; vídeo MP4/WebM; 21/21 E2E | Publicar solo con permiso |
-| 27 · Release hero replay R14          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md`; Railway `2b300a52…`; UI pública verificada | — |
-| 28 · Liquidity Heatmap R15             | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r15-production.md`; heatmap, CTA y UI pública verificados | — |
+| 27 · Release hero replay R14          | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r14-hero-replay-production.md`; Railway `2b300a52…`; UI pública verificada | - |
+| 28 · Liquidity Heatmap R15             | complete | `docs/verification/2026-09-01-interactive-portfolio-landing-r15-production.md`; heatmap, CTA y UI pública verificados | - |
 
 Estados permitidos: `pending`, `in_progress`, `blocked`, `complete`.
 

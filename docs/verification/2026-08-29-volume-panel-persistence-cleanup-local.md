@@ -30,14 +30,14 @@ modificaron CSS, layout, dimensiones visuales, rutas, fixtures, datos, replay, v
 - El E2E focalizado de sincronización, settings y teclado pasa en Chromium, Firefox y WebKit. Para
   WebKit se usaron únicamente `NO_PROXY=localhost,127.0.0.1`,
   `no_proxy=localhost,127.0.0.1` y `TMPDIR=/tmp` por el proxy local.
-- La suite E2E completa pasa: `pnpm run test:e2e --workers=1 --retries=1` — 120/120 en 8,9 min.
+- La suite E2E completa pasa: `pnpm run test:e2e --workers=1 --retries=1` - 120/120 en 8,9 min.
 
 ## Gates
 
-- `git diff --check` — pass.
-- `pnpm run check:docs` — contrato documental correcto para 20 archivos requeridos.
-- `pnpm run lint` — pass.
-- `pnpm run test:unit` — 12/12 pass.
-- `pnpm run build` — build de producción correcto con Vite 4.3.9.
+- `git diff --check` - pass.
+- `pnpm run check:docs` - contrato documental correcto para 20 archivos requeridos.
+- `pnpm run lint` - pass.
+- `pnpm run test:unit` - 12/12 pass.
+- `pnpm run build` - build de producción correcto con Vite 4.3.9.
 
 Esta evidencia es local. No se hizo commit, push, PR, despliegue ni verificación de producción.

@@ -4,7 +4,7 @@ last_verified: 2026-09-01
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing R14 — hero replay local
+# Interactive portfolio landing R14 - hero replay local
 
 ## Alcance
 
@@ -24,14 +24,14 @@ ocupe todo el escenario del hero; los nombres de modo permanecen en los controle
 
 ## Verificación local
 
-- `pnpm run record:landing-hero` — correcto; genera ambos formatos con FFmpeg.
-- `ffprobe` — MP4 y WebM, 1600 × 900, 12,12 s; H.264 y VP9 respectivamente.
-- `pnpm run lint` — correcto.
-- `pnpm run check:docs` — correcto, 20 documentos requeridos.
-- `pnpm run test:unit` — 19/19 correctos.
-- `pnpm run build` — aplicación y Storybook correctos.
-- `PLAYWRIGHT_PORT=5190 NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR=/tmp pnpm exec playwright test e2e/landing.spec.js --project=chromium --project=firefox --project=webkit --reporter=line` — 21/21 correctos.
-- QA visual 1440 × 1000 y 390 × 844 — el vídeo carga, reproduce, conserva 1600 × 900, no hay overflow, la consola está limpia y no hay requests `/data/tardis/**`.
+- `pnpm run record:landing-hero` - correcto; genera ambos formatos con FFmpeg.
+- `ffprobe` - MP4 y WebM, 1600 × 900, 12,12 s; H.264 y VP9 respectivamente.
+- `pnpm run lint` - correcto.
+- `pnpm run check:docs` - correcto, 20 documentos requeridos.
+- `pnpm run test:unit` - 19/19 correctos.
+- `pnpm run build` - aplicación y Storybook correctos.
+- `PLAYWRIGHT_PORT=5190 NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR=/tmp pnpm exec playwright test e2e/landing.spec.js --project=chromium --project=firefox --project=webkit --reporter=line` - 21/21 correctos.
+- QA visual 1440 × 1000 y 390 × 844 - el vídeo carga, reproduce, conserva 1600 × 900, no hay overflow, la consola está limpia y no hay requests `/data/tardis/**`.
 
 Evidencia visual y fuente:
 

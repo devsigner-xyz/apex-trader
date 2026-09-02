@@ -24,12 +24,12 @@ BTCUSDT sin modificar ni ampliar el dataset de un día.
 
 ## Gates
 
-- `pnpm run test:unit` — 16/16 archivos de tests pasan.
-- `pnpm run check:docs` — contrato documental correcto.
-- `pnpm run lint` — sin errores.
-- `pnpm run build` — build de producción correcto.
-- E2E profesional en Chromium — pasada completa 21/21; comprobación focalizada posterior de las
+- `pnpm run test:unit` - 16/16 archivos de tests pasan.
+- `pnpm run check:docs` - contrato documental correcto.
+- `pnpm run lint` - sin errores.
+- `pnpm run build` - build de producción correcto.
+- E2E profesional en Chromium - pasada completa 21/21; comprobación focalizada posterior de las
   34 velas iniciales, 1/1.
-- `git diff --check` — correcto.
+- `git diff --check` - correcto.
 
 Esta evidencia es local. No se hizo commit, push, despliegue ni verificación de producción.

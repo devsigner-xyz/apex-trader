@@ -4,7 +4,7 @@ date: 2026-08-29
 owners: product-design-engineering
 ---
 
-# 0008 — User-controlled future chart space
+# 0008 - User-controlled future chart space
 
 ## Context
 

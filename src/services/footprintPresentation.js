@@ -87,7 +87,7 @@ export function deriveFootprintBar(rawBar, settings) {
 }
 
 export function formatFootprintVolume(value, format) {
-  if (value === 0) return '—'
+  if (value === 0) return '-'
   if (format === 'precise') return value.toFixed(3)
   if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}k`
   if (Math.abs(value) >= 100) return value.toFixed(0)

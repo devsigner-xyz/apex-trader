@@ -1,11 +1,11 @@
 ---
-title: Interactive portfolio landing — Figma approval gate
+title: Interactive portfolio landing - Figma approval gate
 status: current
 last_verified: 2026-08-30
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing — Figma approval gate
+# Interactive portfolio landing - Figma approval gate
 
 Esta verificación documenta la propuesta visual previa a React definida en
 `docs/plans/interactive-portfolio-landing.md`. Demuestra que los artefactos existen y fueron
@@ -24,7 +24,7 @@ Archivo maestro: `Ze9eGnPaNDj8u0oB1iUt3C`, página `560:7369`
 
 | Artefacto | Node ID | Dimensiones | Captura local ignorada por Git |
 | --- | --- | --- | --- |
-| Sección | `656:7412` | 3680 × 7120 | — |
+| Sección | `656:7412` | 3680 × 7120 | - |
 | Desktop | `656:7413` | 1440 × 6920 | `output/figma/interactive-portfolio-landing-desktop.png` |
 | Mobile | `656:7414` | 390 × 6920 | `output/figma/interactive-portfolio-landing-mobile.png` |
 | Motion storyboard | `656:7415` | 1440 × 3760 | `output/figma/interactive-portfolio-landing-motion-storyboard.png` |

@@ -4,7 +4,7 @@ last_verified: 2026-09-01
 owners: product-design-engineering
 ---
 
-# Interactive portfolio landing R13 — focused landing local
+# Interactive portfolio landing R13 - focused landing local
 
 ## Alcance
 
@@ -23,13 +23,13 @@ vídeo grabado `hero-replay.mp4`/`hero-replay.webm`, con poster estático y cont
 
 Completada el 2026-09-01:
 
-- `git diff --check` — correcto;
-- `pnpm run check:docs` — correcto, 20 documentos requeridos;
-- `pnpm run lint` — correcto;
-- `pnpm run test:unit` — 19/19 suites/casos correctos;
-- `pnpm run build` — aplicación y Storybook correctos;
-- `PLAYWRIGHT_PORT=5190 NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR=/tmp pnpm exec playwright test e2e/landing.spec.js --project=chromium --project=firefox --project=webkit --reporter=line` — 21/21 correctos;
-- QA visual en 1440×1000 y 390×844 — `#session` y `#workspace` ausentes, CTA del banner con URL `https://devsigner.xyz`, sin overflow horizontal y consola sin errores ni warnings.
+- `git diff --check` - correcto;
+- `pnpm run check:docs` - correcto, 20 documentos requeridos;
+- `pnpm run lint` - correcto;
+- `pnpm run test:unit` - 19/19 suites/casos correctos;
+- `pnpm run build` - aplicación y Storybook correctos;
+- `PLAYWRIGHT_PORT=5190 NO_PROXY=localhost,127.0.0.1 no_proxy=localhost,127.0.0.1 TMPDIR=/tmp pnpm exec playwright test e2e/landing.spec.js --project=chromium --project=firefox --project=webkit --reporter=line` - 21/21 correctos;
+- QA visual en 1440×1000 y 390×844 - `#session` y `#workspace` ausentes, CTA del banner con URL `https://devsigner.xyz`, sin overflow horizontal y consola sin errores ni warnings.
 
 Evidencia visual:
 

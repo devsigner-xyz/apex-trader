@@ -1,6 +1,6 @@
 # Plan: modo Footprint / Order Flow de demostración
 
-> **Superseded — 2026-08-23.** This early plan proposed synthetic local order-flow data. It is not the runtime contract of the current Apex Trader rebuild. The implemented professional Footprint view derives bid/ask cells, volume, delta, CVD, POC and imbalances from the real Binance Spot BTCUSDT Tardis trade stream for 2019-12-01. The document remains only as historical design context and must not be used as market-data provenance.
+> **Superseded - 2026-08-23.** This early plan proposed synthetic local order-flow data. It is not the runtime contract of the current Apex Trader rebuild. The implemented professional Footprint view derives bid/ask cells, volume, delta, CVD, POC and imbalances from the real Binance Spot BTCUSDT Tardis trade stream for 2019-12-01. The document remains only as historical design context and must not be used as market-data provenance.
 
 ## Objetivo
 
@@ -32,7 +32,7 @@ Los datos OHLCV y el orderbook actual no permiten reconstruir un footprint real.
 
 Mostrar siempre, dentro de la visualización:
 
-`DEMO — datos sintéticos generados localmente. No son cotizaciones, no son ejecutables y no representan actividad de mercado.`
+`DEMO - datos sintéticos generados localmente. No son cotizaciones, no son ejecutables y no representan actividad de mercado.`
 
 Cambiar cualquier título que diga `Kraken` en este modo por:
 

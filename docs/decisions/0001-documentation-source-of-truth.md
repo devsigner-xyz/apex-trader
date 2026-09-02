@@ -4,7 +4,7 @@ last_verified: 2026-08-27
 owners: product-design-engineering
 ---
 
-# 0001 — Documentation source of truth
+# 0001 - Documentation source of truth
 
 ## Context
 
