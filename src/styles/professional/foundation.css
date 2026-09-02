@@ -10,6 +10,7 @@
   --pro-text: #edf2f5;
   --pro-muted: #9aa6af;
   --pro-accent: var(--color-text-accent, #f1cfa1);
+  --pro-on-accent: #11171c;
   --pro-buy: #2fb67c;
   --pro-sell: #e15b64;
   --pro-popover-surface: rgb(24 32 39 / 0.98);
@@ -26,6 +27,8 @@
   --pro-footprint-ask-imbalance: #ff8e97;
   --pro-price-axis: #11171c;
   --pro-current-price-tag: var(--color-text-accent, #f1cfa1);
+  --pro-candle-up: var(--pro-buy);
+  --pro-candle-down: var(--pro-sell);
   --pro-dom-ask-volume: rgb(225 91 100 / 0.25);
   --pro-dom-bid-volume: rgb(47 182 124 / 0.25);
   --pro-action-buy: #226f55;

@@ -13,6 +13,11 @@ test('landing renders its product thesis without loading historical data', async
 
   await page.goto('/')
 
+  await expect(page.getByRole('link', { name: 'Apex Trader home' }).locator('img')).toHaveAttribute(
+    'src',
+    '/media/apex-trader.svg'
+  )
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/favicon.png')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'See beyond the candles.'
   )
@@ -306,7 +311,7 @@ test('primary landing CTA opens the canonical demo', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('link', { name: 'Open demo' }).first().click()
   await expect(page).toHaveURL(/\/demo$/)
-  await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Apex Trader' })).toBeVisible()
   await expect(page.getByLabel('candles historical chart')).toBeVisible()
 })
 

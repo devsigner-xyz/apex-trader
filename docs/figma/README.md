@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-31
+last_verified: 2026-09-02
 owners: product-design
 ---
 
@@ -92,7 +92,9 @@ vigente pasa a ser R3–R14.
 R15 añade una séptima escena aislada de Liquidity Heatmap con intensidad configurable y fixtures
 locales; Figma tampoco refleja este ajuste, por lo que el gap vigente pasa a ser R3-R15. R16 ajusta
 el CTA secundario del hero y retira la etiqueta `TIME` del heatmap; Figma tampoco refleja ese copy
-ni ese detalle de composición.
+ni ese detalle de composición. R17 sustituye en runtime las recreaciones tipográficas del header de
+landing y del header global de terminal por el wordmark vectorial canónico, y añade el favicon Apex;
+este cambio de marca permanece pendiente de sincronización en los frames de Figma.
 
 ## Producción
 

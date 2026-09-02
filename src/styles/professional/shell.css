@@ -32,8 +32,10 @@
   border-bottom: 1px solid var(--pro-border);
 }
 
-.market-header strong:first-child {
-  font: 700 15px Inter, sans-serif;
+.market-header__brand {
+  display: block;
+  width: 118px;
+  height: auto;
 }
 
 .positive {

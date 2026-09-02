@@ -1,4 +1,5 @@
 import {
+  chartAppearanceDefaults,
   chartLiquidityDefaults,
   chartPanelSizeDefaults,
   chartPanelSizeLimits,
@@ -7,6 +8,8 @@ import {
   panelSizeDefaults,
   panelSizeLimits
 } from '../components/professional/config.js'
+
+const colorPattern = /^#[0-9a-f]{6}$/i
 
 function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum)
@@ -47,6 +50,18 @@ export function normalizeChartLiquidity(candidate) {
     intensity: Number.isFinite(intensity)
       ? clamp(intensity, 0.2, 1)
       : chartLiquidityDefaults.intensity
+  }
+}
+
+export function normalizeChartAppearance(candidate) {
+  const normalizeColor = (value) =>
+    typeof value === 'string' && colorPattern.test(value) ? value.toLowerCase() : null
+
+  return {
+    candles: {
+      down: normalizeColor(candidate?.candles?.down) ?? chartAppearanceDefaults.candles.down,
+      up: normalizeColor(candidate?.candles?.up) ?? chartAppearanceDefaults.candles.up
+    }
   }
 }
 

@@ -10,7 +10,10 @@ owners: product-engineering
 
 La terminal profesional es una experiencia desktop de replay histórico. Chart, DOM y Time & Sales comparten un único reloj y representan el mismo instante. Markets, Activity, cuenta y ejecución siguen siendo fixtures o simulación local salvo indicación contraria.
 
-El ancho interno requiere aproximadamente 1920 px para acceso simultáneo a todos los paneles. A 1366–1440 px existe desplazamiento horizontal; una experiencia compacta o plegable sigue pendiente de decisión.
+El ancho interno requiere aproximadamente 1920 px para acceso simultáneo a todos los paneles. En
+móvil y tablet, la demo bloquea la workstation con un aviso que reutiliza el vídeo de la home,
+explica que la experiencia está diseñada para escritorio y enlaza al detalle público del proyecto.
+La terminal responsive o plegable sigue fuera del alcance actual.
 
 ## Rutas
 
@@ -40,6 +43,12 @@ Candles muestra por defecto un [Historical liquidity heatmap](liquidity-heatmap.
 L2 real, con visibilidad e intensidad persistentes en Chart settings. La capa respeta el viewport y
 el reloj del replay y no se monta en Footprint o Step Profile.
 
+Chart settings separa opciones comunes y específicas del modo. Profile, VAH/POC/VAL y volumen
+permanecen visibles en todos los modos. Candles añade sus colores `up` y `down`, el heatmap y su
+intensidad. Los colores aceptan selección libre, persisten en
+`apex-trader:chart-appearance:v1` bajo `candles` y pueden volver a los tokens semánticos del sistema;
+Footprint y Step Profile no heredan esos valores.
+
 ### Ventana de replay
 
 La demo conserva la sesión Spot BTCUSDT de un día y empieza a reproducirla a las 16:30 UTC. Ese
@@ -58,9 +67,10 @@ exceso del tick para que el loop sea continuo. Cualquier seek se limita a esta v
   y heatmap comparten ese desplazamiento. El margen futuro mantiene el seguimiento del dato más
   reciente; `0` elimina el margen y restaura el encaje al borde derecho. Si el heatmap está activo,
   el gesto conserva sus tiles cargados y lo repinta en el mismo frame visual sin flashes de carga.
-- Cada cambio real de timeframe restaura la densidad por defecto del modo y aplica inicialmente ese
-  margen futuro máximo. No es padding fijo: el usuario puede arrastrar hacia la derecha para volver
-  a situar datos bajo el Volume Profile. La carga inicial y `0` conservan el encaje al borde derecho.
+- La carga inicial de Candles, Footprint y Step Profile, cada cambio de modo y cada cambio real de
+  timeframe restauran la densidad por defecto y aplican el margen futuro máximo. No es padding
+  fijo: el usuario puede arrastrar hacia la derecha para volver a situar datos bajo el Volume
+  Profile. `0` conserva la salida explícita al encaje del borde derecho.
 - El cálculo analítico incluye una barra cuando su centro temporal está dentro del plot. Las barras buffer recortadas fuera de ese criterio sirven únicamente para continuidad visual y no alteran profile, POC, VAH o VAL.
 - Los límites de barras visibles son 28–160 para Candles, 4–13 para Footprint y 1–12 para Step Profile. Estos límites protegen respectivamente la separación máxima de velas y la legibilidad mínima de celdas densas.
 - Los labels temporales se seleccionan según el ancho renderizado y conservan una separación mínima; el zoom-out reduce su cantidad antes de permitir solapamientos.
@@ -110,6 +120,7 @@ canónica elimina `profile`.
 - Metadata neutral; buy/sell colorea trades, no el resumen.
 - Radio single-select: All trades, Buys only y Sells only.
 - Filtro transitorio; máximo 20 trades coincidentes.
+- Cada fila mide 26 px desde que aparece; las pocas filas iniciales no crecen para rellenar el panel.
 - Limitación: las filas son botones sin acción implementada.
 
 ## Orders and positions
@@ -122,9 +133,13 @@ La tab bar mide 38 px, no muestra métricas globales y empieza en Positions sin 
 | Orders         | Tabla          | Time, Symbol, Side, Type, Qty, Limit/Trigger, TIF, Status, Action |
 | Fills          | Tabla          | Time, Symbol, Side, Qty, Fill Price, Fee, Liquidity, Order ID     |
 | Activity       | Tabla          | Time, Event, Detail, Status, Account                              |
-| Account & Risk | Composición    | Identidad SIM, P&L, fees, posiciones, órdenes y límites           |
+| Account & Risk | Resumen + modal | Identidad SIM, P&L, límites y disclosure detallado                |
 
-`CLOSE` y `CANCEL` son danger; `DETAILS` es navegación neutral. Hoy son texto, no controles operativos. Account & Risk identifica `DEMO-001` como `SIMULATED ACCOUNT`; sus meters mantienen texto y semántica `progressbar` al 0%.
+`CLOSE` y `CANCEL` son danger; `DETAILS` es navegación neutral. Hoy son texto, no controles
+operativos. Account & Risk prioriza Net P&L, su desglose y los límites principales. `VIEW MORE`
+abre un modal con snapshot financiero, exposición y todos los límites, restaura foco al CTA al
+cerrar y mantiene la identificación `DEMO-001 · SIMULATED ACCOUNT`. Sus meters conservan texto y
+semántica `progressbar`, incluido el 0%.
 
 ## Datos y accesibilidad
 

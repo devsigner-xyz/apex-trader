@@ -12,6 +12,7 @@ export const optionalWatchlistColumns = watchlistColumns
   .map(({ id }) => id)
 
 export const storageKeys = {
+  chartAppearance: 'apex-trader:chart-appearance:v1',
   chartPanelSizes: 'apex-trader:chart-panel-sizes:v1',
   chartPanelVisibility: 'apex-trader:chart-panel-visibility:v1',
   chartLiquidity: 'apex-trader:chart-liquidity:v1',
@@ -91,3 +92,6 @@ export const chartPanelSizeLimits = {
 }
 export const chartPanelVisibilityDefaults = { profile: true, valueArea: true, volume: true }
 export const chartLiquidityDefaults = { enabled: true, intensity: 0.6 }
+export const chartAppearanceDefaults = {
+  candles: { down: null, up: null }
+}

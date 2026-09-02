@@ -99,11 +99,21 @@ export const activityTabs = [
 ]
 
 export const accountSummary = [
+  { label: 'Net P&L', tone: 'positive', value: '+$26.06' },
   { label: 'Unrealized P&L', tone: 'positive', value: '+$7.64' },
   { label: 'Realized P&L', tone: 'positive', value: '+$18.42' },
   { label: 'Estimated fees', value: '$0.75' },
   { label: 'Open positions', value: '2' },
   { label: 'Working orders', value: '2' }
+]
+
+export const accountDetails = [
+  { label: 'Account balance', value: '$25,018.42' },
+  { label: 'Estimated equity', value: '$25,026.06' },
+  { label: 'Available buying power', value: '$24,120.00' },
+  { label: 'Gross exposure', value: '0.35 BTC' },
+  { label: 'Session market', value: 'BTCUSDT' },
+  { label: 'Settlement currency', value: 'USD' }
 ]
 
 export const riskLimits = [

@@ -57,3 +57,44 @@ test('footprint chart panels, settings and volume size persist', async ({ page }
   await expect(profilePanel).toBeVisible()
   expect((await volumePanel.boundingBox()).height).toBeCloseTo(118, 0)
 })
+
+test('chart settings keep common controls and scope candle colors to Candles', async ({ page }) => {
+  await page.goto('/demo')
+  const settingsTrigger = page.getByLabel('Chart settings')
+  await settingsTrigger.click()
+
+  for (const label of [
+    'Show visible range volume profile',
+    'Show VAH, POC and VAL',
+    'Show volume'
+  ]) {
+    await expect(page.getByLabel(label)).toBeVisible()
+  }
+  await expect(page.getByLabel('Up candle color')).toBeVisible()
+  await expect(page.getByLabel('Down candle color')).toBeVisible()
+  await expect(page.getByLabel('Show liquidity heatmap')).toBeVisible()
+
+  await page.getByLabel('Up candle color').fill('#335577')
+  await page.getByLabel('Down candle color').fill('#884422')
+  await expect
+    .poll(() =>
+      page.evaluate(() => JSON.parse(localStorage.getItem('apex-trader:chart-appearance:v1')))
+    )
+    .toEqual({ candles: { down: '#884422', up: '#335577' } })
+  expect(
+    await page.locator('.market-chart .up rect').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(51, 85, 119)')
+
+  await page.getByLabel('Chart mode').selectOption('footprint')
+  await expect(page).toHaveURL(/\/demo\/footprint$/)
+  await expect(page.getByRole('dialog', { name: 'Chart settings' })).toBeVisible()
+  await expect(page.getByLabel('Show visible range volume profile')).toBeVisible()
+  await expect(page.getByLabel('Up candle color')).toHaveCount(0)
+  await expect(page.getByLabel('Show liquidity heatmap')).toHaveCount(0)
+
+  await page.getByLabel('Chart mode').selectOption('candles')
+  await expect(page.getByLabel('Up candle color')).toHaveValue('#335577')
+  await page.reload()
+  await settingsTrigger.click()
+  await expect(page.getByLabel('Down candle color')).toHaveValue('#884422')
+})

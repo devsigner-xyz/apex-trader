@@ -60,6 +60,17 @@
   letter-spacing: 0.4px;
 }
 
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-brand img {
+  display: block;
+  width: clamp(140px, 12vw, 160px);
+  height: auto;
+}
+
 .landing-nav {
   display: flex;
   gap: var(--pro-space-24);
@@ -92,7 +103,7 @@
 }
 
 .landing-button--primary {
-  color: var(--pro-canvas) !important;
+  color: var(--pro-on-accent) !important;
   background: var(--pro-accent);
 }
 

@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-31
+last_verified: 2026-09-02
 owners: product-design-engineering
 ---
 
@@ -27,7 +27,8 @@ Session evidence y The workspace se mantienen como snapshots históricos, pero n
 landing actual. `The blind spot` se elimina porque repetía la tesis sin aportar una interacción o
 una lectura adicional. El CTA secundario del hero dirige a Devsigner en una pestaña nueva.
 
-- Header sólido y sticky, sin blur ni transparencia.
+- Header sólido y sticky, sin blur ni transparencia. El enlace de inicio muestra el wordmark
+  vectorial de Apex Trader, no una recreación tipográfica del nombre.
 - Canvas y panel alternan la jerarquía sin gradientes, glass o neón.
 - El hero usa un vídeo 16:9 del workstation real con el mismo encuadre. Recorre Candles, Footprint y
   Step Profile, conserva controles manuales y pausa explícita. El vídeo usa `contain`, no `cover`,

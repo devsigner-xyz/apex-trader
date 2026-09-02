@@ -107,14 +107,14 @@
 
 .market-chart .up line,
 .market-chart .up rect {
-  fill: var(--pro-buy);
-  stroke: var(--pro-buy);
+  fill: var(--pro-candle-up);
+  stroke: var(--pro-candle-up);
 }
 
 .market-chart .down line,
 .market-chart .down rect {
-  fill: var(--pro-sell);
-  stroke: var(--pro-sell);
+  fill: var(--pro-candle-down);
+  stroke: var(--pro-candle-down);
 }
 
 .session-profile-overlay {
@@ -299,10 +299,14 @@
 }
 
 .price-tick,
-.current-price-text,
 .hover-price-text {
   fill: var(--pro-text);
   font: 700 11px 'Roboto Mono', monospace;
+}
+
+.current-price-text,
+.current-price-countdown {
+  fill: var(--pro-on-accent);
 }
 
 .current-price-line {
@@ -321,7 +325,6 @@
 }
 
 .current-price-countdown {
-  fill: var(--pro-text);
   font: 700 8px 'Roboto Mono', monospace;
   letter-spacing: 0.02em;
   opacity: 0.82;

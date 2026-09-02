@@ -45,7 +45,8 @@ La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfil
   cambiar el nivel de zoom. Esto permite separar el último dato del Volume Profile; todas las capas
   temporales se desplazan juntas y el seguimiento del último dato permanece activo.
 - Al seleccionar otra temporalidad, el viewport comienza con ese 30% reservado. El margen sigue
-  siendo interactivo: arrastrar hacia la derecha devuelve datos bajo el Volume Profile y `0`
+  siendo interactivo: la carga inicial y cada cambio de modo parten con ese margen, arrastrar hacia
+  la derecha devuelve datos bajo el Volume Profile y `0`
   restaura el encaje al borde derecho.
 - Una barra participa en cálculos visibles cuando su centro temporal cae dentro del plot. Las barras buffer parcialmente dibujadas cuyo centro queda fuera son solo presentación.
 - Los ticks temporales se reducen dinámicamente según el ancho disponible y nunca se apoyan en un conteo fijo que pueda provocar solapamientos.

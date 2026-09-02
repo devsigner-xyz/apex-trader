@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
+  normalizeChartAppearance,
   normalizeChartLiquidity,
   normalizeChartPanelSizes,
   normalizeChartPanelVisibility,
@@ -9,6 +10,20 @@ import {
   readPersistentValue,
   writePersistentValue
 } from '../src/services/professionalTerminalPersistence.js'
+
+test('normalizes persistent chart appearance within the candles mode only', () => {
+  assert.deepEqual(normalizeChartAppearance(), { candles: { down: null, up: null } })
+  assert.deepEqual(
+    normalizeChartAppearance({
+      candles: { down: '#ABCDEF', up: '#123456' },
+      footprint: { down: '#111111', up: '#222222' }
+    }),
+    { candles: { down: '#abcdef', up: '#123456' } }
+  )
+  assert.deepEqual(normalizeChartAppearance({ candles: { down: 'red', up: '#12345' } }), {
+    candles: { down: null, up: null }
+  })
+})
 
 test('normalizes workspace panel sizes with the existing defaults and limits', () => {
   assert.deepEqual(normalizePanelSizes({ dom: 999, execution: '260', watch: -1 }), {

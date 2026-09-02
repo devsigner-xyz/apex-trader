@@ -33,3 +33,18 @@ test('orders and positions remain visible at a smaller desktop viewport', async 
   expect(domBox.height).toBeGreaterThanOrEqual(750)
   expect(ladderBox.height).toBeGreaterThan(580)
 })
+
+test('mobile demo shows the desktop workstation notice and project CTA', async ({ page }) => {
+  await page.setViewportSize({ height: 844, width: 390 })
+  await page.goto('/demo')
+
+  const notice = page.getByRole('dialog', { name: 'APEX TRADER ESTÁ PENSADO PARA ESCRITORIO' })
+  await expect(notice).toBeVisible()
+  await expect(notice.locator('video')).toHaveAttribute('poster', '/media/hero-terminal-candles.png')
+  const projectLink = notice.getByRole('link', { name: 'VER DETALLE DEL PROYECTO' })
+  await expect(projectLink).toHaveAttribute(
+    'href',
+    'https://www.devsigner.xyz/proyectos/apextrader/'
+  )
+  await expect(projectLink).toHaveAttribute('target', '_blank')
+})

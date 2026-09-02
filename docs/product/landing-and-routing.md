@@ -1,6 +1,6 @@
 ---
 status: current
-last_verified: 2026-08-31
+last_verified: 2026-09-02
 owners: product-design-engineering
 ---
 
@@ -19,6 +19,9 @@ y no añade una sección de producto adicional.
 El marco del vídeo usa el borde neutro de la superficie; no añade una franja superior de color acento.
 El CTA primario y los indicadores de foco de la landing reutilizan la crema de Devsigner a través de
 `--pro-accent`; verde y rojo siguen reservados a estados de mercado.
+
+El header identifica el producto con el wordmark vectorial canónico `public/media/apex-trader.svg`.
+El documento usa `public/favicon.png`, de 128 × 128 px, como favicon de todas las rutas de Apex.
 
 La antigua sección `The blind spot` y su comparación OHLC/Volume at Price se retiran en R6 porque
 repetían la tesis del hero sin añadir una lectura accionable. El CTA secundario del hero enlaza a

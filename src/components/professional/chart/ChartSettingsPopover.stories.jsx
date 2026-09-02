@@ -9,8 +9,9 @@ const meta = {
 
 export default meta
 
-function InteractiveSettings({ initialLiquidityEnabled = true }) {
+function InteractiveSettings({ initialLiquidityEnabled = true, mode = 'candles' }) {
   const [liquidity, setLiquidity] = useState({ enabled: initialLiquidityEnabled, intensity: 0.6 })
+  const [candleColors, setCandleColors] = useState({ down: null, up: null })
   const [panelVisibility, setPanelVisibility] = useState({
     profile: true,
     valueArea: true,
@@ -20,7 +21,12 @@ function InteractiveSettings({ initialLiquidityEnabled = true }) {
   return (
     <div className="storybook-chart-settings">
       <ChartSettingsPopover
+        candleColors={candleColors}
         liquidity={liquidity}
+        mode={mode}
+        onCandleColorChange={(side, color) =>
+          setCandleColors((current) => ({ ...current, [side]: color }))
+        }
         onLiquidityEnabledChange={(enabled) => setLiquidity((current) => ({ ...current, enabled }))}
         onLiquidityIntensityChange={(intensity) =>
           setLiquidity((current) => ({ ...current, intensity }))
@@ -29,13 +35,15 @@ function InteractiveSettings({ initialLiquidityEnabled = true }) {
           setPanelVisibility((current) => ({ ...current, [panel]: visible }))
         }
         panelVisibility={panelVisibility}
+        resetCandleColors={() => setCandleColors({ down: null, up: null })}
       />
     </div>
   )
 }
 
 InteractiveSettings.propTypes = {
-  initialLiquidityEnabled: PropTypes.bool
+  initialLiquidityEnabled: PropTypes.bool,
+  mode: PropTypes.oneOf(['candles', 'footprint', 'step-profile'])
 }
 
 export const Default = {
@@ -44,4 +52,8 @@ export const Default = {
 
 export const HeatmapDisabled = {
   render: () => <InteractiveSettings initialLiquidityEnabled={false} />
+}
+
+export const FootprintContext = {
+  render: () => <InteractiveSettings mode="footprint" />
 }

@@ -26,7 +26,7 @@ test('historical synchronization, settings and keyboard controls remain coherent
   )
   await expect(
     page.locator('.market-chart .chart-data-layer > g.up, .market-chart .chart-data-layer > g.down')
-  ).toHaveCount(34)
+  ).toHaveCount(Math.ceil(34 * (1 - 0.3)))
   await timeframe.selectOption('15')
   await expect(timeframe).toHaveValue('15')
   await expect(countdown).toHaveText(/CLOSE 1[0-4]:\d{2}/)

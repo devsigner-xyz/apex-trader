@@ -14,6 +14,7 @@ import {
   findTimeScaleBarIndex
 } from '../../../services/professionalChartGeometry.js'
 import {
+  normalizeChartAppearance,
   normalizeChartLiquidity,
   normalizeChartPanelSizes,
   normalizeChartPanelVisibility
@@ -45,6 +46,7 @@ import { trackEvent } from '../../../services/analytics.js'
 const { chartWidth, mainBottom, mainTop, plotLeft, plotRight, priceChartHeight } = chartDimensions
 const plotWidth = plotRight - plotLeft
 const {
+  chartAppearance: chartAppearanceStorageKey,
   chartLiquidity: chartLiquidityStorageKey,
   chartPanelSizes: chartPanelSizesStorageKey,
   chartPanelVisibility: chartPanelVisibilityStorageKey
@@ -60,6 +62,10 @@ export default function MarketChart({
   timeframe,
   view
 }) {
+  const [appearance, setAppearance] = usePersistentState(
+    chartAppearanceStorageKey,
+    normalizeChartAppearance
+  )
   const [persistedLiquidity, setPersistedLiquidity] = usePersistentState(
     chartLiquidityStorageKey,
     normalizeChartLiquidity
@@ -246,7 +252,34 @@ export default function MarketChart({
       value: Math.round(intensity * 100)
     })
   }
+  const handleCandleColorChange = (side, color) => {
+    setAppearance((currentAppearance) => ({
+      ...currentAppearance,
+      candles: { ...currentAppearance.candles, [side]: color }
+    }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: `candles_${side}_color`,
+      value: color
+    })
+  }
+  const resetCandleColors = () => {
+    setAppearance((currentAppearance) => ({
+      ...currentAppearance,
+      candles: { down: null, up: null }
+    }))
+    trackEvent('change_demo_setting', {
+      area: 'chart',
+      setting: 'candles_colors',
+      value: 'system_default'
+    })
+  }
   const summaryBar = bars[hoveredBarIndex] ?? current
+  const chartAppearanceStyle = {
+    ...chartPanelStyle,
+    ...(appearance.candles.down ? { '--pro-candle-down': appearance.candles.down } : {}),
+    ...(appearance.candles.up ? { '--pro-candle-up': appearance.candles.up } : {})
+  }
 
   return (
     <section className="market-chart" ref={chartRef}>
@@ -264,13 +297,17 @@ export default function MarketChart({
       </header>
       {settingsOpen && (
         <ChartSettingsPopover
+          candleColors={appearance.candles}
           liquidity={liquidity}
+          mode={mode}
+          onCandleColorChange={handleCandleColorChange}
           onLiquidityEnabledChange={handleLiquidityEnabledChange}
           onLiquidityIntensityCommit={handleLiquidityIntensityCommit}
           onLiquidityIntensityChange={handleLiquidityIntensityChange}
           onPanelVisibilityChange={handlePanelVisibilityChange}
           panelVisibility={panelVisibility}
           popoverRef={settingsPopoverRef}
+          resetCandleColors={resetCandleColors}
         />
       )}
       <div
@@ -278,7 +315,7 @@ export default function MarketChart({
         data-show-profile={panelVisibility.profile}
         data-show-value-area={panelVisibility.valueArea}
         data-show-volume={panelVisibility.volume}
-        style={chartPanelStyle}
+        style={chartAppearanceStyle}
       >
         <MarketChartSurface
           candleCloseCountdown={candleCloseCountdown}

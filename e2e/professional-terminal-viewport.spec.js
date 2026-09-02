@@ -26,7 +26,8 @@ test('time-axis wheel zoom anchors the latest visible candle', async ({ page }) 
     .poll(async () => Number(await chart.getAttribute('data-visible-count')))
     .toBeLessThan(initialVisibleCount)
   await expect(chart).toHaveAttribute('data-window-end', initialWindowEnd)
-  await expect(chart).toHaveAttribute('data-right-offset', '0')
+  const zoomedVisibleCount = Number(await chart.getAttribute('data-visible-count'))
+  await expect(chart).toHaveAttribute('data-right-offset', String(-zoomedVisibleCount * 0.3))
   await expect(chart).toHaveAttribute('data-follow-latest', 'true')
   await expect.poll(readVisibleProfile).not.toEqual(initialProfile)
 })
@@ -229,7 +230,7 @@ test('timeframe changes maximize future space while drag can restore profile ove
   expect(overlappedGeometry.dataRight).toBeGreaterThan(overlappedGeometry.profileLeft)
 })
 
-test('drag can move current data left of the volume profile in every chart mode', async ({
+test('initial load separates current data from the volume profile in every chart mode', async ({
   page
 }) => {
   const cases = [
@@ -252,18 +253,22 @@ test('drag can move current data left of the volume profile in every chart mode'
       return { dataRight: data.right, profileLeft: profile.left }
     })
 
-    await page.mouse.move(bounds.x + bounds.width * 0.65, bounds.y + bounds.height * 0.45)
+    expect(Number(await chart.getAttribute('data-right-offset'))).toBe(
+      -Number(initialVisibleCount) * 0.3
+    )
+    expect(initialGeometry.dataRight).toBeLessThan(initialGeometry.profileLeft)
+
+    await page.mouse.move(bounds.x + bounds.width * 0.3, bounds.y + bounds.height * 0.45)
     await page.mouse.down()
-    await page.mouse.move(bounds.x + bounds.width * 0.3, bounds.y + bounds.height * 0.45, {
+    await page.mouse.move(bounds.x + bounds.width * 0.62, bounds.y + bounds.height * 0.45, {
       steps: 8
     })
     await page.mouse.up()
 
     await expect
       .poll(async () => Number(await chart.getAttribute('data-right-offset')))
-      .toBeLessThan(0)
+      .toBeGreaterThan(-Number(initialVisibleCount) * 0.3)
     await expect(chart).toHaveAttribute('data-visible-count', initialVisibleCount)
-    await expect(chart).toHaveAttribute('data-follow-latest', 'true')
 
     const shiftedGeometry = await chart.evaluate((node) => {
       const data = node.querySelector('.chart-data-layer').getBoundingClientRect()
@@ -273,9 +278,9 @@ test('drag can move current data left of the volume profile in every chart mode'
       return { dataRight: data.right, profileLeft: profile.left }
     })
     const shiftedVolumeBar = await page.locator('.volume-bar').last().boundingBox()
-    expect(shiftedGeometry.dataRight).toBeLessThan(initialGeometry.dataRight)
-    expect(shiftedGeometry.dataRight).toBeLessThan(shiftedGeometry.profileLeft)
-    expect(shiftedVolumeBar.x).toBeLessThan(initialVolumeBar.x)
+    expect(shiftedGeometry.dataRight).toBeGreaterThan(initialGeometry.dataRight)
+    expect(shiftedGeometry.dataRight).toBeGreaterThan(shiftedGeometry.profileLeft)
+    expect(shiftedVolumeBar.x).toBeGreaterThan(initialVolumeBar.x)
 
     await chart.focus()
     await page.keyboard.press('0')

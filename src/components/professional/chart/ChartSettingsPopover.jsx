@@ -36,14 +36,52 @@ export function LiquidityIntensityControl({ enabled, intensity, onChange, onComm
   )
 }
 
+function semanticColor(token) {
+  if (typeof document === 'undefined') return ''
+  return getComputedStyle(document.documentElement).getPropertyValue(token).trim()
+}
+
+function CandleColorControls({ colors, onChange, onReset }) {
+  return (
+    <fieldset className="chart-candle-color-options">
+      <legend>CANDLES</legend>
+      <label>
+        <span>UP CANDLE</span>
+        <input
+          aria-label="Up candle color"
+          onChange={(event) => onChange('up', event.target.value)}
+          type="color"
+          value={colors.up ?? semanticColor('--pro-buy')}
+        />
+      </label>
+      <label>
+        <span>DOWN CANDLE</span>
+        <input
+          aria-label="Down candle color"
+          onChange={(event) => onChange('down', event.target.value)}
+          type="color"
+          value={colors.down ?? semanticColor('--pro-sell')}
+        />
+      </label>
+      <button className="chart-colors-reset" onClick={onReset} type="button">
+        RESET CANDLE COLORS
+      </button>
+    </fieldset>
+  )
+}
+
 export default function ChartSettingsPopover({
+  candleColors,
   liquidity,
+  mode,
+  onCandleColorChange,
   onLiquidityEnabledChange,
   onLiquidityIntensityCommit,
   onLiquidityIntensityChange,
   onPanelVisibilityChange,
   panelVisibility,
-  popoverRef
+  popoverRef,
+  resetCandleColors
 }) {
   return (
     <aside
@@ -55,6 +93,7 @@ export default function ChartSettingsPopover({
     >
       <strong>CHART SETTINGS</strong>
       <div className="chart-panel-options">
+        <span className="chart-settings-section-label">COMMON</span>
         <label>
           <input
             aria-label="Show visible range volume profile"
@@ -82,21 +121,31 @@ export default function ChartSettingsPopover({
           />
           <span>VOLUME</span>
         </label>
-        <label>
-          <input
-            aria-label="Show liquidity heatmap"
-            checked={liquidity.enabled}
-            onChange={(event) => onLiquidityEnabledChange(event.target.checked)}
-            type="checkbox"
-          />
-          <span>LIQUIDITY HEATMAP</span>
-        </label>
-        <LiquidityIntensityControl
-          enabled={liquidity.enabled}
-          intensity={liquidity.intensity}
-          onCommit={onLiquidityIntensityCommit}
-          onChange={onLiquidityIntensityChange}
-        />
+        {mode === 'candles' && (
+          <>
+            <CandleColorControls
+              colors={candleColors}
+              onChange={onCandleColorChange}
+              onReset={resetCandleColors}
+            />
+            <span className="chart-settings-section-label">CANDLES OVERLAYS</span>
+            <label>
+              <input
+                aria-label="Show liquidity heatmap"
+                checked={liquidity.enabled}
+                onChange={(event) => onLiquidityEnabledChange(event.target.checked)}
+                type="checkbox"
+              />
+              <span>LIQUIDITY HEATMAP</span>
+            </label>
+            <LiquidityIntensityControl
+              enabled={liquidity.enabled}
+              intensity={liquidity.intensity}
+              onCommit={onLiquidityIntensityCommit}
+              onChange={onLiquidityIntensityChange}
+            />
+          </>
+        )}
       </div>
     </aside>
   )

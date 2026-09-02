@@ -94,7 +94,7 @@
 
 .account-risk-view {
   display: grid;
-  grid-template-columns: minmax(360px, 1.15fr) minmax(300px, 0.85fr);
+  grid-template-columns: minmax(390px, 1.25fr) minmax(290px, 0.75fr);
   min-height: 171px;
   background: var(--pro-canvas);
 }
@@ -129,14 +129,15 @@
   font-size: 8px;
 }
 
-.account-metrics {
+.account-performance-summary {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: minmax(112px, 0.8fr) minmax(0, 2.2fr);
   gap: 1px;
   background: var(--pro-subtle);
   border: 1px solid var(--pro-subtle);
 }
 
+.account-primary-metric,
 .account-metric {
   display: grid;
   min-width: 0;
@@ -147,6 +148,7 @@
   background: var(--pro-panel);
 }
 
+.account-primary-metric > span,
 .account-metric > span {
   overflow: hidden;
   color: var(--pro-muted);
@@ -155,9 +157,21 @@
   white-space: nowrap;
 }
 
+.account-primary-metric strong,
 .account-metric strong {
   color: var(--pro-text);
   font: 700 12px 'Roboto Mono', monospace;
+}
+
+.account-primary-metric strong {
+  font-size: 16px;
+}
+
+.account-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--pro-subtle);
 }
 
 .risk-summary-heading strong {
@@ -168,6 +182,10 @@
 .risk-limits {
   display: grid;
   gap: 9px;
+}
+
+.risk-limits--summary {
+  gap: 7px;
 }
 
 .risk-limit {
@@ -201,6 +219,147 @@
   height: 100%;
   background: var(--pro-buy);
   border-radius: inherit;
+}
+
+.account-details-trigger {
+  min-height: 26px;
+  margin-top: 9px;
+  padding: 0 10px;
+  color: var(--pro-text);
+  background: var(--pro-raised);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 700 9px 'Roboto Mono', monospace;
+}
+
+.account-details-trigger:hover,
+.account-details-trigger:focus-visible {
+  color: var(--pro-on-accent);
+  background: var(--pro-accent);
+  border-color: var(--pro-accent);
+  outline: none;
+}
+
+.account-details-backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: color-mix(in srgb, var(--pro-canvas) 82%, transparent);
+}
+
+.account-details-dialog {
+  width: min(780px, calc(100vw - 64px));
+  max-height: calc(100dvh - 64px);
+  overflow: auto;
+  color: var(--pro-text);
+  background: var(--pro-panel);
+  border: 1px solid var(--pro-strong);
+  box-shadow: var(--pro-popover-shadow);
+}
+
+.activity .account-details-dialog > header {
+  display: flex;
+  height: auto;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--pro-raised);
+  border-bottom: 1px solid var(--pro-border);
+}
+
+.activity .account-details-dialog > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.account-details-dialog header span,
+.account-details-dialog h3 {
+  color: var(--pro-muted);
+  font: 700 9px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.account-details-dialog h2,
+.account-details-dialog h3 {
+  margin: 0;
+}
+
+.account-details-dialog h2 {
+  font: 700 14px Inter, sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.account-details-dialog header button {
+  height: 28px;
+  padding: 0 10px;
+  color: var(--pro-muted);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 700 9px 'Roboto Mono', monospace;
+}
+
+.account-details-dialog header button:hover,
+.account-details-dialog header button:focus-visible {
+  color: var(--pro-text);
+  border-color: var(--pro-accent);
+  outline: none;
+}
+
+.account-details-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
+  gap: 1px;
+  background: var(--pro-subtle);
+}
+
+.account-details-content > section {
+  padding: 16px;
+  background: var(--pro-panel);
+}
+
+.account-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 10px;
+  gap: 1px;
+  background: var(--pro-subtle);
+  border: 1px solid var(--pro-subtle);
+}
+
+.account-details-grid > div {
+  display: grid;
+  min-height: 52px;
+  align-content: center;
+  padding: 8px;
+  gap: 5px;
+  background: var(--pro-canvas);
+}
+
+.account-details-grid span {
+  color: var(--pro-muted);
+  font-size: 9px;
+}
+
+.account-details-grid strong {
+  font: 700 11px 'Roboto Mono', monospace;
+}
+
+.account-details-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.account-details-section-heading > strong {
+  color: var(--pro-buy);
+  font: 700 9px 'Roboto Mono', monospace;
 }
 
 .terminal-footer {

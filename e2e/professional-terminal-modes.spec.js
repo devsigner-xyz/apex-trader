@@ -7,11 +7,17 @@ for (const [route, mode] of terminalViews) {
   test(`${mode} matches the professional terminal contract`, async ({ page }) => {
     const errors = []
     page.on('console', (message) => {
-      if (message.type() === 'error') errors.push(message.text())
+      if (message.type() === 'error') {
+        const source = message.location().url
+        errors.push(source ? `${message.text()} (${source})` : message.text())
+      }
     })
     page.on('pageerror', (error) => errors.push(error.message))
+    await page.route('https://umami-production-6a0a.up.railway.app/script.js', (route) =>
+      route.fulfill({ body: '', contentType: 'application/javascript' })
+    )
     await page.goto(route)
-    await expect(page.getByText('APEX TRADER', { exact: true })).toBeVisible()
+    await expect(page.getByRole('img', { name: 'Apex Trader' })).toBeVisible()
     await expect(page.getByLabel(`${mode} historical chart`)).toBeVisible()
     await expectFooterContract(page, expect)
     await expect(page.locator('.window-label')).toHaveCount(0)
@@ -32,7 +38,10 @@ for (const [route, mode] of terminalViews) {
     const domHeader = dom.locator('header')
     const tapeHeader = tape.locator(':scope > header')
     await expect(activity).toBeVisible()
-    await expect(marketHeader).toContainText('APEX TRADER')
+    await expect(marketHeader.getByRole('img', { name: 'Apex Trader' })).toHaveAttribute(
+      'src',
+      '/media/apex-trader.svg'
+    )
     await expect(marketHeader.locator('select')).toHaveCount(0)
     await expect(page.getByLabel('Market', { exact: true })).toHaveCount(0)
     await expect(chartControls.locator('select')).toHaveCount(2)
@@ -113,6 +122,24 @@ for (const [route, mode] of terminalViews) {
       })
     expect(Math.abs(priceAxisPadding.left - priceAxisPadding.right)).toBeLessThanOrEqual(4)
     await expect(page.locator('.current-price-countdown')).toHaveText(/CLOSE \d{2}:\d{2}/)
+    const currentPriceContrast = await page.locator('.current-price-tag').evaluate((tag) => {
+      const rootStyle = getComputedStyle(document.documentElement)
+      const svg = tag.ownerSVGElement
+      const probe = document.createElement('span')
+      probe.style.color = rootStyle.getPropertyValue('--pro-on-accent').trim()
+      document.body.append(probe)
+      const expectedText = getComputedStyle(probe).color
+      probe.remove()
+      return {
+        countdown: getComputedStyle(svg.querySelector('.current-price-countdown')).fill,
+        expectedText,
+        price: getComputedStyle(svg.querySelector('.current-price-text')).fill,
+        tag: getComputedStyle(tag).fill
+      }
+    })
+    expect(currentPriceContrast.price).toBe(currentPriceContrast.expectedText)
+    expect(currentPriceContrast.countdown).toBe(currentPriceContrast.expectedText)
+    expect(currentPriceContrast.price).not.toBe(currentPriceContrast.tag)
     await expect(page.locator('.chart-summary > span')).toHaveCount(1)
     await expect(page.locator('.chart-summary')).toContainText(/O .* H .* L .* C .* Δ .* V /)
     await expect(page.getByText(/VOLUME · ALIGNED TO PRICE BARS/i)).toHaveCount(0)

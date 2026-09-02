@@ -11,7 +11,7 @@ export default function LandingPage() {
 
       <header className="landing-header">
         <a className="landing-brand" href="/" aria-label="Apex Trader home">
-          APEX TRADER
+          <img alt="" height="243" src="/media/apex-trader.svg" width="1552" />
         </a>
         <nav className="landing-nav" aria-label="Apex Trader primary navigation">
           <a href="/storybook/">Component library</a>

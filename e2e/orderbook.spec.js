@@ -160,6 +160,28 @@ test.describe('Professional historical order flow', () => {
     const countdownBefore = await countdown.textContent()
     const firstTradeBefore = await page.locator('.tape > button').first().textContent()
     const groupsBefore = Number(await page.locator('.dom').getAttribute('data-groups-applied'))
+    const tradeRows = page.locator('.tape > .tape-row')
+    const initialRows = await tradeRows.evaluateAll((rows) =>
+      rows.map((row) => {
+        const style = getComputedStyle(row)
+        return {
+          flexBasis: style.flexBasis,
+          flexGrow: style.flexGrow,
+          height: row.getBoundingClientRect().height,
+          maxHeight: style.maxHeight,
+          minHeight: style.minHeight
+        }
+      })
+    )
+    const initialRowHeights = initialRows.map(({ height }) => height)
+    expect(initialRowHeights.length).toBeGreaterThan(0)
+    expect(new Set(initialRowHeights.map((height) => height.toFixed(3))).size).toBe(1)
+    expect(initialRows[0]).toMatchObject({
+      flexBasis: '26px',
+      flexGrow: '0',
+      maxHeight: '26px',
+      minHeight: '26px'
+    })
 
     await expect(countdown).not.toHaveText(countdownBefore)
     await expect(page.locator('.tape > button').first()).not.toHaveText(firstTradeBefore, {
@@ -170,6 +192,11 @@ test.describe('Professional historical order flow', () => {
         timeout: 10_000
       })
       .toBeGreaterThan(groupsBefore)
+    const updatedRowHeights = await tradeRows.evaluateAll((rows) =>
+      rows.map((row) => row.getBoundingClientRect().height)
+    )
+    expect(new Set(updatedRowHeights.map((height) => height.toFixed(3))).size).toBe(1)
+    expect(updatedRowHeights[0]).toBeCloseTo(initialRowHeights[0], 3)
   })
 
   test('filters Time and Sales by aggressor from its settings', async ({ page }) => {

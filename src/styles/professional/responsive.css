@@ -13,6 +13,100 @@
   }
 }
 
+.demo-viewport-notice {
+  display: none;
+}
+
+@media (max-width: 767px), (max-width: 1399px) and (hover: none) and (pointer: coarse) {
+  .demo-viewport-notice {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    overflow: auto;
+    color: var(--pro-text);
+    background: var(--pro-canvas);
+  }
+
+  .demo-viewport-notice__card {
+    width: min(720px, 100%);
+    overflow: hidden;
+    background: var(--pro-panel);
+    border: 1px solid var(--pro-border);
+    box-shadow: var(--pro-popover-shadow);
+  }
+
+  .demo-viewport-notice__video {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--pro-top);
+    border-bottom: 1px solid var(--pro-border);
+  }
+
+  .demo-viewport-notice__video video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .demo-viewport-notice__content {
+    display: grid;
+    padding: clamp(20px, 6vw, 38px);
+    gap: 14px;
+  }
+
+  .demo-viewport-notice__content > span {
+    color: var(--pro-accent);
+    font: 700 10px Inter, sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  .demo-viewport-notice__content h1,
+  .demo-viewport-notice__content p {
+    margin: 0;
+  }
+
+  .demo-viewport-notice__content h1 {
+    max-width: 20ch;
+    font: 700 clamp(20px, 6vw, 32px) Inter, sans-serif;
+    line-height: 1.05;
+  }
+
+  .demo-viewport-notice__content p {
+    max-width: 58ch;
+    color: var(--pro-muted);
+    font: 500 12px Inter, sans-serif;
+    line-height: 1.55;
+  }
+
+  .demo-viewport-notice__content a {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    padding: 0 14px;
+    color: var(--pro-on-accent);
+    background: var(--pro-accent);
+    border: 1px solid var(--pro-accent);
+    border-radius: 3px;
+    font: 700 10px Inter, sans-serif;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+
+  .demo-viewport-notice__content a:hover,
+  .demo-viewport-notice__content a:focus-visible {
+    background: color-mix(in srgb, var(--pro-accent) 88%, var(--pro-text));
+    outline: 2px solid var(--pro-accent);
+    outline-offset: 3px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;

@@ -45,7 +45,13 @@ export default function ProfessionalTerminal({ mode, onMode, playback }) {
   return (
     <div className="pro-terminal">
       <header className="market-header">
-        <strong>APEX TRADER</strong>
+        <img
+          alt="Apex Trader"
+          className="market-header__brand"
+          height="243"
+          src="/media/apex-trader.svg"
+          width="1552"
+        />
       </header>
       <div className="terminal-workspace" style={workspaceStyle}>
         <Watchlist />

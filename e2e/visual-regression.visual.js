@@ -63,6 +63,30 @@ test('resized volume panel visual contract', async ({ page }) => {
   await expect(stack).toHaveScreenshot('volume-panel-resized.png', screenshotOptions)
 })
 
+test('Account and Risk summary visual contract', async ({ page }) => {
+  await gotoStablePage(page, '/demo')
+  await page.getByRole('tab', { name: 'ACCOUNT & RISK' }).click()
+  const activity = page.getByLabel('Orders and positions')
+  await expect(page.getByRole('button', { name: 'VIEW MORE' })).toBeVisible()
+  await expect(activity).toHaveScreenshot('account-risk-summary.png', screenshotOptions)
+})
+
+test('Account and Risk details visual contract', async ({ page }) => {
+  await gotoStablePage(page, '/demo')
+  await page.getByRole('tab', { name: 'ACCOUNT & RISK' }).click()
+  await page.getByRole('button', { name: 'VIEW MORE' }).click()
+  await expect(page.getByRole('dialog', { name: 'ACCOUNT & RISK DETAILS' })).toBeVisible()
+  await expect(page).toHaveScreenshot('account-risk-details.png', screenshotOptions)
+})
+
+test('mobile workstation notice visual contract', async ({ page }) => {
+  await gotoStablePage(page, '/demo', { height: 844, width: 390 })
+  await expect(
+    page.getByRole('dialog', { name: 'APEX TRADER ESTÁ PENSADO PARA ESCRITORIO' })
+  ).toBeVisible()
+  await expect(page).toHaveScreenshot('demo-mobile-workstation-notice.png', screenshotOptions)
+})
+
 test('landing desktop visual contract', async ({ page }) => {
   await gotoStablePage(page, '/')
   const landing = page.locator('main')

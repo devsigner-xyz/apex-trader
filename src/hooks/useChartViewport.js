@@ -18,7 +18,9 @@ export function useChartViewport({
   plotRatio = 1,
   timeframe
 }) {
-  const [rightOffset, setRightOffset] = useState(0)
+  const [rightOffset, setRightOffset] = useState(() =>
+    deriveMinimumChartOffset(defaultVisibleCount, futureSpaceRatio)
+  )
   const [visibleCount, setVisibleCount] = useState(defaultVisibleCount)
   const [followLatest, setFollowLatest] = useState(true)
   const [dragging, setDragging] = useState(false)
@@ -53,10 +55,9 @@ export function useChartViewport({
   useEffect(() => {
     const previous = previousConfiguration.current
     if (previous.mode === mode && previous.timeframe === timeframe) return
-    if (previous.timeframe !== timeframe) separateViewport()
-    else resetViewport()
+    if (previous.mode !== mode || previous.timeframe !== timeframe) separateViewport()
     previousConfiguration.current = { mode, timeframe }
-  }, [mode, resetViewport, separateViewport, timeframe])
+  }, [mode, separateViewport, timeframe])
 
   useEffect(() => {
     const normalizedOffset = isChartOffsetAtLatest(safeOffset) ? 0 : safeOffset

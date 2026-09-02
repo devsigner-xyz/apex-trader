@@ -1,10 +1,14 @@
 ---
 status: current
-last_verified: 2026-08-29
+last_verified: 2026-09-02
 owners: product-design-engineering
 ---
 
 # Panel patterns
+
+El header global de la terminal conserva 44 px de altura y presenta el wordmark vectorial de Apex
+Trader a 118 px de ancho. El logo sustituye al nombre compuesto con tipografía de interfaz y no
+añade controles ni metadata a esa franja.
 
 ## Headers contextuales
 
@@ -40,7 +44,8 @@ temporal como popovers, focos o asas; no se apilan dos bordes en una misma unió
 | Contexto     | Control                        | Persistencia       |
 | ------------ | ------------------------------ | ------------------ |
 | Markets      | Checkboxes con obligatorios    | Persistente        |
-| Chart        | Tres checkboxes independientes | Persistente        |
+| Chart común  | Profile, value area y volumen  | Persistente        |
+| Candles      | Color up/down y heatmap         | Persistente        |
 | DOM          | Select de grouping             | Transitorio actual |
 | Time & Sales | Radio single-select            | Transitorio        |
 
@@ -48,7 +53,9 @@ Una medida única de ancho/anclaje sigue sin normalizar.
 
 ## Tablas y vistas
 
-Cada tab declara columnas, acciones, vacío, densidad y disclosure. Account & Risk usa métricas y límites, no una tabla genérica.
+Cada tab declara columnas, acciones, vacío, densidad y disclosure. Account & Risk usa un resumen
+jerarquizado y un modal de detalle, no una tabla genérica. El CTA del resumen abre un dialog modal,
+mueve foco a su cierre, atrapa Tab, cierra con Escape o backdrop y restaura foco al CTA.
 
 La tab bar de Activity usa roving `tabIndex`: la seleccionada tiene `0` y las demás `-1`.
 ArrowLeft/ArrowRight circulan y activan la tab anterior/siguiente; Home y End activan los extremos.
@@ -75,4 +82,14 @@ VAH, POC y VAL son independientes de las barras:
 
 La demostración se identifica coherentemente. No uses verde como “live” para datos simulados.
 
-La terminal es una workstation horizontal. Hasta decidir otra cosa, 1920 px es el ancho recomendado y por debajo se conserva scroll horizontal. Un layout compacto debe especificar paneles plegados, estado y recuperación de foco.
+La terminal es una workstation horizontal. 1920 px es el ancho recomendado. En viewports móviles
+y dispositivos tablet de puntero coarse, una capa bloqueante muestra el replay de la home, explica
+la restricción desktop y ofrece el CTA al case study. No se presenta el scroll horizontal como una
+solución responsive.
+
+Time & Sales conserva filas de 26 px con `flex-grow: 0`: una lista corta deja espacio vacío debajo
+y nunca redistribuye la altura disponible entre sus trades.
+
+Cuando una superficie usa `accent` o el cream oficial como fondo, su texto usa `on-accent` oscuro.
+El current-price tag, su precio y countdown aplican juntos este contrato; no se permite texto blanco
+sobre ese fondo.

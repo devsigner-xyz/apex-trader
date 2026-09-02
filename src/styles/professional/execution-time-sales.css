@@ -183,8 +183,9 @@
 }
 
 .tape-row {
-  min-height: 22px;
-  flex: 1 1 26px;
+  min-height: 26px;
+  max-height: 26px;
+  flex: 0 0 26px;
   width: 100%;
   color: var(--pro-muted);
   background: transparent;

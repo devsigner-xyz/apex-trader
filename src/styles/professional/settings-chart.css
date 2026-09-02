@@ -24,6 +24,59 @@
   gap: 2px;
 }
 
+.chart-settings-section-label,
+.chart-candle-color-options legend {
+  display: block;
+  margin: 8px 5px 4px;
+  color: var(--pro-muted);
+  font: 700 9px Inter, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.chart-settings-section-label:first-child {
+  margin-top: 0;
+}
+
+.chart-candle-color-options {
+  display: grid;
+  padding: 0;
+  border: 0;
+}
+
+.chart-candle-color-options legend {
+  width: calc(100% - 10px);
+}
+
+.chart-panel-options .chart-candle-color-options label {
+  grid-template-columns: minmax(0, 1fr) 28px;
+}
+
+.chart-panel-options input[type='color'] {
+  width: 28px;
+  height: 22px;
+  padding: 2px;
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.chart-colors-reset {
+  min-height: 28px;
+  margin: 4px 5px 2px;
+  color: var(--pro-muted);
+  background: var(--pro-canvas);
+  border: 1px solid var(--pro-border);
+  border-radius: 2px;
+  font: 700 9px 'Roboto Mono', monospace;
+}
+
+.chart-colors-reset:hover,
+.chart-colors-reset:focus-visible {
+  color: var(--pro-text);
+  border-color: var(--pro-accent);
+}
+
 .chart-panel-options label {
   display: grid;
   grid-template-columns: 16px minmax(0, 1fr);
