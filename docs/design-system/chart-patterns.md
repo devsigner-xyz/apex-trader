@@ -22,13 +22,17 @@ En hover, la toolbar sustituye temporalmente los valores de la barra actual por 
 
 Chart settings permite sustituir de forma independiente los colores de velas `up` y `down`. La
 preferencia es propia de Candles, persiste entre sesiones y puede volver a los tokens semánticos del
-sistema sin modificar Footprint o Step Profile.
+sistema sin modificar Footprint o Step Profile. Si el panel de volumen está visible, sus barras
+`up` y `down` usan el mismo par de colores.
 
 ## Footprint
 
 Cada barra precio-tiempo distribuye las ejecuciones por nivel de precio. El lado bid representa ventas agresivas ejecutadas contra bids y el lado ask compras agresivas ejecutadas contra asks.
 
 Las celdas permiten leer volumen bid/ask, imbalance, delta y POC local del intervalo. No debe describirse como una reconstrucción visual del libro de órdenes: representa operaciones ejecutadas.
+
+Footprint no expone preferencias de color. Su delta y las barras del panel de volumen, si está
+visible, conservan los tokens semánticos de compra y venta del sistema.
 
 La vista permite entre 4 y 13 barras. En el zoom-out máximo, cada mitad bid/ask reserva ancho suficiente para su valor compacto y padding; el texto no desborda la celda ni invade la barra vecina.
 
@@ -40,7 +44,9 @@ Se diferencia del Volume Profile de rango en que Step Profile genera una distrib
 
 Chart settings permite sustituir de forma independiente los colores de los perfiles `bid` y `ask`.
 La preferencia es propia de Step Profile, persiste entre sesiones y puede volver a los tokens
-semánticos del sistema sin modificar Candles o Footprint.
+semánticos del sistema sin modificar Candles o Footprint. El delta positivo toma el color `bid` y
+el negativo el color `ask`; si el panel de volumen está visible, sus barras ascendentes y
+descendentes usan respectivamente ese mismo par.
 
 La vista permite entre 1 y 12 barras. El ancho central, los valores y los perfiles laterales mantienen una caja mínima legible en el zoom-out máximo y no se solapan con el siguiente intervalo.
 

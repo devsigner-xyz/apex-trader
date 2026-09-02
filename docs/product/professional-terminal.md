@@ -48,7 +48,11 @@ permanecen visibles en todos los modos. Candles añade sus colores `up` y `down`
 intensidad. Step Profile añade colores independientes para sus perfiles `bid` y `ask`. Los colores
 aceptan selección libre, persisten en `apex-trader:chart-appearance:v1` bajo `candles` o
 `stepProfile` y pueden volver a los tokens semánticos del sistema. Footprint no hereda ninguno de
-esos valores y todavía no expone settings de color.
+esos valores y todavía no expone settings de color. Cuando el panel inferior está visible, sus
+barras siguen el par de colores del modo activo: `up`/`down` en Candles y `bid`/`ask` en Step
+Profile. En Step Profile, el delta positivo usa `bid` y el negativo usa `ask`, igual que el
+perfil; en Footprint tanto el delta como las barras de volumen conservan los tokens semánticos del
+sistema.
 
 ### Ventana de replay
 

@@ -31,6 +31,8 @@
   --pro-candle-down: var(--pro-sell);
   --pro-step-profile-bid: var(--pro-buy);
   --pro-step-profile-ask: var(--pro-sell);
+  --pro-chart-positive: var(--pro-buy);
+  --pro-chart-negative: var(--pro-sell);
   --pro-dom-ask-volume: rgb(225 91 100 / 0.25);
   --pro-dom-bid-volume: rgb(47 182 124 / 0.25);
   --pro-action-buy: #226f55;

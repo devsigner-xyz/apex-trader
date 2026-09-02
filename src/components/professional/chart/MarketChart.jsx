@@ -297,8 +297,27 @@ export default function MarketChart({
     })
   }
   const summaryBar = bars[hoveredBarIndex] ?? current
+  const activeModeColorStyle =
+    mode === 'candles'
+      ? {
+          ...(appearance.candles.down
+            ? { '--pro-chart-negative': appearance.candles.down }
+            : {}),
+          ...(appearance.candles.up ? { '--pro-chart-positive': appearance.candles.up } : {})
+        }
+      : mode === 'step-profile'
+        ? {
+            ...(appearance.stepProfile.ask
+              ? { '--pro-chart-negative': appearance.stepProfile.ask }
+              : {}),
+            ...(appearance.stepProfile.bid
+              ? { '--pro-chart-positive': appearance.stepProfile.bid }
+              : {})
+          }
+        : {}
   const chartAppearanceStyle = {
     ...chartPanelStyle,
+    ...activeModeColorStyle,
     ...(appearance.candles.down ? { '--pro-candle-down': appearance.candles.down } : {}),
     ...(appearance.candles.up ? { '--pro-candle-up': appearance.candles.up } : {}),
     ...(appearance.stepProfile.ask

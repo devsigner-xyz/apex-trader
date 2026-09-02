@@ -87,6 +87,12 @@ test('chart settings keep common controls and scope colors to each supported mod
   expect(
     await page.locator('.market-chart .up rect').first().evaluate((node) => getComputedStyle(node).fill)
   ).toBe('rgb(51, 85, 119)')
+  expect(
+    await page.locator('.volume-up').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(51, 85, 119)')
+  expect(
+    await page.locator('.volume-down').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(136, 68, 34)')
 
   await page.getByLabel('Chart mode').selectOption('footprint')
   await expect(page).toHaveURL(/\/demo\/footprint$/)
@@ -95,6 +101,12 @@ test('chart settings keep common controls and scope colors to each supported mod
   await expect(page.getByLabel('Up candle color')).toHaveCount(0)
   await expect(page.getByLabel('Step profile bid color')).toHaveCount(0)
   await expect(page.getByLabel('Show liquidity heatmap')).toHaveCount(0)
+  expect(
+    await page.locator('.volume-up').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(47, 182, 124)')
+  expect(
+    await page.locator('.volume-down').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(225, 91, 100)')
 
   await page.getByLabel('Chart mode').selectOption('step-profile')
   await expect(page).toHaveURL(/\/demo\/step-profile$/)
@@ -122,6 +134,24 @@ test('chart settings keep common controls and scope colors to each supported mod
       .locator('.step-profile-ask')
       .first()
       .evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(18, 52, 86)')
+  expect(
+    await page
+      .locator('.step-delta.positive-fill')
+      .first()
+      .evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(221, 238, 255)')
+  expect(
+    await page
+      .locator('.step-delta.negative-fill')
+      .first()
+      .evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(18, 52, 86)')
+  expect(
+    await page.locator('.volume-up').first().evaluate((node) => getComputedStyle(node).fill)
+  ).toBe('rgb(221, 238, 255)')
+  expect(
+    await page.locator('.volume-down').first().evaluate((node) => getComputedStyle(node).fill)
   ).toBe('rgb(18, 52, 86)')
 
   await page.getByLabel('Chart mode').selectOption('candles')

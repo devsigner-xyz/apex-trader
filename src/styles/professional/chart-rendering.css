@@ -233,19 +233,19 @@
 }
 
 .positive-fill {
-  fill: var(--pro-buy);
+  fill: var(--pro-chart-positive);
 }
 
 .negative-fill {
-  fill: var(--pro-sell);
+  fill: var(--pro-chart-negative);
 }
 
 .volume-up {
-  fill: var(--pro-buy);
+  fill: var(--pro-chart-positive);
 }
 
 .volume-down {
-  fill: var(--pro-sell);
+  fill: var(--pro-chart-negative);
 }
 
 .poc-line {
