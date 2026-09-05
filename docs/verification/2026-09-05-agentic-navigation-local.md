@@ -4,7 +4,7 @@ last_verified: 2026-09-05
 owners: product-design-engineering
 ---
 
-# Agentic navigation - local verification
+# Agentic navigation - production verification
 
 ## Baseline pública
 
@@ -38,4 +38,13 @@ Lighthouse 13.4.1 contra el build servido localmente dio 100 en Agentic Browsing
 `llms-txt` obtuvo 1 y mostró `llms.txt follows recommendations`, sin detalles de error.
 
 También pasaron `pnpm run check:docs`, `pnpm run lint`, los 21 tests unitarios, `pnpm run build` y
-`git diff --check`. La corrección está validada localmente y pendiente de publicación.
+`git diff --check`.
+
+El commit funcional `6ace8232b9b305790997fb5c77b89f2befa5f56a` llegó al deployment Railway
+`85b0d887-0983-4778-b4a2-f4b583386a01` con estado `SUCCESS`. En producción, `/llms.txt` responde
+HTTP 200 como `text/plain; charset=utf-8`, `/index.md` responde HTTP 200 como
+`text/markdown; charset=utf-8` y la landing publica ambas relaciones de descubrimiento.
+
+La repetición de Lighthouse 13.4.1 contra `https://apex.devsigner.xyz/` dio 100 en Agentic Browsing.
+La auditoría `llms-txt` obtuvo 1 y mostró `llms.txt follows recommendations`, sin detalles de error.
+La corrección está publicada y verificada en producción.
