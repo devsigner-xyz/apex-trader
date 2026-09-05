@@ -4,7 +4,7 @@ last_verified: 2026-09-05
 owners: product-design-engineering
 ---
 
-# Landing PageSpeed optimization - local verification
+# Landing PageSpeed optimization - production verification
 
 ## Alcance y límite
 
@@ -83,7 +83,25 @@ flash sin estilos o riesgo de CLS.
   captura.
 - `git diff --check`: correcto.
 
+## Resultado publicado
+
+El commit de implementación `4cc9d31b15d5c59017b0b1f24216c4eba8fc0828` llegó al despliegue Railway
+`eab4497c-04a8-44fe-9771-5589b47c7eca` con estado `SUCCESS`.
+
+Una nueva medición móvil de Lighthouse 13.4.1 contra `https://apex.devsigner.xyz/` produjo 99 en
+Performance y 100 en Accessibility, Best Practices y SEO, con FCP de 1,6 s, LCP de 2,0 s, TBT de
+0 ms, CLS de 0 y 10 solicitudes. El diagnóstico confirmó que el poster LCP es descubrible desde el
+HTML inicial, recibe `fetchpriority="high"` y no usa carga diferida.
+
+La verificación pública confirmó además:
+
+- `/` y `/demo` responden HTTP 200.
+- `/robots.txt` responde como texto válido; Cloudflare antepone sus directivas administradas.
+- Ambos derivados AVIF responden como `image/avif` con caché inmutable de un año.
+- A 390 × 844 el navegador descarga solo `hero-terminal-candles-800.avif`.
+- La landing renderiza el hero completo sin errores de consola.
+
 ## Estado
 
-La mejora está verificada solo en local. No se ha hecho commit, push ni despliegue y las métricas de
-producción continúan describiendo el baseline hasta una publicación autorizada.
+La mejora está publicada y verificada en producción. Los archivos de vídeo permanecen idénticos a
+la revisión anterior.
