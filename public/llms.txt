@@ -1,0 +1,22 @@
+# Apex Trader
+
+> Apex Trader is a desktop-only interactive portfolio demo for exploring how price, traded volume, order flow, liquidity and the tape relate within a market session.
+
+Use the Markdown overview for concise product context. Apex Trader is not a broker, does not provide live trading and does not represent its interface fixtures as live market data.
+
+## Product
+
+- [Apex Trader overview](https://apex.devsigner.xyz/index.md): Clean Markdown version of the public product overview, core views and limitations.
+- [Public landing](https://apex.devsigner.xyz/): Human-readable introduction to the workstation and its market views.
+- [Interactive demo](https://apex.devsigner.xyz/demo): Desktop-only workstation demo starting in Candles mode.
+
+## Chart views
+
+- [Candles](https://apex.devsigner.xyz/demo): Price direction and traded-volume context.
+- [Footprint](https://apex.devsigner.xyz/demo/footprint): Bid and ask execution at each price level.
+- [Step Profile](https://apex.devsigner.xyz/demo/step-profile): Participation distributed across price within each bar.
+
+## Optional
+
+- [Component library](https://apex.devsigner.xyz/storybook/): Isolated Apex Trader interface components and deterministic examples.
+- [Devsigner](https://devsigner.xyz/): Public portfolio behind the Apex Trader case study.

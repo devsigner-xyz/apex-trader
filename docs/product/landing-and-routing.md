@@ -85,6 +85,21 @@ experiencia si Umami todavía no está disponible. La instrumentación se limita
 No se envían precios, tamaños, ticks, posiciones del cursor, movimientos de pan/zoom, contenido del
 prompt ni actividad automática del replay.
 
+## Navegación agentica
+
+La raíz pública expone `public/llms.txt` como un índice Markdown breve y estructurado para agentes.
+Empieza por un H1, continúa con un resumen en blockquote y organiza los recursos mediante H2 y listas
+de enlaces descriptivos. `public/index.md` ofrece una versión limpia y legible por agentes de la
+presentación del producto, sus vistas, rutas y límites.
+
+`index.html` declara `rel="describedby"` hacia `/llms.txt` y `rel="alternate"` con
+`type="text/markdown"` hacia `/index.md`. Estos recursos son contenido público de descubrimiento, no
+instrucciones privilegiadas, y no sustituyen la política de rastreo de `robots.txt`.
+
+La prueba `tests/llmsTxt.test.js` conserva las condiciones comprobadas por Lighthouse: al menos 50
+caracteres, un H1 y un enlace Markdown. También fija el orden recomendado de título y resumen y las
+relaciones de descubrimiento del HTML.
+
 ## Biblioteca de componentes
 
 `pnpm run storybook` abre el explorador local en el puerto 6006. `pnpm run build:storybook` genera su salida en `dist/storybook`; el build de producción lo ejecuta después de Vite para publicar la ruta `/storybook/` junto con la landing. Las historias Canvas importan los estilos ejecutables de Apex y presentan fixtures locales; no cargan el replay histórico ni solicitan assets bajo `/data/tardis/**`. El catálogo cubre foundations, las seis variantes activas de MarketChart (Candles, Footprint y Step Profile con volumen mostrado u oculto), las cinco vistas de Activity y el panel/matriz de ejecución. Line no se publica como modo activo: permanece como variante Figma legado.
