@@ -80,7 +80,7 @@ test('every remaining exported product image loads when its section enters the v
   await page.goto('/')
   const replay = page.locator('.landing-mode-carousel__video')
   await expect(replay).toHaveCount(1)
-  await expect(replay).toHaveAttribute('poster', '/media/hero-terminal-candles.png')
+  await expect(replay).toHaveAttribute('poster', '/media/hero-terminal-candles.avif')
   await expect(replay.locator('source[type="video/mp4"]')).toHaveAttribute(
     'src',
     '/media/hero-replay.mp4'
@@ -94,6 +94,16 @@ test('every remaining exported product image loads when its section enters the v
     .toEqual({ height: 900, width: 1600 })
   await expect(replay).toHaveCSS('object-fit', 'contain')
   await expect(page.locator('.landing-mode-carousel')).toHaveCSS('border-top-width', '1px')
+})
+
+test('hero replay uses the compact AVIF poster on mobile', async ({ page }) => {
+  await page.setViewportSize({ height: 844, width: 390 })
+  await page.goto('/')
+
+  await expect(page.locator('.landing-mode-carousel__video')).toHaveAttribute(
+    'poster',
+    '/media/hero-terminal-candles-800.avif'
+  )
 })
 
 test('hero replay rotates through the three chart modes and supports manual control', async ({
@@ -221,7 +231,7 @@ test('isolated market primitives load near the viewport without mounting the wor
     await expect(backdrop).toHaveCSS('background-image', /linear-gradient/)
     await expect(backdrop).toHaveCSS('mask-image', 'none')
     await expect(backdrop).toHaveCSS('animation-name', 'none')
-    await expect(row).toHaveCSS('box-shadow', /rgb\(0, 0, 0\)/)
+    await expect(row).toHaveCSS('box-shadow', 'rgba(0, 0, 0, 0.28) 0px 14px 28px 0px')
     await expect(row).toHaveCSS('border-top-width', '1px')
     await expect(row).toHaveCSS('border-radius', '16px')
     await expect(row).toHaveCSS('background-color', 'rgb(20, 26, 31)')

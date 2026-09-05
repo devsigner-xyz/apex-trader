@@ -20,7 +20,7 @@ export default function DeferredMarketPrimitivesShowcase() {
         setShouldLoad(true)
         observer.disconnect()
       },
-      { rootMargin: '500px 0px', threshold: 0 }
+      { rootMargin: '240px 0px', threshold: 0 }
     )
     observer.observe(root)
     return () => observer.disconnect()

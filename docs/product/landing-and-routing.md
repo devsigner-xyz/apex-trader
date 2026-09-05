@@ -95,17 +95,25 @@ La landing no importa ni inicializa `ProfessionalTerminal` ni `useProfessionalPl
 `DemoPage` se carga mediante `React.lazy` y es el único propietario del hook de replay. Visitar `/`
 no debe solicitar ningún asset bajo `/data/tardis/**`.
 
-`MarketPrimitivesShowcase` vive en un chunk lazy propio. Un `IntersectionObserver` permite
-solicitarlo solo cuando la sección se aproxima al viewport; sus fixtures compactos son locales y no
+`MarketPrimitivesShowcase` vive en un chunk lazy propio. Un `IntersectionObserver` con 240 px de
+margen permite solicitarlo solo cuando la sección se aproxima al viewport; sus fixtures compactos son locales y no
 activan manifest, book, trades ni tiles del replay. Reutiliza las capas SVG reales de Candles,
 Footprint y Step Profile, la geometría del Volume Profile y filas compartidas de DOM/Time & Sales,
 pero no monta `.market-chart`, resizers ni paneles vecinos. DOM y Time & Sales sí conservan su
 context header y su settings popover real porque ambos controles modifican el módulo aislado.
 
+La hoja profesional completa se carga junto con `DemoPage` o `MarketPrimitivesShowcase`, no en el
+entry inicial de la landing. El primer render conserva solo tokens, globals, foundation y estilos de
+marketing; cuando se monta una superficie profesional, Vite solicita su hoja diferida antes de
+mostrar el componente.
+
 El runtime de la landing referencia `hero-replay.mp4` y `hero-replay.webm` en `public/media/`. El
 vídeo es una grabación 1600 × 900 de la aplicación real, conserva la workstation completa y recorre
-Candles, Footprint y Step Profile en un loop de 12,12 s. El poster `hero-terminal-candles.png` cubre
-la carga inicial y el fallback del navegador. El contenedor mantiene su proporción 16:9 y usa
+Candles, Footprint y Step Profile en un loop de 12,12 s. Los posters
+`hero-terminal-candles.avif` y `hero-terminal-candles-800.avif` cubren la carga inicial y el fallback
+del navegador; el HTML los descubre mediante un preload responsive con prioridad alta. El PNG
+original permanece como fuente preservada, pero no forma parte de la carga de la landing. El
+contenedor mantiene su proporción 16:9 y usa
 `object-fit: contain`, también en mobile, para no recortar paneles. Los exports históricos no
 referenciados permanecen físicamente en `public/media/`; esta iniciativa no autoriza borrarlos.
 

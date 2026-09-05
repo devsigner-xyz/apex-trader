@@ -110,7 +110,9 @@ siguientes alternan ese orden:
 - En mobile el layout pasa a una columna manteniendo la proporción de cada visual. No hay zoom de una
   terminal de 1920 px ni overflow horizontal.
 
-El media de producto del hero se sirve como vídeo con poster estático; las siete explicaciones de
-Market primitives siguen siendo componentes React reales.
+El media de producto del hero se sirve como vídeo con poster AVIF responsive de 1600 × 900 o
+800 × 450 según el viewport; las siete explicaciones de Market primitives siguen siendo componentes
+React reales. El PNG fuente se conserva fuera de la ruta de carga para permitir futuras
+regeneraciones sin recomprimir un derivado.
 Las filas de Market primitives no muestran numeración decorativa; el orden se comunica mediante la
 posición, el nombre de la herramienta y su explicación.

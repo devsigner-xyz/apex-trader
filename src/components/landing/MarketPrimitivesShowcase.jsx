@@ -9,6 +9,8 @@ import { CompactTimeSales } from '../professional/execution/TimeSales.jsx'
 import { LiquidityIntensityControl } from '../professional/chart/ChartSettingsPopover.jsx'
 import { deriveSessionProfileBarGeometry } from '../../services/professionalChartGeometry.js'
 import { useSettingsPopoverFocus } from '../../hooks/useSettingsPopoverFocus.js'
+import '../../styles/professional.css'
+import '../../styles/landing-professional-overrides.css'
 import {
   createMarketPrimitiveSnapshot,
   marketPrimitivePhaseCount,

@@ -17,6 +17,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
   instrumentación de intención y comprobación local de sus payloads.
 - [Landing AI context](verification/2026-09-02-landing-ai-context-local.md): sección contextual,
   prompt público, acciones de proveedor y comprobación responsive local.
+- [Landing PageSpeed optimization](verification/2026-09-05-landing-pagespeed-local.md): baseline
+  pública, poster AVIF responsive, CSS diferido, robots y métricas Lighthouse locales.
 - [Design system](design-system/README.md): fundamentos y reglas visuales.
 - [Marketing patterns](design-system/marketing-patterns.md): tokens, composición responsive y media de la landing.
 - [Interactive portfolio landing plan](plans/interactive-portfolio-landing.md): dirección planificada para presentar Apex como demo funcional de portfolio mediante componentes React animados y escenas de scroll.

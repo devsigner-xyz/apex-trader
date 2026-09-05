@@ -40,7 +40,10 @@ test('mobile demo shows the desktop workstation notice and project CTA', async (
 
   const notice = page.getByRole('dialog', { name: 'APEX TRADER ESTÁ PENSADO PARA ESCRITORIO' })
   await expect(notice).toBeVisible()
-  await expect(notice.locator('video')).toHaveAttribute('poster', '/media/hero-terminal-candles.png')
+  await expect(notice.locator('video')).toHaveAttribute(
+    'poster',
+    '/media/hero-terminal-candles-800.avif'
+  )
   const projectLink = notice.getByRole('link', { name: 'VER DETALLE DEL PROYECTO' })
   await expect(projectLink).toHaveAttribute(
     'href',

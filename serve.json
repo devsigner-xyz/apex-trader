@@ -38,6 +38,15 @@
       ]
     },
     {
+      "source": "/media/*.avif",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/avif"
+        }
+      ]
+    },
+    {
       "source": "/data/tardis/datasets/**",
       "headers": [
         {

@@ -581,56 +581,6 @@
   letter-spacing: 0.08em;
 }
 
-.dom--compact,
-.tape--compact {
-  width: min(500px, 100%);
-  margin-inline: auto;
-  background: var(--pro-panel);
-  border: 1px solid var(--pro-border);
-  border-radius: 2px;
-}
-
-.dom--compact {
-  grid-column: auto;
-  grid-row: auto;
-  height: auto;
-}
-
-.dom--compact .dom-head,
-.dom--compact .dom-row {
-  grid-template-columns: 1.5fr 0.7fr 1.15fr 0.75fr;
-}
-
-.dom--compact .dom-head span,
-.dom--compact .dom-row span {
-  overflow: visible;
-  text-overflow: clip;
-}
-
-.dom-compact-side {
-  display: grid;
-}
-
-.dom--compact .dom-row {
-  height: 28px;
-  min-height: 28px;
-}
-
-.tape--compact {
-  min-height: 322px;
-}
-
-.tape--compact .tape-row {
-  min-height: 42px;
-  flex: 0 0 42px;
-  padding-inline: 16px;
-  font-size: 12px;
-}
-
-.tape-compact-list {
-  display: grid;
-}
-
 .landing-primitive[data-primitive='dom'] .landing-primitive__visual {
   min-height: 276px;
   aspect-ratio: auto;

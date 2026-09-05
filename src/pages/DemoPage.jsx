@@ -3,6 +3,7 @@ import ProfessionalTerminal from '../components/ProfessionalTerminal.jsx'
 import DemoViewportNotice from '../components/professional/DemoViewportNotice.jsx'
 import { demoModes } from '../app/routes.js'
 import { useProfessionalPlayback } from '../hooks/useProfessionalPlayback.js'
+import '../styles/professional.css'
 
 export default function DemoPage({ mode, onMode }) {
   const playback = useProfessionalPlayback()

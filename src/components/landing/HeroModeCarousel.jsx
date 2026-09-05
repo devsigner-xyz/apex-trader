@@ -21,27 +21,26 @@ const modeSlides = [
 
 const replayDuration = 12.12
 
-function useReducedMotion() {
-  const [reducedMotion, setReducedMotion] = useState(
-    () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-  )
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => window.matchMedia?.(query).matches ?? false)
 
   useEffect(() => {
-    const media = window.matchMedia?.('(prefers-reduced-motion: reduce)')
+    const media = window.matchMedia?.(query)
     if (!media) return undefined
-    const update = () => setReducedMotion(media.matches)
+    const update = () => setMatches(media.matches)
     update()
     media.addEventListener('change', update)
     return () => media.removeEventListener('change', update)
-  }, [])
+  }, [query])
 
-  return reducedMotion
+  return matches
 }
 
 export default function HeroModeCarousel() {
   const rootRef = useRef(null)
   const videoRef = useRef(null)
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const compactPoster = useMediaQuery('(max-width: 767px)')
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
   const [documentVisible, setDocumentVisible] = useState(() => !document.hidden)
@@ -116,7 +115,11 @@ export default function HeroModeCarousel() {
           muted
           onTimeUpdate={updateActiveMode}
           playsInline
-          poster="/media/hero-terminal-candles.png"
+          poster={
+            compactPoster
+              ? '/media/hero-terminal-candles-800.avif'
+              : '/media/hero-terminal-candles.avif'
+          }
           preload="metadata"
           ref={videoRef}
         >

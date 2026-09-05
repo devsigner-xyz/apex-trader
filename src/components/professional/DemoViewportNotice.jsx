@@ -37,7 +37,7 @@ export default function DemoViewportNotice() {
             loop
             muted
             playsInline
-            poster="/media/hero-terminal-candles.png"
+            poster="/media/hero-terminal-candles-800.avif"
             preload="metadata"
           >
             <source src="/media/hero-replay.mp4" type="video/mp4" />
