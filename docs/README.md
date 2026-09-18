@@ -15,6 +15,8 @@ Este directorio es el contexto versionado de producto y diseño. Debe permitir e
 - [Landing and routing specification](product/landing-and-routing.md): narrativa pública, rutas canónicas, aliases y frontera de carga.
 - [Umami product events verification](verification/2026-09-01-umami-product-events-local.md):
   instrumentación de intención y comprobación local de sus payloads.
+- [Umami tracking migration verification](verification/2026-09-18-umami-tracking-migration-local.md):
+  migración de la instancia, website ID y revisión del contrato de eventos.
 - [Landing AI context](verification/2026-09-02-landing-ai-context-local.md): sección contextual,
   prompt público, acciones de proveedor y comprobación responsive local.
 - [Landing PageSpeed optimization](verification/2026-09-05-landing-pagespeed-local.md): baseline

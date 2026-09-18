@@ -13,7 +13,7 @@ for (const [route, mode] of terminalViews) {
       }
     })
     page.on('pageerror', (error) => errors.push(error.message))
-    await page.route('https://umami-production-6a0a.up.railway.app/script.js', (route) =>
+    await page.route('https://umami-production-7314.up.railway.app/script.js', (route) =>
       route.fulfill({ body: '', contentType: 'application/javascript' })
     )
     await page.goto(route)
